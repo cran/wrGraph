@@ -2,12 +2,7 @@
 % Please edit documentation in R/MAplotW.R
 \name{MAplotW}
 \alias{MAplotW}
-\title{MA-plot (differential intensity versus average intensity)   
-This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.
-Basically one would like to compare numerous independent measures (ie gene transcript or protein abundance values) of 2 samples/data-sets,
-it is usual to compare a change ('Minus'=M) versus absolute mean value ('Average'=A).
-In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-value represents a relative change.
-Besides, output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} can be directly read to produce MA plots for diagnostic reasons.}
+\title{MA-plot (differential intensity versus average intensity)}
 \usage{
 MAplotW(
   Mvalue,
@@ -37,7 +32,7 @@ M-values and A-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{Avalue}{(numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the A-values to be used}
 
-\item{filtFin}{(logical) optional filter (matrix of \code{TRUE}/\code{FALSE}) to apply to data before plotting}
+\item{filtFin}{(matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied}
 
 \item{ProjNa}{(character) custom title}
 
@@ -72,30 +67,30 @@ M-values and A-values may be given as 2 columsn of a matrix, in this case the ar
 \item{debug}{(logical) additional messages for debugging}
 }
 \value{
-plot
+MA-plot only
 }
 \description{
-MA-plot (differential intensity versus average intensity)   
 This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.
 Basically one would like to compare numerous independent measures (ie gene transcript or protein abundance values) of 2 samples/data-sets,
 it is usual to compare a change ('Minus'=M) versus absolute mean value ('Average'=A).
 In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-value represents a relative change.
 Besides, output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} can be directly read to produce MA plots for diagnostic reasons.
+Please note, that plotting a very number of points in transparency (eg >10000) may take several seconds.
 }
 \examples{
 library(wrMisc)
 set.seed(2005); mat <- matrix(round(runif(600),1),ncol=6)
 rownames(mat) <- c(rep(letters[1:25],each=3),letters[2:26])
-MAplotW(mat[,2]-mat[,1],rowMeans(mat))
+MAplotW(mat[,2]-mat[,1], rowMeans(mat))
 ## assume 2 groups with 3 samples each
-matMeans <- rowGrpMeans(mat,gr=gl(2,3,labels=LETTERS[3:4]))
-MAplotW(matMeans[,2]-matMeans[,1],matMeans) 
+matMeans <- rowGrpMeans(mat, gr=gl(2,3,labels=LETTERS[3:4]))
+MAplotW(matMeans[,2]-matMeans[,1], matMeans) 
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- moderTest2grp(mat,gl(2,3))
 MAplotW(tRes$Mval, tRes$Amean)                          
-MAplotW(M=tRes$Mval, A=tRes$means,FCth=1.3) 
+MAplotW(M=tRes$Mval, A=tRes$means, FCth=1.3) 
 MAplotW(tRes)
-MAplotW(tRes,limM=c(-2,2),FCth=1.3) 
+MAplotW(tRes, limM=c(-2,2), FCth=1.3) 
 
 }
 \seealso{

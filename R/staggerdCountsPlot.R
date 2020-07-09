@@ -4,7 +4,7 @@
 #' At each given threshold the counts are plotted like a staggered bar-chart (or staggered histogram) but without vertical lines to illustrated the almost continuous change
 #' from preceedig or following threshold-value.
 #' Initially this plot was designed for showing the absolute count-data used when constructing roc-curves (eg using 
-#' the package package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} with \code{\link[wrProteo]{summarizeForROC}} ).
+#' the function \code{summarizeForROC} of package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} ).
 #' The main input should furnish the panel of threshold as one column and the coresponding counts data as min 2 columns. 
 #' The threshold coumns gets specified using the argument \code{threColumn}, the counts-data may either be specified using argument \code{countsCol}
 #' or be searched using \code{\link[base]{grep}} using column-names containing the text given in argument \code{varCountNa} with may be combined with 
@@ -30,7 +30,7 @@
 #' @param silent (logical) suppress messages
 #' @param callFrom (character) allow easier tracking of message(s) produced
 #' @return plot only
-#' @seealso \code{\link[stats]{ecdf}}, for preparing input to ROC: function \code{\link[wrProteo]{summarizeForROC}} in package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}
+#' @seealso \code{\link[stats]{ecdf}}, for preparing input to ROC: function \code{summarizeForROC} in package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}
 #' @examples
 #' set.seed(2019); test1 <- cbind(a=sample.int(n=7,size=50,repl=TRUE),
 #'   b=sample.int(n=11,size=50,repl=TRUE),c=sample.int(n=18,size=50,repl=TRUE))

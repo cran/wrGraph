@@ -18,7 +18,8 @@
 #' @param callFrom (character) allow easier tracking of message(s) produced
 #' @return figure
 #' @examples
-#' dat <- rnorm(90); plot(dat); legendHist(dat,col=1:5)
+#' dat <- rnorm(90); plot(dat)
+#' legendHist(dat, col=1:5)
 #' @export
 legendHist <- function(x,colRamp=NULL,location="bottomright",legTit=NULL,cex=0.7,srt=67,offS=NULL,border=TRUE,silent=FALSE,callFrom=NULL){
   ## add histogram instead of legend using colors from 'colorRamp', so far as bottomright

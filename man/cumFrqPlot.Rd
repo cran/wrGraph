@@ -80,9 +80,9 @@ If numeric (& > 2 columns), its value will be used \code{\link[wrMisc]{exclExtrV
 Of course, exclusion of extreme values should be done with great care, important features of the data may get lost.
 }
 \examples{
-set.seed(2017); dat0 <- matrix(rnorm(500),ncol=5,dimnames=list(NULL,1:5))
-cumFrqPlot(dat0)
-cumFrqPlot(dat0,cumSum=TRUE)
+set.seed(2017); dat0 <- matrix(rnorm(500), ncol=5, dimnames=list(NULL,1:5))
+cumFrqPlot(dat0, tit="Sorted values")
+cumFrqPlot(dat0, cumSum=TRUE, tit="Sum of sorted values")
 }
 \seealso{
 \code{\link[graphics]{layout}}, \code{\link[wrMisc]{exclExtrValues}} for decision of potential outliers; \code{\link[graphics]{hist}}, \code{\link{vioplotW}}

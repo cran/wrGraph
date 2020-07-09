@@ -8,7 +8,7 @@ vioplotW(
   x,
   ...,
   finiteOnly = TRUE,
-  range = 1.5,
+  halfViolin = FALSE,
   hh = NULL,
   ylim = NULL,
   nameSer = NULL,
@@ -20,12 +20,9 @@ vioplotW(
   las = 1,
   lwd = 1,
   rectCol = "black",
-  colMed = "white",
-  pchMed = 19,
   at = 0,
   add = FALSE,
   wex = 1,
-  drawRect = TRUE,
   silent = FALSE,
   callFrom = NULL
 )
@@ -37,21 +34,21 @@ vioplotW(
 
 \item{finiteOnly}{(logical) eliminate non-finite elements to avoid potential errors (eg when encountering \code{NA})}
 
-\item{range}{(numerical) custom range}
+\item{halfViolin}{(logical or character) decide with \code{TRUE} or \code{FALSE} if full or only half of violins should be plotted, if "pairwise" always 2 data-sets will be plotted back-to-back}
 
-\item{hh}{(numeric) a vector of length one, two or three, defining the smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in \code{\link[vioplot]{vioplot}}; see also \code{\link[sm]{sm.density}}}
+\item{hh}{(numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in \code{\link[vioplot]{vioplot}}; see also \code{\link[sm]{sm.density}}}
 
-\item{ylim}{(numeric, length=2) custom limit on y-axis, see also \code{\link[graphics]{par}}}
+\item{ylim}{(\code{NULL} or numeric, length=2) custom limit on y-axis, see also \code{\link[graphics]{par}}}
 
-\item{nameSer}{(character) custom label}
+\item{nameSer}{(character) custom label for data-sets or columns (length must match number of data-sets)}
 
 \item{horizontal}{(logical) orientation of plot}
 
-\item{col}{(character or integer) for gradients may be custom colors or  'rainbow', 'grayscale', 'Spectral' or 'Paired'}
+\item{col}{(character or integer) custom colors or gradients like 'rainbow', 'grayscale', 'heat.colors', 'topo.colors', 'Spectral' or 'Paired',  or you may use colors made by the package \href{https://CRAN.R-project.org/package=colorRamps}{colorRamps}}
 
 \item{border}{(character) custom color for figure border}
 
-\item{lty}{(integer) type of line(s) (see also \code{\link[graphics]{par}})}
+\item{lty}{(integer) line-type for linear regression line (see also \code{\link[graphics]{par}})}
 
 \item{tit}{(character) custom title to figure}
 
@@ -61,17 +58,11 @@ vioplotW(
 
 \item{rectCol}{(character) color of rectangle}
 
-\item{colMed}{(character or integer) color for median (or average) point to show center of group}
-
-\item{pchMed}{(integer) symbol type for center  (see also \code{pch} in \code{\link[graphics]{par}})}
-
-\item{at}{(numeric) custom locoation of data-series names}
+\item{at}{(numeric) custom locoation of data-series names, ie the points at which tick-marks are to be drawn, will be passed to \code{\link[graphics]{axis}}, it's length ust match the number of data-sets}
 
 \item{add}{(logical) add to existing plot if \code{TRUE}}
 
-\item{wex}{(integer) relative expansion of the violin}
-
-\item{drawRect}{(logical) if \code{TRUE}, draw box}
+\item{wex}{(integer) relative expansion factor of the violin}
 
 \item{silent}{(logical) suppress messages}
 
@@ -81,23 +72,27 @@ vioplotW(
 figure only
 }
 \description{
-This function allows generating violin-plots using a variety of input formats and offers additional options for colors.   
-Code from \href{https://CRAN.R-project.org/package=vioplot}{vioplot} was modified based on a omment on
-\href{http://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble} and 
-further extended. The package \href{https://CRAN.R-project.org/package=vioplot}{vioplot} does not have to be installed for using this function. 
-Main input data may now be matrix of list of multiple data-elements (entries may be of variable length),
-individual colors for different sets of data or color-gradients can be specified, and display n per set of data was integtated. 
-Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).
+This function allows generating \href{https://en.wikipedia.org/wiki/Violin_plot}{Violin plots}) using a variety of input formats and offers additional options for colors. 
+Main input may be multiple vectors, a matrix or list of multiple data-elements (entries may be of variable length),
+individual colors for different sets of data or color-gradients can be specified, and the display of n per set of data was integtated 
+(based on an inspiration from  \href{http://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble}). 
+It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
+Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (this package is not required for this function.
+Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).    
+Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas
 }
 \examples{
 set.seed(2013)
-datT6 <- matrix(round(rnorm(300)+3,1),ncol=6,dimnames=list(paste("li",1:50,sep=""),
-  letters[19:24]))
-vioplotW(datT6)
+dat6 <- matrix(round(rnorm(300)+3,1), ncol=6, 
+	 dimnames=list(paste("li",1:50,sep=""), letters[19:24])) 
+vioplotW(dat6)
 ## variable number of elements (each n is displayed)
-datT6b <- apply(datT6,2,function(x) x[which(x <5)])
-vioplotW(datT6b,col="Spectral")
+dat6b <- apply(dat6,2,function(x) x[which(x <5)])
+dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
+vioplotW(dat6b,col="Spectral")
+vioplotW(dat6b,col="Spectral",halfViolin="pairwise",horizontal=TRUE)
+vioplotW(dat6b,col="Spectral",halfViolin="pairwise",horizontal=FALSE)
 }
 \seealso{
-(the original :) \code{\link[vioplot]{vioplot}}
+the package \href{https://CRAN.R-project.org/package=vioplot}{vioplot}, \code{\link[sm]{sm}} is used for the density estimation
 }

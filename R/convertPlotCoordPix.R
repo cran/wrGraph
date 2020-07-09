@@ -1,7 +1,9 @@
 #' Convert points of plot to coordinates in pixels 
 #' 
 #' This function allows conversion the plotting positions ('x' and 'y' coordiantes) of points in a given plot into coordiantes in pixels (of the entire plotting region).
-#' Some functionalities do need such pixel-coordiantes, like \code{\link{mouseOverHtmlFile}} for annotating given points of a plot for mouse-over interactive html.
+#' It was designed to be used as coordinates in an html file for mouse-over interactivity (display of names of points and links).
+#' Of course, the size of the plotting region is crucial and may not be changed afterwards (if the plot is not written to file using \code{png} etc).
+#' In turn the function \code{\link{mouseOverHtmlFile}} will use the pixel-coordiantes, allowing to annotate given points of a plot for mouse-over interactive html.
 #'	 
 #' @param x (numeric) initial plotting coordinates on x-axis, names of vector - if available- will be used as IDs
 #' @param y (numeric) initial plotting coordinates on y-axis 
@@ -16,7 +18,8 @@
 #' @examples
 #' df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
 #'   link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
-#' ## here we'll use R's tempdir, later you may want to choose other locations
+#' ## Typically one wants to get pixel-coordinates for plots written to file.
+#' ## Here we'll use R's tempdir, later you may want to choose other locations
 #' pngFile <- file.path(tempdir(),"test01.png")
 #' png(pngFile,width=800, height=600,res=72)
 #' ## here we'll just plot a set of horiontal points at default parameters ...

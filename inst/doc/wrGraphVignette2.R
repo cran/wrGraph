@@ -10,8 +10,10 @@ suppressPackageStartupMessages({
 })
 
 ## ----setup2, echo=TRUE--------------------------------------------------------
-library(wrMisc)
-library(wrGraph)
+library("wrMisc")
+library("wrGraph")
+# This is version no:
+packageVersion("wrGraph")
 
 ## ----partitionPlot1, out.width="110%", out.heigth="110%", echo=TRUE-----------
 ## as the last column of the iris-data is not numeric we choose -1
@@ -63,14 +65,17 @@ plotBy2Groups(dat$Sepal.Length,gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5),yLab="Sepal.Length")
 
 
+## ----plotLinReg1, echo=TRUE---------------------------------------------------
+plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
+
 ## ----PCA1, fig.height=7, fig.width=7, echo=TRUE-------------------------------
 ## the basic way
-pca.prc <- prcomp(iris[,1:4], scale.=TRUE)
-biplot(pca.prc)              # traditional plot
+iris.prc <- prcomp(iris[,1:4], scale.=TRUE)
+biplot(iris.prc)              # traditional plot
 
 ## ----PCA3, echo=TRUE----------------------------------------------------------
 ## via FactoMineR
-library(FactoMineR); library(factoextra)
+library(FactoMineR); library(dplyr); library(factoextra)
 iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
 fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
   addEllipses=TRUE, legend.title="Groups" )

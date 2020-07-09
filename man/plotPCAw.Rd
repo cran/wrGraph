@@ -72,21 +72,22 @@ plot and optional matrix of outlyer-data
 }
 \description{
 Function to plot \href{https://en.wikipedia.org/wiki/Principal_component_analysis}{principal components analysis (PCA)}, 
-with options to show center and potential outliers for each of the groups.
-One of the specificities of this implemenation is the integration of elments to better visualize different groups of points 
-(if they can be organized so beforehand as distinc groups) :
-The main body of data is shown as 'bag-plots' (a bivariate boxplot, see  \href{https://en.wikipedia.org/wiki/Bagplot}{Bagplot})
+with options to show center and potential outliers for each of the groups (columns of data).
+One of the specificities of this implementation is the integration of bag-plots to better visualize different groups of points 
+(if they can be organized so beforehand as distinct groups) :
+The main body of data is shown as 'bag-plots' (a bivariate boxplot, see \href{https://en.wikipedia.org/wiki/Bagplot}{Bagplot})
 with different transparent colors to highlight the core part of different groups (if they contain more than 2 values per group).
 Furthermore, group centers are shown as average or median (see 'nGrpForMedian') with stars & index-number (if <25 groups).
-Layout is automatically set to 2 or 4 subplots (if plotting more than 2 princ components makes sense).
+Layout is automatically set to 2 or 4 subplots (if plotting more than 2 principal components makes sense).
 Note : This function uses for calulating PCA \code{\link[stats]{prcomp}} with default \code{center=TRUE} and \code{scale.=FALSE}, (different to princomp() which standardizes by default).
-Note: \code{NA}-values cannot be processed by PCA - all lines with any non-finite values/content (eg \code{NA}) will be omitted !
+Note: \code{NA}-values cannot (by definition) be processed by PCA - all lines with any non-finite values/content (eg \code{NA}) will be omitted !
 Note : Package RColorBrewer may be used if avaialble.
-Finally, note that several packages dedicated to PCA exist, for example \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR} offers a very wide spectrum of possibiities.
+Finally, note that several other packages dedicated to PCA exist, for example \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR} offers 
+ a very wide spectrum of possibiities, in particular for combined numeric and categorical data.
 }
 \examples{
-set.seed(2019); dat1 <- matrix(round(c(rnorm(1000),runif(1000,-0.9,0.9)),2),ncol=20,
-  byrow=TRUE) + matrix(rep(rep(1:5,6:2),each=100),ncol=20)
+set.seed(2019); dat1 <- matrix(round(c(rnorm(1000), runif(1000,-0.9,0.9)),2), 
+  ncol=20, byrow=TRUE) + matrix(rep(rep(1:5,6:2), each=100), ncol=20)
 biplot(prcomp(dat1))      # traditional plot
 (grp = factor(rep(LETTERS[5:1],6:2)))
 plotPCAw(dat1,grp)

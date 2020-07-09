@@ -60,7 +60,7 @@ The basic idea of this plot is to show how counts data change while shifting a t
 At each given threshold the counts are plotted like a staggered bar-chart (or staggered histogram) but without vertical lines to illustrated the almost continuous change
 from preceedig or following threshold-value.
 Initially this plot was designed for showing the absolute count-data used when constructing roc-curves (eg using 
-the package package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} with \code{\link[wrProteo]{summarizeForROC}} ).
+the function \code{summarizeForROC} of package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} ).
 The main input should furnish the panel of threshold as one column and the coresponding counts data as min 2 columns. 
 The threshold coumns gets specified using the argument \code{threColumn}, the counts-data may either be specified using argument \code{countsCol}
 or be searched using \code{\link[base]{grep}} using column-names containing the text given in argument \code{varCountNa} with may be combined with 
@@ -79,5 +79,5 @@ staggerdCountsPlot(test1,countsCol=c("a","b","c"))
 ## example below requires the package wrProteo
 }
 \seealso{
-\code{\link[stats]{ecdf}}, for preparing input to ROC: function \code{\link[wrProteo]{summarizeForROC}} in package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}
+\code{\link[stats]{ecdf}}, for preparing input to ROC: function \code{summarizeForROC} in package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}
 }

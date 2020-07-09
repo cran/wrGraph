@@ -26,8 +26,7 @@
 plotBy2Groups <- function(dat,grp,grp2=NULL,col=NULL,pch=NULL,tit=NULL,cex=2,lwd=0.5,lty=2,yLab=NULL,cexLab=NULL,sepLines=FALSE,silent=FALSE,callFrom=NULL) {
   ## plot indiv values as membership of 2 grouping vectors (eg by grp=patient and grp2=age-group)
   fxNa <- wrMisc::.composeCallName(callFrom,newNa="plotBy2Groups")  
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  opar <- graphics::par(no.readonly=TRUE)                        # so far no commads used modifying parameters
   namesXYZ <- c(deparse(substitute(dat)),deparse(substitute(grp)),deparse(substitute(grp2)))
   ## check for undefined elments
   if(length(grp2) <1) grp2 <- grp
@@ -59,7 +58,7 @@ plotBy2Groups <- function(dat,grp,grp2=NULL,col=NULL,pch=NULL,tit=NULL,cex=2,lwd
   dat <- by(as.numeric(dat),grp2b,as.numeric)             # ranking remaines
   names(dat) <- names(nGrp2)
   ## work with grp (eg group 'age-class', already organized by grp2) 
-  grp3 <-  tapply(grp2,grp,function(x) unique(x))
+  grp3 <- tapply(grp2,grp,function(x) unique(x))
   grp3 <- grp3[match(unique(grp),names(grp3))]
   nGrp3 <- sapply(grp3,length)
   grp3ctr <- cumsum(nGrp3) -sapply(nGrp3,function(x) mean(0:(x-1),na.rm=TRUE))
@@ -67,7 +66,7 @@ plotBy2Groups <- function(dat,grp,grp2=NULL,col=NULL,pch=NULL,tit=NULL,cex=2,lwd
   if(is.null(col)) col <- as.numeric(as.factor(grp))
   if(is.null(pch)) pch <- as.numeric(as.factor(grp))
   if(length(cexLab) <2) cexLab <- c(0.9,0.7)
-  if(is.null(tit)) tit <- paste(namesXYZ[1],"organized by",if(sum(nchar(namesXYZ[2:3])) >19) "two factors" else paste(namesXYZ[2],"and",namesXYZ[3]))
+  if(is.null(tit)) tit <- paste(namesXYZ[1],"organized by",if(sum(nchar(namesXYZ[2:3])) > 19) "two factors" else paste(namesXYZ[2],"and",namesXYZ[3]))
   graphics::plot(grp2b,unlist(dat),col=col,pch=pch,main=tit,cex=2,las=1,xaxt='n',xlab="",ylab=yLab)
   graphics::mtext(at=unique(grp2b),names(grp2ctr),cex=0.7,side=1,col=col[grp2ctr])      # animal no
   graphics::mtext(at=grp3ctr,names(grp3ctr),cex=0.9,side=1,line=1.5,col=unique(col))    # genotype

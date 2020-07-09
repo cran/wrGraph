@@ -34,9 +34,9 @@
 #' @return plot only
 #' @seealso \code{\link[graphics]{layout}}, \code{\link[wrMisc]{exclExtrValues}} for decision of potential outliers; \code{\link[graphics]{hist}}, \code{\link{vioplotW}}
 #' @examples
-#' set.seed(2017); dat0 <- matrix(rnorm(500),ncol=5,dimnames=list(NULL,1:5))
-#' cumFrqPlot(dat0)
-#' cumFrqPlot(dat0,cumSum=TRUE)
+#' set.seed(2017); dat0 <- matrix(rnorm(500), ncol=5, dimnames=list(NULL,1:5))
+#' cumFrqPlot(dat0, tit="Sorted values")
+#' cumFrqPlot(dat0, cumSum=TRUE, tit="Sum of sorted values")
 #' @export  
 cumFrqPlot <- function(dat,cumSum=FALSE,exclCol=NULL,colNames=NULL,displColNa=TRUE,tit=NULL,xLim=NULL,yLim=NULL,
   xLab=NULL,yLab=NULL,col=NULL,CVlimit=NULL,thisResol=NULL,supTxtAdj=0,supTxtYOffs=0,useLog="",silent=FALSE,callFrom=NULL) {

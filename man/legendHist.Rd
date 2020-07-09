@@ -48,5 +48,6 @@ figure
 Add histogram at pleace of legend using colors from 'colorRamp'.
 }
 \examples{
-dat <- rnorm(90); plot(dat); legendHist(dat,col=1:5)
+dat <- rnorm(90); plot(dat)
+legendHist(dat, col=1:5)
 }

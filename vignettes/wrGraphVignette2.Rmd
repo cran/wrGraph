@@ -18,13 +18,10 @@ vignette: >
 ## Introduction
 This package contains a collection of various plotting tools, mostly as an extension of packages 
 [wrMisc](https://CRAN.R-project.org/package=wrMisc) and [wrProteo](https://CRAN.R-project.org/package=wrProteo). 
-To get started, we need to load the package [wrMisc](https://CRAN.R-project.org/package=wrMisc) and 
-this package, all are available from [CRAN](https://cran.r-project.org/).
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse=TRUE, comment = "#>")
 ```
-
 
 ```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
 suppressPackageStartupMessages({
@@ -35,10 +32,17 @@ suppressPackageStartupMessages({
 })
 ```
 
+To get started, we need to load the package [wrMisc](https://CRAN.R-project.org/package=wrMisc) and 
+[wrProteo (this package)](https://CRAN.R-project.org/package=wrGraph), all are available from [CRAN](https://cran.r-project.org/).
+
+
 ```{r setup2, echo=TRUE}
-library(wrMisc)
-library(wrGraph)
+library("wrMisc")
+library("wrGraph")
+# This is version no:
+packageVersion("wrGraph")
 ```
+
 
 
 ## Prepare Layout for Accomodating Multiple Smaller Plots
@@ -57,7 +61,7 @@ for(i in colnames(iris)[-5]) hist(iris[,i],main=i)
 ```
 
 
-## Another Histogram Function
+## One More Histogram Function
 
 Histograms are a very versitile tool to rapidly gain insights in the distribution of data.
 This package presents a histogram function allowing to convienently work with log2-data and (if desired) 
@@ -92,11 +96,10 @@ legendHist(iris[,2],loc="tl",legTit=colnames(iris)[2],cex=0.5)
 
 [Violin plots](https://en.wikipedia.org/wiki/Violin_plot) or vioplots are basically an adaptation of plotting the
 [Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation).
-The function in this package is a modified version of the function avaialble in [vioplot](https://CRAN.R-project.org/package=vioplot).
-
-The function provided here offers more flexibility for data-formats accepted (inlcuding data.frames and lists), coloring and display of n.
-In the case of the iris-data, there are no NAs and thus n is constant, thus it will be displayed only once. 
-But when working with data-sets containing NAs, or simply with lists the final n may vary.
+Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
+the function provided here offers more flexibility for data-formats accepted (inlcuding data.frames and lists), coloring and display of n.
+In the case of the iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
+However, when working with data-sets containing NAs, or simply when working with lists the number of values per data-set/violin n may vary.
 
 
 ```{r vioplot1, echo=TRUE}
@@ -122,6 +125,10 @@ cumFrqPlot(iris[,1:4])
 For example, the iris-data are rounded. As a result in the plot above the line is not progessing smooth but with more marked charcater of steps of stairs.
 To get the same conclusion one would need to increase the number of bars in a histogram very much which would makes it in our experience more difficult
 to avaluate the same time the global distribution character.
+
+At this plot you may note that the curves patal.width and petal.length look differently. 
+On the previous vioplots you may have noticed the bimodal character of the values, again this plot may be helpful to identify distributios
+which are very difficult to see well using boxplots.
 
 
 ## Examine Counts based on Variable Threshold Levels (for ROC curves)
@@ -153,16 +160,26 @@ In real-world testing data have often some nested structure.
 For example repeated measures from a set of patients which can be organized as diseased and non-diseased.
 This plot allows to plot all values obtained from the each patient together, then organized by disease-groups.
 
-For this example suppose the iris-data were organized as 10 sets of 5 measures each.
-Then we can plot while highlighting the two factors (ie species and set of measurement).
+For this example suppose the iris-data were organized as 10 sets of 5 measures each (of course, in this case it is a pure hypothesis).
+Then, we can plot while highlighting the two factors (ie species and set of measurement).
 Basically we need to furnish with the main data two additional factors for the groupings.
 Note, that the 1st factor should contain the smaller sub-groups to visually inspect if there are any batch effects.
+This plot is not well adopted to big data (it will get too crowded).
 
 ```{r plotBy2Groups1, echo=TRUE}
 dat <- iris[which(iris$Species %in% c("setosa","versicolor")),]
 plotBy2Groups(dat$Sepal.Length,gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5),yLab="Sepal.Length")
 
+```
+
+## Plotting linear regression and confidence intervals
+
+The function _plotLinReg()_ provides help to display a series of bivariate points given in 'dat' (multiple data formats possible), to model a [linear regression-plots](https://en.wikipedia.org/wiki/Linear_regression) and plot the results.
+
+
+```{r plotLinReg1, echo=TRUE}
+plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
 ```
 
 
@@ -178,14 +195,14 @@ Let's look at the similarity of the 3 iris-species from the iris data-set.
 
 ```{r PCA1, fig.height=7, fig.width=7, echo=TRUE}
 ## the basic way
-pca.prc <- prcomp(iris[,1:4], scale.=TRUE)
-biplot(pca.prc)              # traditional plot
+iris.prc <- prcomp(iris[,1:4], scale.=TRUE)
+biplot(iris.prc)              # traditional plot
 ```
 
 
 ```{r PCA3, echo=TRUE}
 ## via FactoMineR
-library(FactoMineR); library(factoextra)
+library(FactoMineR); library(dplyr); library(factoextra)
 iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
 fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
   addEllipses=TRUE, legend.title="Groups" )
@@ -259,7 +276,7 @@ In the last plot one can see easily the 80 points that have been increased in th
 exceed a (based on linear data) fold-change of 1.5 (which on log2 scale apprears at 0.58).
 
 
-## Standalone Html Page with Plot and Mouse-Over Interactive Features 
+## Standalone html Page with Plot and Mouse-Over Interactive Features 
 
 The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.rstudio.com/).
 In this case the origial idea was simply to provide help to identify points in a plot and display 
