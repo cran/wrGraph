@@ -10,7 +10,7 @@ output:
     highlight: null
     number_sections: no
 vignette: >
-  %\VignetteIndexEntry{wrProteoVignette1}
+  %\VignetteIndexEntry{wrGraphVignette1}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -31,12 +31,18 @@ suppressPackageStartupMessages({
     library(factoextra)
 })
 ```
+This package is available from [CRAN](https://cran.r-project.org/), you might also have to install [wrMisc](https://CRAN.R-project.org/package=wrMisc), too.
+If not yet installed, the lastest versions of this package can be installed like this : 
 
-To get started, we need to load the package [wrMisc](https://CRAN.R-project.org/package=wrMisc) and 
-[wrProteo (this package)](https://CRAN.R-project.org/package=wrGraph), all are available from [CRAN](https://cran.r-project.org/).
+```{r setup2, echo=TRUE, eval=FALSE}
+install.packages("wrGraph")
+```
 
 
-```{r setup2, echo=TRUE}
+To get started, we need to load the packages [wrMisc](https://CRAN.R-project.org/package=wrMisc) and [wrGraph (this package)](https://CRAN.R-project.org/package=wrGraph).
+
+
+```{r setup3, echo=TRUE}
 library("wrMisc")
 library("wrGraph")
 # This is version no:
@@ -51,35 +57,39 @@ The function *partitionPlot()* prepares a matrix to serve as grid for segmenting
 (ie the available plotting region). It aims to optimize the layout based on a given number of plots to accomodate.
 The user may choose if the layout should rather be adopted to lanscape (default) or portrait geometry.
 
+This migt be useful in particular when during an analysis-pipline it's not known/clear in advance how may plots might bee needed.
+
 
 ```{r partitionPlot1, out.width="110%", out.heigth="110%", echo=TRUE}
 ## as the last column of the iris-data is not numeric we choose -1
 (part <- partitionPlot(ncol(iris)-1))
 layout(part)
-for(i in colnames(iris)[-5]) hist(iris[,i],main=i)
+for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
 
 ```
 
 
-## One More Histogram Function
+## One More Histogram Function ...
 
-Histograms are a very versitile tool to rapidly gain insights in the distribution of data.
+Histograms are a very versitile tool for rapidly gaining insights in the distribution of data.
 This package presents a histogram function allowing to convienently work with log2-data and (if desired) 
 display numbers calculated back to linear values on the x-axis.
+
+Default settings aim to give rather a quick overview, for "high resulution" representations one could set a high number of breaks or one might also consider other/alternative graphical representations. Some of the alternatives are shown later in this vignette.
 
 ```{r Hist1, echo=TRUE}
 set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
 dat1 <- dat1[which(dat1 <50 & dat1 > 0.2)]
-histW(dat1,br="FD",isLog=FALSE,silent=TRUE)
+histW(dat1, br="FD", isLog=FALSE, silent=TRUE)
 ## view as log, but x-scale in linear
-histW(log2(dat1),br="FD",isLog=TRUE,silent=TRUE)
+histW(log2(dat1), br="FD", isLog=TRUE, silent=TRUE)
 ```
 
 Now we can combine this with the previous segmentation :
 ```{r Hist2, out.width="110%", out.heigth="150%", echo=TRUE}
 ## quick overview of distributions  
 layout(partitionPlot(4))
-for(i in 1:4) histW(iris[,i],isLog=FALSE,tit=colnames(iris)[i])
+for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 ```
 
 ### Small Histogram(s) as Legend
@@ -87,15 +97,17 @@ for(i in 1:4) histW(iris[,i],isLog=FALSE,tit=colnames(iris)[i])
 ```{r Hist3, out.width="110%", out.heigth="150%", echo=TRUE}
 layout(1)
 plot(iris[,1:2],main="Iris data")
-legendHist(iris[,1],loc="br",legTit=colnames(iris)[1],cex=0.5)
-legendHist(iris[,2],loc="tl",legTit=colnames(iris)[2],cex=0.5)
+legendHist(iris[,1], loc="br", legTit=colnames(iris)[1],cex=0.5)
+legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
 
 ```
 
 ## Violin Plots
 
 [Violin plots](https://en.wikipedia.org/wiki/Violin_plot) or vioplots are basically an adaptation of plotting the
-[Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation).
+[Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) allowing to compare multiple data-sets.
+Please note, that although smoothed distrubutions please the human eye, some data-sets do not have such a continuous character.
+
 Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
 the function provided here offers more flexibility for data-formats accepted (inlcuding data.frames and lists), coloring and display of n.
 In the case of the iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
@@ -142,14 +154,14 @@ Typically used in context of benchmark-tests in proteomics.
 
 
 ```{r cumulCountPlot1, echo=TRUE}
-thr <- seq(min(iris[,1:4]),max(iris[,1:4])+0.1,length.out=100)
+thr <- seq(min(iris[,1:4]), max(iris[,1:4])+0.1,length.out=100)
 irisC <- sapply(thr,function(x) colSums(iris[,1:4] < x))
 irisC <- cbind(thr,t(irisC))
 
   head(irisC)
-staggerdCountsPlot(irisC[,],countsCol=colnames(iris)[1:4],tit="Iris-data")
-staggerdCountsPlot(irisC[,],varCountNa="Sepal",tit="Iris-data")
-staggerdCountsPlot(irisC[,],varCountNa="Sepal",tit="Iris-data (log-scale)",logScale=TRUE)
+staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data (log-scale)", logScale=TRUE)
 
 ```
 
@@ -168,8 +180,8 @@ This plot is not well adopted to big data (it will get too crowded).
 
 ```{r plotBy2Groups1, echo=TRUE}
 dat <- iris[which(iris$Species %in% c("setosa","versicolor")),]
-plotBy2Groups(dat$Sepal.Length,gl(2,50,labels=c("setosa","versicolor")),
-  gl(20,5),yLab="Sepal.Length")
+plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
+  gl(20,5), yLab="Sepal.Length")
 
 ```
 
@@ -188,7 +200,7 @@ plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
 Principal components analysis, [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis), is a very powerful method
 to investigate similarity and correlation in larger sets of data.  
 Please note that several implementations exist in R (eg *prcomp()* in the base package stats or the package 
-[FactoMineR](http://factominer.free.fr/index_fr.html)).
+[FactoMineR](https://CRAN.R-project.org/package=FactoMineR)).
 We'll start by looking at the plot produced with the basic function and FactoMineR, too.
 
 Let's look at the similarity of the 3 iris-species from the iris data-set.
@@ -220,20 +232,21 @@ a simple line draws the contour of the most distant points.
 
 ```{r PCA4, echo=TRUE}
 ## via wrGraph, similar to FactoMineR but with bagplots
-plotPCAw(t(as.matrix(iris[,-5])),gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves", suplFig=FALSE,cexTxt=1.3,rotatePC=2)
+plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
+  tit="Iris data", rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2)
 ```
 
-Thus, you can see in this case there is some intersection between *versicolor* and *virginica* species, 
-but the center regions stay apart. Of course, similar to boxplots, this representation won't work well
-with multi-modal distributions within one group of points. Luckily this happens only very rarely with principal components.
+Thus, you can see in this case, there is some intersection between *versicolor* and *virginica* species, 
+but the center regions stay apart. Of course, similar to boxplots, this representation is nor adopted/recommended
+for multi-modal distributions within one group of points.
+One might get some indications about this by starting the data-analysis by inspecting histograms or vioplots for each set/column of data.
 
 You can also add the 3rd principal component and the Scree-plot :
 
 ```{r PCA5, fig.height=12, fig.width=9, fig.align="center", echo=TRUE}
 ## including 3rd component and Screeplot
-plotPCAw(t(as.matrix(iris[,-5])),gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves",cexTxt=2)
+plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
+  tit="Iris data", rowTyName="types of leaves", cexTxt=2)
 
 ```
 
@@ -249,13 +262,13 @@ The version presented here is rather generic and uses transparent points to avoi
 
 ```{r MA1, echo=TRUE}
 ## let's generate some toy data
-set.seed(2005); mat <- matrix(round(runif(2400),3),ncol=6)
+set.seed(2005); mat <- matrix(round(runif(2400),3), ncol=6)
 mat[11:90,4:6] <- mat[11:90,4:6] +round(abs(rnorm(80)),3)
 mat[11:90,] <- mat[11:90,] +0.3
 dimnames(mat) <- list(paste("li",1:nrow(mat),sep="_"),paste(rep(letters[1:2],each=3),1:6,sep=""))
 ## assume 2 groups with 3 samples each
-matMeans <- round(cbind(A=rowMeans(mat[,1:3]),B=rowMeans(mat[,4:6])),4)
-MAplotW(matMeans[,1]-matMeans[,2],rowMeans(mat)) 
+matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
+MAplotW(matMeans[,1] -matMeans[,2], rowMeans(mat)) 
 ```
 
 The function *MAplotW* may also be used to conveniently inspect results from t-tests performed with the package [wrMisc](https://CRAN.R-project.org/package=wrMisc)
@@ -266,10 +279,10 @@ thus 1.5 will draw a lines at +0.58 and -0.58).
 
 ```{r MA5, echo=TRUE}
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
-tRes <- wrMisc::moderTest2grp(mat,gl(2,3),addResults=c("FDR","Mval","means"))
+tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
 ## 
 ## convenient way, add fold-change threshold and mark who is beyond
-MAplotW(tRes,FCth=1.5,cexLa=1)    
+MAplotW(tRes, FCth=1.5, cexLa=1)    
 ```
                           
 In the last plot one can see easily the 80 points that have been increased in the second group, many of them 
@@ -306,23 +319,23 @@ Please note that the resulting html will not display the image if your browser c
 
 ```{r createHtmlWithPointsIdentif1, echo=TRUE}
 ## Let's make some toy data 
-df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
+df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10) ,mou=paste("point",letters[1:10]),
   link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
 ## here we'll use R's tempdir, later you may want to choose other locations
 pngFile <- file.path(tempdir(),"test01.png")
-png(pngFile,width=800, height=600,res=72)
+png(pngFile, width=800, height=600, res=72)
 ## here we'll just plot a set of horiontal points ...
-plot(df1[,2:3],las=1,main="test01")
+plot(df1[,2:3], las=1, main="test01")
 dev.off()
 ## Note : Special characters should be converted for proper display in html during mouse-over
 library(wrMisc)
 df1$mou <- htmlSpecCharConv(df1$mou)
 ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
-df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2],y=df1[,3],plotD=c(800,600),plotRes=72))
+df1 <- cbind(df1, convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600), plotRes=72))
 head(df1)
 ## Now make the html-page allowing to display mouse-over to the png made before
 htmFile <- file.path(tempdir(),"test01.html")
-mouseOverHtmlFile(df1,pngFile,HtmFileNa=htmFile,pxDiam=15,
+mouseOverHtmlFile(df1, pngFile, HtmFileNa=htmFile, pxDiam=15,
   textAtStart="Points in the figure are interactive to mouse-over ...",
   textAtEnd="and/or may contain links")
 ## We still need to make some toy links
@@ -336,7 +349,7 @@ Thank you for you interest in this package.
 This package is still under development, new functions will be added to the next version.
 
 
-## Session-Info
+## Appendix: Session-Info
 
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()

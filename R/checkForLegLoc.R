@@ -26,12 +26,12 @@ checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testC
   ## 'sampleGrp' .. legend-names to be displayed
   ## 'testCorner' specifies places(corners) to be tested: c("topleft","topright","bottomright","bottomleft")
   ## return list with $showL as logical depending if legend should be drawn, and  $loc as location
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="checkFForLegLoc")
+  fxNa <- wrMisc::.composeCallName(callFrom,newNa="checkForLegLoc")
   txt <- "'matr' must be matrix or data.frame with at least 1 row and at least 2 columns"
   if(length(dim(matr)) <2) stop(txt)
   if(any(dim(matr)[1:2] < 1:2)) stop(txt)
   .longTxt <- function(x,nLim=8) {    # return longest or almost longest of text-entries in 'x': if more than 'nLim' text-entries look for 87%quantile
-    out <- NULL                # initialize
+    out <- NULL                       # initialize
     if(any(nchar(x) >0)) {
       y <- graphics::strwidth(as.character(x), units="figure")
       if(length(x) >nLim) {

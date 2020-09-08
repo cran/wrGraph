@@ -9,6 +9,7 @@ vioplotW(
   ...,
   finiteOnly = TRUE,
   halfViolin = FALSE,
+  boxCol = "def",
   hh = NULL,
   ylim = NULL,
   nameSer = NULL,
@@ -35,6 +36,8 @@ vioplotW(
 \item{finiteOnly}{(logical) eliminate non-finite elements to avoid potential errors (eg when encountering \code{NA})}
 
 \item{halfViolin}{(logical or character) decide with \code{TRUE} or \code{FALSE} if full or only half of violins should be plotted, if "pairwise" always 2 data-sets will be plotted back-to-back}
+
+\item{boxCol}{(character) decide if boxplot should be adde inside the violin, use "def" for default transparent grey}
 
 \item{hh}{(numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in \code{\link[vioplot]{vioplot}}; see also \code{\link[sm]{sm.density}}}
 
@@ -75,7 +78,7 @@ figure only
 This function allows generating \href{https://en.wikipedia.org/wiki/Violin_plot}{Violin plots}) using a variety of input formats and offers additional options for colors. 
 Main input may be multiple vectors, a matrix or list of multiple data-elements (entries may be of variable length),
 individual colors for different sets of data or color-gradients can be specified, and the display of n per set of data was integtated 
-(based on an inspiration from  \href{http://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble}). 
+(based on an inspiration from  \href{https://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble}). 
 It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
 Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (this package is not required for this function.
 Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).    
@@ -90,8 +93,8 @@ vioplotW(dat6)
 dat6b <- apply(dat6,2,function(x) x[which(x <5)])
 dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
 vioplotW(dat6b,col="Spectral")
-vioplotW(dat6b,col="Spectral",halfViolin="pairwise",horizontal=TRUE)
-vioplotW(dat6b,col="Spectral",halfViolin="pairwise",horizontal=FALSE)
+vioplotW(dat6b,col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
+vioplotW(dat6b,col="Spectral", halfViolin="pairwise", horizontal=FALSE)
 }
 \seealso{
 the package \href{https://CRAN.R-project.org/package=vioplot}{vioplot}, \code{\link[sm]{sm}} is used for the density estimation

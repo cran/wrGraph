@@ -28,7 +28,7 @@
 #' @param textAtStart (character) text in html before figure 
 #' @param textAtEnd (character) text in html after figure 
 #' @param pxDiam (integer, length=1) diameter for mouse-over tip to appear (single val or vector), simpler version/solution than with 'Tooltip' package 
-#' @param addLinks (character) for clickable links, either 1) vector of links or 2) single character-chain to be used for pasting to rownames (eg http://www.uniprot.org/uniprot/)  
+#' @param addLinks (character) for clickable links, either 1) vector of links or 2) single character-chain to be used for pasting to rownames (eg https://www.uniprot.org/uniprot/)  
 #'  or 3) \code{TRUE} to check presence of 4th name specified in 'colNa' to be useed as columname from 'myCoor'   dominates over eventual presence of 4th name in 'colNa' 
 #' @param linkExt (character) if specified : links will get specified ending, define as \code{NULL} or "" for taking 'addLinks' asIs  
 #' @param htmlExt (character, length=1) extension used when making html files  
@@ -73,20 +73,20 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   ## make html file/output where (www-)links & supplemental information is accessible at mouse-over on image/plot (eg IDs/names in plot)
   ##  assume, that initial png is already made and coordinates are already converted to pixel level of png-image
   ##  'displSi'  size of image ('pngFileNa') at display in html (width,height)
-  ## 'addLinks' for clickable links, either 1) vector of links or 2) single char-chain to be used for pasting to rownames (eg http://www.uniprot.org/uniprot/)
+  ## 'addLinks' for clickable links, either 1) vector of links or 2) single char-chain to be used for pasting to rownames (eg https://www.uniprot.org/uniprot/)
   ##   or 3) TRUE to check presence of 4th name specified in 'colNa' to be useed as columname from 'myCoor'
   ##   dominates over eventual presence of 4th name in 'colNa'
   myCoorTy <- NULL
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="mouseOverHtmlFile")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="mouseOverHtmlFile")
   if(length(dim(myCoor)) !=2) stop(" Expecting matrix or data.frame")
   if(nrow(myCoor) <1) stop(" 'myCoor' seems to be empty !")
-  if(!is.data.frame(myCoor)) myCoor <- as.data.frame(myCoor,stringsAsFactors=FALSE)
+  if(!is.data.frame(myCoor)) myCoor <- as.data.frame(myCoor, stringsAsFactors=FALSE)
   if(is.null(myComment)) myComment <- c(" Produced by R using createHtmlWithPointsIdentif()", " from package WRmisc, ",Sys.Date())
   .corPath <- function(x,asHtml=TRUE) {
     ## correct mixed slash and backslash in file path
     if(length(grep("ming.32",R.Version()$platform)) >0) {
-      x <- gsub("\\\\","/",x)  #"
-      if(asHtml & length(grep("[[:upper:]]:",substr(x,1,2))) >0) {
+      x <- gsub("\\\\", "/", x)     # (for some editors) "
+      if(asHtml & length(grep("[[:upper:]]:", substr(x,1,2))) >0) {
         x <- paste("file:///",x,sep="") }
     } else if(asHtml & length(grep("^/",x)) >0) x <- paste("file:///",x,sep="")
     x }      
@@ -114,7 +114,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
       if(any(potLinkname %in% remColNa)) {aa <- .serachColName(remColNa,potLinkname,plusLowerCaps=FALSE,returnList=TRUE)
         remColNa <- aa$remainNa; colN2[5] <- aa$foundNa}}}
   ## select data to be used
-  myCoor <- data.frame(myCoor[,colN2[which(!is.na(colN2))]],stringsAsFactors=FALSE)              # set proper order of cols
+  myCoor <- data.frame(myCoor[,colN2[which(!is.na(colN2))]], stringsAsFactors=FALSE)              # set proper order of cols
   if(is.na(colN2[1])) {
     myCoor$ID <- if(is.null(rownames(myCoor))) 1:nrow(myCoor) else rownames(myCoor)
     colN2[1] <- "ID"
@@ -134,13 +134,13 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   if(identical(addLinks,TRUE)) {            # colNa has priority over IDs
     myCoor$link <- myCoor[,if(is.na(colN2[5])) colN2[1] else colN2[5]]
     colN2[5] <- "addLinks" } else {
-   if(length(addLinks) >0) {if(length(addLinks) ==nrow(myCoor) & length(unique(addLinks)) > 1 &max(nchar(addLinks),na.rm=TRUE) >0) {
+   if(length(addLinks) >0) {if(length(addLinks) ==nrow(myCoor) & length(unique(addLinks)) > 1 & max(nchar(addLinks),na.rm=TRUE) >0) {
      myCoor$link <- addLinks
      colN2[5] <- "addLinks" } else {
-     if(!silent) message(fxNa," invalid entry for 'addLinks' (expecting length ",nrow(myCoor)," but found ",length(addLinks),")")}}} # no default
+     if(!silent) message(fxNa," invalid entry for 'addLinks' (expecting length ",nrow(myCoor)," but found ",length(addLinks),")")}}}   # no default
   ## check extensions of specified links (ie myCoor$link) : if 'linkExt' specified (& longer than 0 char) add to this ending if not present
   if(length(linkExt) >0) if(nchar(linkExt) >0) {
-    chExt <- grep(paste(linkExt,"$",sep=""),myCoor$link)
+    chExt <- grep(paste(linkExt,"$",sep=""), myCoor$link)
     if(length(chExt) < nrow(myCoor) & length(chExt) >0) myCoor$link[chExt] <- paste(myCoor$link[chExt],linkExt,sep="")
   }
   ## prepare for making html file
@@ -153,12 +153,12 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
     htmlExt <- if(length(htmlExt) <0) "" else htmlExt[1]                     # allow file wo extesion if empty argument 'htmlExt'
     if(!silent) message(fxNa," setting file-name + extension to : ",baseFiNa,".",htmlExt)
   } else {
-    htmlExt <- substr(HtmFileNa,unlist(regexec("\\.htm",HtmFileNa)),nchar(HtmFileNa))}
-  HtmFileNa <- wrMisc::.checkFileNameExtensions(baseFiNa,htmlExt)       # check file extensions for HtmFileNa & pngFileNa
+    htmlExt <- substr(HtmFileNa, unlist(regexec("\\.htm",HtmFileNa)), nchar(HtmFileNa))}
+  HtmFileNa <- wrMisc::.checkFileNameExtensions(baseFiNa, htmlExt)       # check file extensions for HtmFileNa & pngFileNa
   .convTxtToHtmPar <- function(txt){    # convert character vector to paragraphs  <p>My paragraph.</p>
     txt <- as.character(txt)
     nLi <- length(txt)
-    apply(matrix(c(rep("<p>",nLi), txt,rep("</p>",nLi)),nrow=nLi),1,paste,collapse="") }
+    apply(matrix(c(rep("<p>",nLi), txt,rep("</p>",nLi)), nrow=nLi), 1, paste, collapse="") }
   ## main, ie html creation
   htmVec <- c('<!DOCTYPE html>','<html lang="en">','<head>','<meta charset="utf-8">')
   htmTit <- paste(c('<title>',myHtmTit,'</title>'),collapse="")
@@ -193,7 +193,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
 .serachColName <- function(x,searchColNa, plusLowerCaps=TRUE,returnList=TRUE,callFrom=NULL) {
   ## 'x' character vector of column-names to inspect, or matrix/data.frame where colnames will be extracted/inspected
   ## 'searchColNa' (character) 
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa=".serachColName")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa=".serachColName")
   x <- if(length(dim(x)) >1)  colnames(x) else as.character(x)
   if(length(x) <1) return(NULL) else {
   errMsg <- "argument 'searchColNa' is emty or all NA !"

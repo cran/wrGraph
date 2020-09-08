@@ -51,7 +51,7 @@ Associated with (already existing) figure file 'pngFileNa' and make html page wh
 
 \item{pxDiam}{(integer, length=1) diameter for mouse-over tip to appear (single val or vector), simpler version/solution than with 'Tooltip' package}
 
-\item{addLinks}{(character) for clickable links, either 1) vector of links or 2) single character-chain to be used for pasting to rownames (eg http://www.uniprot.org/uniprot/)
+\item{addLinks}{(character) for clickable links, either 1) vector of links or 2) single character-chain to be used for pasting to rownames (eg https://www.uniprot.org/uniprot/)
 or 3) \code{TRUE} to check presence of 4th name specified in 'colNa' to be useed as columname from 'myCoor'   dominates over eventual presence of 4th name in 'colNa'}
 
 \item{linkExt}{(character) if specified : links will get specified ending, define as \code{NULL} or "" for taking 'addLinks' asIs}
