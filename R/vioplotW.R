@@ -5,7 +5,7 @@
 #'	individual colors for different sets of data or color-gradients can be specified, and the display of n per set of data was integtated 
 #' (based on an inspiration from  \href{https://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble}). 
 #' It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
-#' Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (this package is not required for this function.
+#' Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (here, the package \code{vioplot} is not required).
 #' Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).    
 #' Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas 
 #'  
@@ -14,14 +14,20 @@
 #' @param finiteOnly (logical) eliminate non-finite elements to avoid potential errors (eg when encountering \code{NA})
 #' @param halfViolin (logical or character) decide with \code{TRUE} or \code{FALSE} if full or only half of violins should be plotted, if "pairwise" always 2 data-sets will be plotted back-to-back
 #' @param boxCol (character) decide if boxplot should be adde inside the violin, use "def" for default transparent grey
-#' @param hh (numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in \code{\link[vioplot]{vioplot}}; see also \code{\link[sm]{sm.density}} 
+#' @param hh (numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in package  \href{https://CRAN.R-project.org/package=vioplot}{vioplot} ; see also \code{\link[sm]{sm.density}} 
 #' @param ylim (\code{NULL} or numeric, length=2) custom limit on y-axis, see also \code{\link[graphics]{par}} 
 #' @param nameSer (character) custom label for data-sets or columns (length must match number of data-sets)
+#' @param cexNameSer (numeric) size of individual data-series labels as cex-expansion factor (see also \code{\link[graphics]{par}})
 #' @param horizontal (logical) orientation of plot
 #' @param col (character or integer) custom colors or gradients like 'rainbow', 'grayscale', 'heat.colors', 'topo.colors', 'Spectral' or 'Paired',  or you may use colors made by the package \href{https://CRAN.R-project.org/package=colorRamps}{colorRamps}  
 #' @param border (character) custom color for figure border
+#' @param xlab (character) custom axis label
+#' @param cexLab (numeric) size of axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})
+#' @param cexAxis (numeric) size of numerix axis labels as cex-expansion factor (see also \code{\link[graphics]{par}}) 
 #' @param las (integer) orientation of axis labels (see also \code{\link[graphics]{par}}) 
 #' @param lty (integer) line-type for linear regression line (see also \code{\link[graphics]{par}}) 
+#' @param pointCol (character or numeric) display of median: color (defauly white)
+#' @param cexPt (numeric) display of median : size of point as cex-expansion factor (see also \code{\link[graphics]{par}}) 
 #' @param tit (character) custom title to figure
 #' @param lwd (integer) width of line(s) (see also \code{\link[graphics]{par}}) 
 #' @param rectCol (character) color of rectangle
@@ -40,26 +46,29 @@
 #' ## variable number of elements (each n is displayed)
 #' dat6b <- apply(dat6,2,function(x) x[which(x <5)])
 #' dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
-#' vioplotW(dat6b,col="Spectral")
-#' vioplotW(dat6b,col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
-#' vioplotW(dat6b,col="Spectral", halfViolin="pairwise", horizontal=FALSE)
+#' vioplotW(dat6b, col="Spectral")
+#' vioplotW(dat6b, col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
+#' vioplotW(dat6b, col="Spectral", halfViolin="pairwise", horizontal=FALSE)
 #' @export
-vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh=NULL, ylim=NULL, nameSer=NULL, horizontal=FALSE, col="rainbow", 
-	border="black", lty=1, tit=NULL, las=1, lwd=1, rectCol="black", at=0, add=FALSE, wex=1, silent=FALSE, callFrom=NULL) {
+vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh=NULL, ylim=NULL, nameSer=NULL,  cexNameSer=NULL, horizontal=FALSE, 
+	col="rainbow", border="black", xlab=NULL, cexLab=NULL, cexAxis=NULL, lty=1, pointCol=NULL, cexPt=NULL,
+    tit=NULL, las=1, lwd=1, rectCol="black", at=0, add=FALSE, wex=1, silent=FALSE, callFrom=NULL) {
   ## wr variant for violin-plots, inspired&extended based on https://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html
   ## 'col'.. individual fill-colors, may specify gradients (default 'rainbow','grayscale','Spectral','Paired')
   ## default display (short)column names and n
   doPlot <- TRUE
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="vioplotW")
   rangeVa <- 1.5                                                   # how much to extent fitted distribution beyond real min/max (for ra2)
-  pointCol <- grDevices::rgb(1,1,1,0.9)                            # color of (white) point to mark median
+  if(is.null(pointCol)) pointCol <- grDevices::rgb(1,1,1,0.9)      # color of (white) point to mark median
+  if(is.null(cexPt)) cexPt <- 1.7
+  ##  make automatic size of wec : smaller if many violins ...
   argN <- c(x=deparse(substitute(x)), sup=deparse(substitute(...)))
   if(length(x) <1) { warning(fxNa,"input 'x' seems empty !"); doPlot <- FALSE} 
   chSm <- try(find.package("sm"), silent=TRUE)
   if("try-error" %in% class(chSm)) { doPlot <- FALSE
     message("Cannot find package 'sm' which is needed for function ",fxNa)} 
-  fxArg <- c("x","finiteOnly","hh","ylim","nameSer","horizontal","col","border",
-    "lty","tit","lwd","rectCol","colMed","pchMed","halfViolin","at","add","wex","drawRect") 
+  fxArg <- c("x","finiteOnly","halfViolin","boxCol","hh","ylim","nameSer","horizontal","col","border","las",
+    "lty","tit","lwd","rectCol","at","add","wex","drawRect",  "colMed","pchMed") 
   colNx <- if(length(dim(x)) >1) colnames(x) else argN[1]
   datas <- wrMisc::asSepList(list(x, ...), asNumeric=TRUE, fxArg=argN, callFrom=fxNa)
   n <- length(datas)
@@ -76,7 +85,6 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
       chFini <- is.finite(datas[[i]])
       if(any(!chFini)) datas[[i]] <- datas[[i]][which(chFini)] }
     if(identical(boxCol,"def")) boxCol <- grDevices::rgb(0,0,0,0.4)
-    ptCex <- 1.7                                          # size of point
     ## prepare input data
     if(length(col) <n) col <- rep(col,n)[1:n]
     if(horizontal & length(datas) >1) {
@@ -91,14 +99,14 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     smArgs <- list(display="none")
     if(!(is.null(hh))) smArgs <- c(smArgs, hh=hh)
     raGlob <- c(min=min(su["Min.", ], na.rm=TRUE), max=max(su["Max.", ], na.rm=TRUE))     # used ?
-    smFx <- function(yy,wex,halfViolin) {
+    smFx <- function(yy, wex, halfViolin) {
       suY <- summary(yy)
     	raY <- c(lwr=min(suY[1],na.rm=TRUE), upr=max(suY[6],na.rm=TRUE) )         # no extension for estimation range
     	smRes <- do.call("smDensity", c(list(yy, xlim=raY), smArgs))
     	## do we care about the upper and lower ends of a variability band, or standard error estimate (which may not always get produced) ? 
     	smRes$estimate <- smRes$estimate*wex                                       # change proportionally with of violins
       ## truncate to range of real values
-    	chRa <- smRes$eval.points >= min(suY[1],na.rm=TRUE) & smRes$eval.points <= max(suY[6], na.rm=TRUE)
+    	chRa <- smRes$eval.points >= min(suY[1], na.rm=TRUE) & smRes$eval.points <= max(suY[6], na.rm=TRUE)
       if(!all(chRa)) {
     	  smRes$eval.points <- smRes$eval.points[which(chRa)]
     	  smRes$estimate <- smRes$estimate[which(chRa)] }
@@ -113,8 +121,8 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     	  smRes$estimate <- c(smRes$estimate,-1*smRes$estimate[nPo:1]  )
     	  smRes$eval.points <- smRes$eval.points[c(1:nPo,nPo:1)] }
     	list(evalPo=smRes$eval.points, estimate=smRes$estimate, se=smRes$se, summary=suY) }
-    vioDat <- lapply(datas,smFx,wex,halfViolin)
-    xLim <- c(1 -max(vioDat[[1]]$estimate,na.rm=TRUE), n+max(vioDat[[n]]$estimate,na.rm=TRUE))  # supposed vertical display
+    vioDat <- lapply(datas, smFx, wex, halfViolin)
+    xLim <- c(1 -max(vioDat[[1]]$estimate, na.rm=TRUE), n +max(vioDat[[n]]$estimate, na.rm=TRUE))  # supposed vertical display
     yLim <- if(length(ylim) !=2) range(su[c("Min.","Max."),], na.rm=TRUE) else ylim   	  
     ## configure data/sample-names
     label <- if(is.null(nameSer)) names(datas) else nameSer
@@ -123,7 +131,20 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
       xLim <- xLim -c(0,ceiling(n/2))
       labA <- label[2*(1:(ceiling(n/2))) -1]
       labB <- c(label[2*(1:(floor(n/2)))], if(n %%2 >0) "  ")     
-      label <- if(horizontal) paste(labB,labA,sep="\n\n") else paste(labA,labB,sep="    ")
+      ## check if half-series names just differ by extension
+      if(FALSE) {
+        label <- "not yet implemented"
+      } else {
+      
+      ## (if not differing just by extension) concatenate half-series names and  decide if text should contain carriage return      
+      nBL <- nBR <- nBl <- nchar(labA) - nchar(labB)
+      chLe <- nBL < 0
+      if(any(!chLe)) {nBL[which(!chLe)] <- 0       # left text is wider, no need to add add'l blanks)
+        nBR[which(!chLe)] <- abs(nBR) }
+      if(any(chLe)) {nBL[which(chLe)] <- abs(nBl)  # left text is smaller, need to add extra blanks
+        if(any(chLe)) nBR[which(chLe)] <- 0 }
+      conMultFx <- function(y) sapply(y,function(x) paste(rep(" ",x),collapse=""))
+      label <- if(horizontal) paste(labB,labA,sep="\n\n") else paste0(conMultFx(nBL),labA, paste0(rep(" ",c(2))), conMultFx(nBR),labB)}   # try to make symmetrix by adding blanks
       at <- at[1:ceiling(n/2)] }
     ## configure n per samples
     nDisp <- sapply(datas, function(x) sum(!is.na(x)))
@@ -142,22 +163,24 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
       pwBoC[,impa] <- rbind(1:length(impa) -boxFa, ra2[2,impa], 1:length(impa), ra2[4,impa], 1:length(impa) -boxFa/2)
       pwBoC[,pair] <- rbind(1:length(pair), ra2[2,pair], 1:length(pair) +boxFa, ra2[4,pair], 1:length(impa) +boxFa/2)
     }
+     #cat("vi1\n"); vi1 <<- list(xLim=xLim,yLim=yLim,at=at,label=label,cexLab=cexLab,tit=tit,vioDat=vioDat,ra2=ra2,border=border,halfViolin=halfViolin, horizontal=horizontal,add=add)  #,pwBoC=pwBoC,pair=pair                                          
     if(!horizontal) {                                # plot vertical
       if(!add) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
-        graphics::axis(2, las=las)
-        graphics::axis(1, at=at, label=label, las=las)                                                 
+        graphics::axis(2, las=las, cex.axis=cexAxis)        
+        graphics::axis(1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data
+        if(length(xlab) >0) graphics::mtext(xlab, cex=cexLab, side=1) 
         if(!is.null(tit)) graphics::title(main=tit)
       }
       graphics::box()
       if(identical(halfViolin,"pairwise"))  {
         for(i in 1:n) graphics::polygon(ceiling(i/2) +vioDat[[i]]$estimate*(1 -2*(i %% 2)), vioDat[[i]]$evalPo, col=col[i], border=border)
         graphics::rect(pwBoC[1,], pwBoC[2,], pwBoC[3,], pwBoC[4,], col=boxCol, border=NA)
-        graphics::points(pwBoC[5,],ra2[3,], pch=16, cex=ptCex, col=pointCol)
+        graphics::points(pwBoC[5,],ra2[3,], pch=16, cex=cexPt, col=pointCol)
         graphics::segments(pair/2, ra2[2,impa], pair/2, ra2[4,impa], col="grey", lty=2)     # grey line to separate adjacent boxes
       } else {for(i in 1:n) graphics::polygon(i+vioDat[[i]]$estimate, vioDat[[i]]$evalPo, col=col[i], border=border) 
         graphics::rect(boxCoor[,1], boxCoor[,2], boxCoor[,3], boxCoor[,4], col=boxCol, border=NA)
-        graphics::points(1:length(datas), ra2[3,], pch=16, cex=ptCex, col=pointCol) 
+        graphics::points(1:length(datas), ra2[3,], pch=16, cex=cexPt, col=pointCol) 
       }          
       if(length(boxCol >0)) {                      ## add boxplot-like
       }
@@ -165,21 +188,24 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
       ## this is a horizontal plot ..
       if(!add) {
         graphics::plot.window(xlim=yLim, ylim=xLim)
-        graphics::axis(1)
-        graphics::axis(2, at=at, label=label, las=las)
+        graphics::axis(1, cex.axis=cexNameSer)
+        graphics::axis(2, cex.axis=cexAxis, at=at, label=label,  cex=cexNameSer, las=las)
+        if(length(xlab) >0) graphics::mtext(xlab, cex=cexLab, side=1) 
         if(!is.null(tit)) graphics::title(main=tit)
       }
       graphics::box()
       if(identical(halfViolin,"pairwise"))  {
         for(i in 1:n) graphics::polygon(vioDat[[i]]$evalPo, ceiling(i/2) +vioDat[[i]]$estimate*(1 -2*(i %% 2)), col=col[i], border=border)
         graphics::rect(pwBoC[2,], pwBoC[1,], pwBoC[4,], pwBoC[3,], col=boxCol, border=NULL)
-        graphics::points(ra2[3,], pwBoC[5,], pch=16, cex=ptCex, col=pointCol) 
+        graphics::points(ra2[3,], pwBoC[5,], pch=16, cex=cexPt, col=pointCol) 
         graphics::segments(ra2[2,impa], pair/2, ra2[4,impa], pair/2, col="grey",lty=2)     # grey line to separate adjacent boxes
       } else {for(i in 1:n) graphics::polygon(vioDat[[i]]$evalPo,i +vioDat[[i]]$estimate, col=col[i], border=border) 
         graphics::rect(boxCoor[,2], boxCoor[,1], boxCoor[,4], boxCoor[,3], col=boxCol, border=NA)
-        graphics::points( ra2[3,], 1:length(datas), pch=16, cex=ptCex, col=pointCol) 
+        graphics::points( ra2[3,], 1:length(datas), pch=16, cex=cexPt, col=pointCol) 
         }
+          
     }
+    ## display n by series (only if variable along data-set)
     if(length(nDisp) <2) graphics::mtext(nDisp, adj=0, side=3, cex=0.7, line=-1, las=1) else {
       if(identical(halfViolin,"pairwise")) { 
         nDisp <- cbind(nDisp[2*(1:(ceiling(n/2))) -1], c(nDisp[2*(1:(floor(n/2)))], if(n %%2 >0) " "))

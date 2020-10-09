@@ -25,6 +25,16 @@ layout(part)
 for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
 
 
+## ----LegLoc1, echo=TRUE-------------------------------------------------------
+dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
+grp <- c("abc","efghijk")
+(legLoc <- checkForLegLoc(dat1, grp)) 
+
+# now with more graphical parameters (using just the best location information)
+plot(dat1, cex=3)
+legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
+legend(legLoc$loc, legend=grp, text.col=2:3, pch=1, cex=0.8)
+
 ## ----Hist1, echo=TRUE---------------------------------------------------------
 set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
 dat1 <- dat1[which(dat1 <50 & dat1 > 0.2)]
@@ -110,6 +120,32 @@ tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
 ## 
 ## convenient way, add fold-change threshold and mark who is beyond
 MAplotW(tRes, FCth=1.5, cexLa=1)    
+
+## ----Volc1, echo=TRUE---------------------------------------------------------
+## let's generate some toy data
+library(wrMisc)
+set.seed(2005); mat <- matrix(round(runif(900),2), ncol=9)
+rownames(mat) <- paste0(rep(letters[1:25],each=4), rep(letters[2:26],4))
+mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
+mat[3:7,4:9] <- mat[3:7,4:9] + 0.7
+mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
+
+## assume 2 groups with 3 samples each
+gr3 <- gl(3,3,labels=c("C","A","B"))
+tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
+
+VolcanoPlotW(tRes2)
+VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
+
+
+## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
+## assume 3 groups with 3 samples each
+tRes <- moderTestXgrp(mat, gr3)
+
+layout(matrix(1:3, nrow=1))
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 
 ## ----createHtmlWithPointsIdentif1, echo=TRUE----------------------------------
 ## Let's make some toy data 

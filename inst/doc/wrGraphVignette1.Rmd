@@ -68,10 +68,25 @@ for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
 
 ```
 
+## Optimal Legend Location
+
+The function *checkForLegLoc()* allows to check which corner of a given graph is less crowded for placing a legend there.
+Basic legends can be added directely, or one can simply recuperate the location information.
+
+```{r LegLoc1, echo=TRUE}
+dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
+grp <- c("abc","efghijk")
+(legLoc <- checkForLegLoc(dat1, grp)) 
+
+# now with more graphical parameters (using just the best location information)
+plot(dat1, cex=3)
+legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
+legend(legLoc$loc, legend=grp, text.col=2:3, pch=1, cex=0.8)
+```
 
 ## One More Histogram Function ...
 
-Histograms are a very versitile tool for rapidly gaining insights in the distribution of data.
+Histograms are a very versatile tool for rapidly gaining insights in the distribution of data.
 This package presents a histogram function allowing to convienently work with log2-data and (if desired) 
 display numbers calculated back to linear values on the x-axis.
 
@@ -287,6 +302,48 @@ MAplotW(tRes, FCth=1.5, cexLa=1)
                           
 In the last plot one can see easily the 80 points that have been increased in the second group, many of them 
 exceed a (based on linear data) fold-change of 1.5 (which on log2 scale apprears at 0.58).
+
+
+## Volcano-plot
+
+The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate) and outcome of statistical test on the other axis (abscissa). Typically the statical values are represented as negative log10.
+
+This plot is very useful when inspecting larger data-sets for random or systematic effects.  
+Points with high log-ratios (ie high fold-change) may not always have enthousiastic p-values, too. 
+Many times such divergences may point to high intra-group variability.
+Numerous implementations for specific applications exist (eg the package [EnhancedVolcano](https://bioconductor.org/packages/release/bioc/html/EnhancedVolcano.html)).
+The version presented here is rather generic and uses transparent points to avoid getting plots too crowded.
+Furthermore, this version has the advantage to take all information needed directly in MArrayLM-objects, like the output of  moderTest2grp() or moderTestXgrp().
+
+
+```{r Volc1, echo=TRUE}
+## let's generate some toy data
+library(wrMisc)
+set.seed(2005); mat <- matrix(round(runif(900),2), ncol=9)
+rownames(mat) <- paste0(rep(letters[1:25],each=4), rep(letters[2:26],4))
+mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
+mat[3:7,4:9] <- mat[3:7,4:9] + 0.7
+mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
+
+## assume 2 groups with 3 samples each
+gr3 <- gl(3,3,labels=c("C","A","B"))
+tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
+
+VolcanoPlotW(tRes2)
+VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
+
+```
+
+```{r Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE}
+## assume 3 groups with 3 samples each
+tRes <- moderTestXgrp(mat, gr3)
+
+layout(matrix(1:3, nrow=1))
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
+VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
+```
+
 
 
 ## Standalone html Page with Plot and Mouse-Over Interactive Features 

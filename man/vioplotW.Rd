@@ -13,10 +13,16 @@ vioplotW(
   hh = NULL,
   ylim = NULL,
   nameSer = NULL,
+  cexNameSer = NULL,
   horizontal = FALSE,
   col = "rainbow",
   border = "black",
+  xlab = NULL,
+  cexLab = NULL,
+  cexAxis = NULL,
   lty = 1,
+  pointCol = NULL,
+  cexPt = NULL,
   tit = NULL,
   las = 1,
   lwd = 1,
@@ -39,11 +45,13 @@ vioplotW(
 
 \item{boxCol}{(character) decide if boxplot should be adde inside the violin, use "def" for default transparent grey}
 
-\item{hh}{(numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in \code{\link[vioplot]{vioplot}}; see also \code{\link[sm]{sm.density}}}
+\item{hh}{(numeric, length <4) smoothing parameter (standard deviation to kernel function, if omited anormal optimal smoothing parameter is used); equivalent to argument \code{h} in package  \href{https://CRAN.R-project.org/package=vioplot}{vioplot} ; see also \code{\link[sm]{sm.density}}}
 
 \item{ylim}{(\code{NULL} or numeric, length=2) custom limit on y-axis, see also \code{\link[graphics]{par}}}
 
 \item{nameSer}{(character) custom label for data-sets or columns (length must match number of data-sets)}
+
+\item{cexNameSer}{(numeric) size of individual data-series labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
 
 \item{horizontal}{(logical) orientation of plot}
 
@@ -51,7 +59,17 @@ vioplotW(
 
 \item{border}{(character) custom color for figure border}
 
+\item{xlab}{(character) custom axis label}
+
+\item{cexLab}{(numeric) size of axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
+
+\item{cexAxis}{(numeric) size of numerix axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
+
 \item{lty}{(integer) line-type for linear regression line (see also \code{\link[graphics]{par}})}
+
+\item{pointCol}{(character or numeric) display of median: color (defauly white)}
+
+\item{cexPt}{(numeric) display of median : size of point as cex-expansion factor (see also \code{\link[graphics]{par}})}
 
 \item{tit}{(character) custom title to figure}
 
@@ -80,7 +98,7 @@ Main input may be multiple vectors, a matrix or list of multiple data-elements (
 individual colors for different sets of data or color-gradients can be specified, and the display of n per set of data was integtated 
 (based on an inspiration from  \href{https://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html}{Nabble}). 
 It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
-Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (this package is not required for this function.
+Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (here, the package \code{vioplot} is not required).
 Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).    
 Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas
 }
@@ -92,9 +110,9 @@ vioplotW(dat6)
 ## variable number of elements (each n is displayed)
 dat6b <- apply(dat6,2,function(x) x[which(x <5)])
 dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
-vioplotW(dat6b,col="Spectral")
-vioplotW(dat6b,col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
-vioplotW(dat6b,col="Spectral", halfViolin="pairwise", horizontal=FALSE)
+vioplotW(dat6b, col="Spectral")
+vioplotW(dat6b, col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
+vioplotW(dat6b, col="Spectral", halfViolin="pairwise", horizontal=FALSE)
 }
 \seealso{
 the package \href{https://CRAN.R-project.org/package=vioplot}{vioplot}, \code{\link[sm]{sm}} is used for the density estimation
