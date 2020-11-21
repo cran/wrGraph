@@ -124,6 +124,7 @@ gr3 <- gl(3,3,labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3), addResults = c("FDR","means"))
 # Note: due to the small number of lines only FDR chosen to calculate 
 VolcanoPlotW(tRes2)
+## Add names of points passing custom filters
 VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="passThr")
 
 ## assume 3 groups with 3 samples each

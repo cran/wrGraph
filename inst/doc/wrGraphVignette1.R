@@ -31,9 +31,9 @@ grp <- c("abc","efghijk")
 (legLoc <- checkForLegLoc(dat1, grp)) 
 
 # now with more graphical parameters (using just the best location information)
-plot(dat1, cex=3)
+plot(dat1, cex=3, col=rep(2:3,3),pch=rep(2:3,3))
 legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
-legend(legLoc$loc, legend=grp, text.col=2:3, pch=1, cex=0.8)
+legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 
 ## ----Hist1, echo=TRUE---------------------------------------------------------
 set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
@@ -60,6 +60,9 @@ vioplotW(iris[,-5],tit="Iris-data")
 ## ----cumFrqPlot1, echo=TRUE---------------------------------------------------
 cumFrqPlot(iris[,1:4])
 
+
+## ----imageW, echo=TRUE--------------------------------------------------------
+imageW(as.matrix(iris[1:40,1:4]))
 
 ## ----cumulCountPlot1, echo=TRUE-----------------------------------------------
 thr <- seq(min(iris[,1:4]), max(iris[,1:4])+0.1,length.out=100)

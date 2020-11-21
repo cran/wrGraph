@@ -54,10 +54,10 @@ packageVersion("wrGraph")
 ## Prepare Layout for Accomodating Multiple Smaller Plots
 
 The function *partitionPlot()* prepares a matrix to serve as grid for segmenting the current device 
-(ie the available plotting region). It aims to optimize the layout based on a given number of plots to accomodate.
-The user may choose if the layout should rather be adopted to lanscape (default) or portrait geometry.
+(ie the available plotting region). It aims to optimize the layout based on a given number of plots to accommodate.
+The user may choose if the layout should rather be adopted to landscape  (default) or portrait geometry.
 
-This migt be useful in particular when during an analysis-pipline it's not known/clear in advance how may plots might bee needed.
+This might be useful in particular when during an analysis-pipeline it's not known/clear in advance how many plots might be needed in a single figure space.
 
 
 ```{r partitionPlot1, out.width="110%", out.heigth="110%", echo=TRUE}
@@ -71,7 +71,7 @@ for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
 ## Optimal Legend Location
 
 The function *checkForLegLoc()* allows to check which corner of a given graph is less crowded for placing a legend there.
-Basic legends can be added directely, or one can simply recuperate the location information.
+Basic legends can be added directly, or one can simply recuperate the location information.
 
 ```{r LegLoc1, echo=TRUE}
 dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
@@ -79,18 +79,18 @@ grp <- c("abc","efghijk")
 (legLoc <- checkForLegLoc(dat1, grp)) 
 
 # now with more graphical parameters (using just the best location information)
-plot(dat1, cex=3)
+plot(dat1, cex=3, col=rep(2:3,3),pch=rep(2:3,3))
 legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
-legend(legLoc$loc, legend=grp, text.col=2:3, pch=1, cex=0.8)
+legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 ```
 
 ## One More Histogram Function ...
 
 Histograms are a very versatile tool for rapidly gaining insights in the distribution of data.
-This package presents a histogram function allowing to convienently work with log2-data and (if desired) 
+This package presents a histogram function allowing to conveniently  work with log2-data and (if desired) 
 display numbers calculated back to linear values on the x-axis.
 
-Default settings aim to give rather a quick overview, for "high resulution" representations one could set a high number of breaks or one might also consider other/alternative graphical representations. Some of the alternatives are shown later in this vignette.
+Default settings aim to give rather a quick overview, for "high resolution" representations one could set a high number of breaks or one might also consider other/alternative graphical representations. Some of the alternatives are shown later in this vignette.
 
 ```{r Hist1, echo=TRUE}
 set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
@@ -121,10 +121,10 @@ legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
 
 [Violin plots](https://en.wikipedia.org/wiki/Violin_plot) or vioplots are basically an adaptation of plotting the
 [Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) allowing to compare multiple data-sets.
-Please note, that although smoothed distrubutions please the human eye, some data-sets do not have such a continuous character.
+Please note, that although smoothed distributions please the human eye, some data-sets do not have such a continuous character.
 
 Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
-the function provided here offers more flexibility for data-formats accepted (inlcuding data.frames and lists), coloring and display of n.
+the function provided here offers more flexibility for data-formats accepted (including data.frames and lists), coloring and display of n.
 In the case of the iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
 However, when working with data-sets containing NAs, or simply when working with lists the number of values per data-set/violin n may vary.
 
@@ -135,9 +135,9 @@ vioplotW(iris[,-5],tit="Iris-data")
 
 ## Plotting Sorted Values ('Summed Frequency')
 
-This plot offers an alterantive to histograms and density-plots. 
+This plot offers an alternative to histograms and density-plots. 
 While histograms and density-plots are very intuitive, their interpretation may pose some difficulties due to the smoothing effect 
-of Kernel-functions or the non-trvial choice of optimal width of bars (histigram) may influence interpretation.
+of Kernel-functions or the non-trivial choice of optimal width of bars (histogram) may influence interpretation.
  
 As alternative, a plot is presented which basically reads like a summed frequency plot and has the main advantage, that all points of data
 may be easily displayed. 
@@ -149,23 +149,34 @@ cumFrqPlot(iris[,1:4])
 
 ```
 
-For example, the iris-data are rounded. As a result in the plot above the line is not progessing smooth but with more marked charcater of steps of stairs.
-To get the same conclusion one would need to increase the number of bars in a histogram very much which would makes it in our experience more difficult
-to avaluate the same time the global distribution character.
+For example, the iris-data are rounded. As a result in the plot above the line is not progressing smooth but with more marked character of steps of stairs. 
+To get the same conclusion one would need to increase the number of bars in a histogram very much which would makes it in our experience more difficult to evaluate the same time the global distribution character.
 
 At this plot you may note that the curves patal.width and petal.length look differently. 
-On the previous vioplots you may have noticed the bimodal character of the values, again this plot may be helpful to identify distributios
-which are very difficult to see well using boxplots.
+On the previous vioplots you may have noticed the bimodal character of the values, again this plot may be helpful to identify distributions which are very difficult to see well using boxplots.
 
+
+## Color-Code Numeric Content of Matrix (Heatmap)
+
+To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.
+The function _image()_ from the graphic-package provides basic help. Such an output can be referred to as heatmap. The function _imageW()_ from this package offers convenient options for displaying row- and column-names.
+
+```{r imageW, echo=TRUE}
+imageW(as.matrix(iris[1:40,1:4]))
+```
+
+Heatmaps are well known for displaying the results of hierarchical clustering, see also for example _heatmap()_ (stats-package) or _heatmap.2()_ from the [gplots-package](https://CRAN.R-project.org/package=wrMisc). In these case rows and columns of the data also get reorganized and dendrograms attached.
+ 
 
 ## Examine Counts based on Variable Threshold Levels (for ROC curves)
 
-The next plot is dedicated to visualize counting results with mooving thresholds.
-While a given threshold criteria moves up or down the resulting number of values passing may not necessarily follow in a linear way.
-This fucntion lets you follow muliple types of samples (eg type of leave in the iris-data) in a single plot. 
-In particular when constructing [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) curves
-it may also be helpful to visualize the (absolute) counting data used underneith before determining TP and FP ratios. 
+
+The next plot is dedicated to visualize counting results with moving thresholds. 
+While a given threshold criteria moves up or down the resulting number of values passing may not necessarily follow in a linear way. 
+This function lets you follow multiple types of samples (eg type of leave in the iris-data) in a single plot. 
+In particular when constructing [ROC curves](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) it may also be helpful to visualize the (absolute) counting data used underneath before determining TP and FP ratios. 
 Typically used in context of benchmark-tests in proteomics.
+
 
 
 ```{r cumulCountPlot1, echo=TRUE}
@@ -200,9 +211,9 @@ plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
 
 ```
 
-## Plotting linear regression and confidence intervals
+## Plotting Linear Regression and Confidence Intervals
 
-The function _plotLinReg()_ provides help to display a series of bivariate points given in 'dat' (multiple data formats possible), to model a [linear regression-plots](https://en.wikipedia.org/wiki/Linear_regression) and plot the results.
+The function _plotLinReg()_ provides help to display a series of bivariate points given in 'dat' (multiple data formats possible), to model a [linear regression](https://en.wikipedia.org/wiki/Linear_regression) and plot the results.
 
 
 ```{r plotLinReg1, echo=TRUE}
@@ -237,7 +248,7 @@ fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3),
 
 However, some sets of points do not always follow elliptic shapes. 
 Note, that FactoMineR represented the 2nd principal component upside-down compared to the very first PCA figure.
-To facilitate comparisons, the function *plotPCAw* has an argument allowing to rotate/flip any princial component axis. 
+To facilitate comparisons, the function *plotPCAw* has an argument allowing to rotate/flip any principal component axis. 
 
 With more crowded data-sets it may be useful to rather highlight the more dense regions. 
 For this reason this package proposes to use [bagplots](https://en.wikipedia.org/wiki/Bagplot) 
@@ -306,10 +317,10 @@ exceed a (based on linear data) fold-change of 1.5 (which on log2 scale apprears
 
 ## Volcano-plot
 
-The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate) and outcome of statistical test on the other axis (abscissa). Typically the statical values are represented as negative log10.
+The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate) and outcome of statistical test on the other axis (abscissa). Typically the statistical values are represented as negative log10.
 
 This plot is very useful when inspecting larger data-sets for random or systematic effects.  
-Points with high log-ratios (ie high fold-change) may not always have enthousiastic p-values, too. 
+Points with high log-ratios (ie high fold-change) may not always have enthusiastic p-values, too. 
 Many times such divergences may point to high intra-group variability.
 Numerous implementations for specific applications exist (eg the package [EnhancedVolcano](https://bioconductor.org/packages/release/bioc/html/EnhancedVolcano.html)).
 The version presented here is rather generic and uses transparent points to avoid getting plots too crowded.
@@ -348,23 +359,20 @@ VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 
 ## Standalone html Page with Plot and Mouse-Over Interactive Features 
 
-The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.rstudio.com/).
-In this case the origial idea was simply to provide help to identify points in a plot and display 
-via mouse-over labels to display and by providing clickable links.
-To do so, very simple html documents are created which display a separately saved image and have a section indicating at which
-location of the figure which information should be displayed as mouse-over and providing the clickable links.
-In high-throughput biology many times reserachers want quickly know which protein or gene a given point in a graphic correpsonds and
-being able to get further information on this protein or gene via links to [UniProt](https://www.uniprot.org/) or [GenBank](https://www.ncbi.nlm.nih.gov/genbank/).
+The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.rstudio.com/). 
+In this case the original idea was simply to provide help to identify points in a plot and display via mouse-over labels to display and by providing clickable links. 
+To do so, very simple html documents are created which display a separately saved image and have a section indicating at which location of the figure which information should be displayed as mouse-over and providing the clickable links. 
+In high-throughput biology many times researchers want quickly know which protein or gene a given point in a graphic corresponds and being able to get further information on this protein or gene via links to [UniProt](https://www.uniprot.org/) or [GenBank](https://www.ncbi.nlm.nih.gov/genbank/).
 
 As this functionality was made for separate html documents it's output cannot be easily integrated into a vignette like this one.
 To generate such a simple mouse-over interactive html document, the user is invited to run the code 
-of this vignette. At the last step you could ask R to open the interactive html page in the default broswer. 
+of this vignette. At the last step you could ask R to open the interactive html page in the default browser. 
 
 Concerning the path provided in the argument *pngFileNa* of the function *mouseOverHtmlFile*:
-In a real world case, you migth want to choose other
+In a real world case, you might want to choose other
 locations to save files rather than R-temp which will be deleted when closing your instance of R.
 It is also possible to work with relative paths (eg by giving the png-filename without path). 
-Then the resultant html will simply require the png-file to be in the same directory as the html itself, and similary for the clickable links.
+Then the resultant html will simply require the png-file to be in the same directory as the html itself, and similarly for the clickable links.
 This results in files that are very easy to distribute to other people, in particular if the clickable links are pointing to the internet,
 however, the pnh-file always needs to be in the same directory as the html ...
 If you have the possibility to make the png-file accessible through a url, you could also provide this url.

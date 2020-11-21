@@ -52,6 +52,7 @@
 #' tRes2 <- moderTest2grp(mat[,1:6], gl(2,3), addResults = c("FDR","means"))
 #' # Note: due to the small number of lines only FDR chosen to calculate 
 #' VolcanoPlotW(tRes2)
+#' ## Add names of points passing custom filters
 #' VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="passThr")
 #'
 #' ## assume 3 groups with 3 samples each
@@ -113,18 +114,19 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           Mvalue$Mval <- Mvalue$Mval[,useComp[1]]}
       } else {
         if("means" %in% names(Mvalue)) {
-          chCol <- useComp %in% 1:ncol(Mvalue$means)
-          if(any(!chCol)) stop(" Invalid 'useComp'")
-          if(!silent) message(fxNa, "Reconstructing Mvalues based on group-means")
+          if(debug) message(fxNa, "Reconstructing Mvalues based on group-means")
+          if(length(splNa) <1) splNa <- NULL
           if(ncol(Mvalue$means) >2 & length(splNa) >1) {
-            ## need to identify appropriate columns for constructing M-values
-            useCCol <- which(colnames(Mvalue$means) %in% splNa)
-            if(length(useCCol) != 2) stop("Can't match 2 columns of Mvalue$means to question no",useComp," !")
-            grpMeans <- cbind(mean1=Mvalue$means[,useCCol[1]], mean2=Mvalue$means[,useCCol[2]])
+            chMe <- lapply(splNa, function(x) colnames(Mvalue$means) %in% x)
+            if(any(sapply(chMe,sum,na.rm=TRUE) <1)) stop("Can't find/match columns of means designated by 'useComp' : ",
+              wrMisc::pasteC(useComp[which(sapply(chMe,sum,na.rm=TRUE) <1)], quoteC="'"))
+            if(any(sapply(chMe,sum,na.rm=TRUE) >1) & !silent) message(fxNa," Some expected column-names of Mvalue$means appear multiple times ! (using first)")
+            grpMeans <- cbind(mean1=Mvalue$means[,which(chMe[[1]])[1]], mean2=Mvalue$means[,which(chMe[[2]])[1]])
           } else grpMeans <- Mvalue$means 
           Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]
           Melem <- which(names(Mvalue)=="Mval")
-        } else stop("Could not find suitable field '$means' in '",namesIn[1],"' to construct M-values !") }    
+        } else stop("Could not find suitable field '$means' in '",namesIn[1],"' to construct M-values !")    
+      }
       ## pValues : if provided separately, check Corresp p-values & Mvalues
       if(length(pValue) >0) if(length(as.numeric(pValue)) != length(as.numeric(Mvalue[[Melem]]))) {
         if(!silent) message(fxNa,"Content of 'pValue' seems not to fit to 'Mvalue', ignore and try to use p-values from '",namesIn[1],"' ")
@@ -275,15 +277,15 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           alph2 <- max(round(4/(10 +sum(filtFin)^0.25),2), alph) 
           alph3 <- max(round(1.3/(10 +sum(filtFin)^0.25),2), alph +0.05)                 # alternative for alph2 
       useCol <- if(grayIncrem) grDevices::rgb(0.35,0.35,0.35,alph) else grDevices::rgb(0.7,0.7,0.7)
-      useCex <- if(length(cexPt) >0) cexPt else max(round(0.8 +1.7/(1 +sum(filtFin, na.rm=TRUE))^0.3,2), 0.7)
-      colPass <- grDevices::rgb(0.8,0.01,0.01,alph2)                 # (default) red
+      useCex <- if(length(cexPt) >0) cexPt else max(round(0.8 +2/(1 +sum(filtFin,na.rm=TRUE))^0.28,2), 1.1)
+      colPass <- grDevices::rgb(0.8,0.01,0.01, alph2)                 # (default) red
       whCol <- rep(1,length(Mvalue))
-      if(any(passAll)) whCol[which(passAll)] <- 2                    # assign color for those passing
+      if(any(passAll)) whCol[which(passAll)] <- 2                     # assign color for those passing
       useCol <- c(useCol,colPass)[whCol]  
     } else useCol <- col
     ## adjust fill color for open symbols
     chPch <- pch %in% c(21:25)
-    if(any(chPch)) {ptBg <- col ; col[which(chPch)] <- grDevices::rgb(0.2,0.2,0.2,max(alph,0.4)) }
+    if(any(chPch)) {ptBg <- col ; col[which(chPch)] <- grDevices::rgb(0.2,0.2,0.2, max(alph,0.4)) }
     
     ## main graphic
     #graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, cex.lab=cexLa, las=1)
@@ -328,7 +330,6 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## custom colors for significant points
     if(length(annColor) >0 & sum(passAll) >0) {  ## replot points passing thresholds according to colors given
       useLi <- which(passAll)
-      
       if(length(annColor) ==length(pValue)) useCol <- annColor[useLi] else {
         useCol <- annColor[as.numeric(as.factor(merg[,annotColumn[1]]))][useLi]
       } 
