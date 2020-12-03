@@ -90,7 +90,7 @@ set.seed(2019); dat1 <- matrix(round(c(rnorm(1000), runif(1000,-0.9,0.9)),2),
   ncol=20, byrow=TRUE) + matrix(rep(rep(1:5,6:2), each=100), ncol=20)
 biplot(prcomp(dat1))      # traditional plot
 (grp = factor(rep(LETTERS[5:1],6:2)))
-plotPCAw(dat1,grp)
+plotPCAw(dat1, grp)
 }
 \seealso{
 (used in this function for the PCA underneith:) \code{\link[stats]{prcomp}}, \code{\link[stats]{princomp}}, the package \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR}

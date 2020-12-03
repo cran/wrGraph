@@ -42,20 +42,20 @@
 #'   ncol=20, byrow=TRUE) + matrix(rep(rep(1:5,6:2), each=100), ncol=20)
 #' biplot(prcomp(dat1))      # traditional plot
 #' (grp = factor(rep(LETTERS[5:1],6:2)))
-#' plotPCAw(dat1,grp)
+#' plotPCAw(dat1, grp)
 #' @export
-plotPCAw <- function(dat,sampleGrp,tit=NULL,useSymb=c(21:25,9:12,3:4),center=TRUE,scale.=TRUE,colBase=NULL,useSymb2=NULL,
-  displBagPl=TRUE,getOutL=FALSE,cexTxt=1,showLegend=TRUE,nGrpForMedian=6,pointLabelPar=NULL,rowTyName="genes",
-  rotatePC=NULL,suplFig=TRUE,callFrom=NULL,silent=FALSE) {
+plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center=TRUE, scale.=TRUE, colBase=NULL, useSymb2=NULL,
+  displBagPl=TRUE, getOutL=FALSE, cexTxt=1, showLegend=TRUE, nGrpForMedian=6, pointLabelPar=NULL, rowTyName="genes",
+  rotatePC=NULL, suplFig=TRUE, callFrom=NULL, silent=FALSE) {
   ## note : so far not well adopted for plotting all points in transparent grey with same symb for interactive mouse-over
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="plotPCAw")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="plotPCAw")
   msg <- " 'dat' must be matrix or data.frame (with at least 2 columns)"
   if(length(dim(dat)) !=2) stop(msg)
   if(length(sampleGrp) <1 | sum(is.na(sampleGrp))==length(sampleGrp)) stop("argument 'sampleGrp' seems to be empty (or all NA)")
   if(length(sampleGrp) != ncol(dat)) stop(fxNa," length of argument 'sampleGrp' must match number of columns of 'dat'")
   if(!is.factor(sampleGrp)) sampleGrp <- as.factor(sampleGrp)
   nGrpLim <- 25                      # decide/limit if group-centers are shown as stars
-  ## reduce to columns defined by 'sampleGrp' (roups declared as NA will be removed) and to columns with finite data
+  ## reduce to columns defined by 'sampleGrp' (groups declared as NA will be removed) and to columns with finite data
   dat <- dat[,!is.na(sampleGrp)]
   chFin <- is.finite(dat)
   chCol <- colSums(chFin) <2
@@ -67,7 +67,7 @@ plotPCAw <- function(dat,sampleGrp,tit=NULL,useSymb=c(21:25,9:12,3:4),center=TRU
     if(ncol(dat) <2) stop("after removing bad (non-finite) columns less than 2 columns remain !")
     sampleGrp <- sampleGrp[which(!chCol)]
     if(length(useSymb) == dimIni[2]) useSymb <- useSymb[which(!chCol)] }
-  opar <- graphics::par(no.readonly = TRUE) 
+  opar <- graphics::par(no.readonly=TRUE) 
   on.exit(graphics::par(opar))  
   if(suplFig & ncol(dat) > 3) on.exit(graphics::par(opar))  else {
     on.exit(graphics::par(opar$mar))
@@ -122,8 +122,8 @@ plotPCAw <- function(dat,sampleGrp,tit=NULL,useSymb=c(21:25,9:12,3:4),center=TRU
   graphics::plot(pca$x[,c(1,2)], main=useTit, type="n",cex.axis=0.7*cexTxt,cex.lab=cexTxt*0.8,cex.main=if(ncol(dat) > 3) 1.4 else 0.85,xlab=lab123[1],ylab=lab123[2],las=1)
   displLeg <- checkForLegLoc(matr=pca$x ,sampleGrp=sampleGrp,showLegend=showLegend,suplSpace=5.5,callFrom=callFrom)
   if(displLeg[[1]]) graphics::legend(displLeg[[2]], pch=useSymb.ori, col=colBase,
-    paste(1:length(levels(sampleGrp)),"..",substr(unique(averNa3),1,25)),text.col=colBase,
-    cex=cexTxt*max(0.4,round(0.75 -((length(unique(sampleGrp)) %/% 5)/31),3)),xjust=0.5,yjust=0.5)
+    paste(1:length(levels(sampleGrp)),"..",substr(unique(averNa3),1,25)), text.col=colBase,
+    cex=cexTxt*max(0.4,round(0.75 -((length(unique(sampleGrp)) %/% 5)/31),3)), xjust=0.5, yjust=0.5)
   graphics::points(pca$x[,c(1,2)], pch=useSymb,col=useCol,cex=0.8)
   ## prepare for labels on points
   if(length(pointLabelPar) >0) {
@@ -157,16 +157,16 @@ plotPCAw <- function(dat,sampleGrp,tit=NULL,useSymb=c(21:25,9:12,3:4),center=TRU
       graphics::points(pca.grpMed[,c(2,3)],col=colBase[order(as.numeric(unique(averNa3)))],pch=useSymb2,cex=1.1)
       cexCtr2 <- if(cexTxt <=1) useCex -0.1 else useCex
       graphics::text(pca.grpMed[,c(2,3)]+ 1.7*figNumOffs(pca,cols=c(2,3)), as.character(1:nGrp)[order(as.numeric(unique(averNa3)))],cex=cexCtr2,col=1) }
-    graphics::plot(pca$x[,c(1,3)],pch=useSymb,main="PCA : 1st and 3rd Component",col=useCol,cex=0.6,cex.axis=0.6*cexTxt,cex.lab=cexTxt*0.7,xlab=lab123[1],ylab=lab123[3],las=1 )
+    graphics::plot(pca$x[,c(1,3)],pch=useSymb,main="PCA : 1st and 3rd Component" ,col=useCol, cex=0.6, cex.axis=0.6*cexTxt, cex.lab=cexTxt*0.7,xlab=lab123[1],ylab=lab123[3],las=1 )
     for(i in 1:length(unique(sampleGrp))) {
       useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256), alpha=if(max(table(sampleGrp)) > 2) signif(0.04+0.25/nGrp,digits=3) else 0.1)
       if(displBagPl) addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(1,3)], outCoef=3.5, bagCol=useCol2,ctrPch=useSymb2,returnOutL=FALSE,silent=TRUE) }
     if(length(nGrpForMedian) >0 & length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {
-      graphics::points(pca.grpMed[,c(1,3)],col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2,cex=1.1)
-      graphics::text(pca.grpMed[,c(1,3)]+ 1.7*figNumOffs(pca,cols=c(1,3)), as.character(1:nGrp)[order(as.numeric(unique(averNa3)))],cex=useCex-0.1,col=1) }
+      graphics::points(pca.grpMed[,c(1,3)],col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2, cex=1.1)
+      graphics::text(pca.grpMed[,c(1,3)]+ 1.7*figNumOffs(pca,cols=c(1,3)), as.character(1:nGrp)[order(as.numeric(unique(averNa3)))], cex=useCex-0.1, col=1) }
   }
-  if(suplFig) { graphics::plot(pca, main="Screeplot on Variance Captured by the Principal Components",cex.main=if(ncol(dat) > 3) 1.3 else 0.8,cex.axis=0.6*cexTxt )
-    graphics::mtext(at=(1.2*(1:length(pca$sdev))-0.5)[1:min(10,ncol(dat))], as.character(1:length(pca$sdev))[1:min(10,ncol(dat))],cex=0.7,side=1) }
+  if(suplFig) { graphics::plot(pca, main="Screeplot on Variance Captured by the Principal Components", cex.main=if(ncol(dat) > 3) 1.3 else 0.8, cex.axis=0.6*cexTxt )
+    graphics::mtext(at=(1.2*(1:length(pca$sdev))-0.5)[1:min(10,ncol(dat))], as.character(1:length(pca$sdev))[1:min(10,ncol(dat))], cex=0.7, side=1) }
   if(getOutL & !is.null(rownames(pca$x))) return(outL)
   }
 
@@ -200,5 +200,5 @@ plotPCAw <- function(dat,sampleGrp,tit=NULL,useSymb=c(21:25,9:12,3:4),center=TRU
   if(length(textAdj) <1) textAdj <- 1:nrow(x)
   if(length(textOffSet) <1) textOffSet <- c(1,-4)*signif(apply(x[,1:2],2,function(x) abs(diff(range(x))))/300,3)   # design for left top display
   textOffSet <- matrix(rep(textOffSet,each=nrow(x)), ncol=2)
-  graphics::text(x[,c(1,2)]-textOffSet, labels=textLabel,col=textCol,cex=textCex,adj=textAdj) }
+  graphics::text(x[,c(1,2)]-textOffSet, labels=textLabel, col=textCol, cex=textCex, adj=textAdj) }
    

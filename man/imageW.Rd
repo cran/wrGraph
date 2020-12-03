@@ -11,6 +11,7 @@ imageW(
   colNa = NULL,
   tit = NULL,
   cexXlab = 0.7,
+  cexAxs = NULL,
   cexYlab = 1,
   cexTit = 1.6,
   NAcol = grDevices::grey(0.8),
@@ -29,6 +30,8 @@ imageW(
 \item{tit}{(character) custom figure title}
 
 \item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
+
+\item{cexAxs}{(numeric) cex-like expansion factor for x- and y-axis text/labels (see also \code{\link[graphics]{par}})}
 
 \item{cexYlab}{(numeric) cex-like expansion factor for y-axis labels  (see also \code{\link[graphics]{par}})}
 
