@@ -15,7 +15,7 @@
 #' @param FCthrs (numeric) Fold-Change threshold (display as line) give as Fold-change and NOT log2(FC)
 #' @param subTxt (character) custom sub-title
 #' @param grayIncrem (logical) if \code{TRUE}, display overlay of points as increased shades of gray 
-#' @param compNa (character) names of groups compared
+#' @param compNa (character) names of groups compared (as colnames of Mvalue$means) 
 #' @param batchFig (logical) if \code{TRUE} figure title and axes legends will be kept shorter for display on fewer splace  
 #' @param cexMa (numeric) expansion factor for font-size of title (see also \code{\link[graphics]{par}})
 #' @param cexLa (numeric) expansion factor \code{cex} for labels (see also \code{\link[graphics]{par}}) 
@@ -49,7 +49,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, filtFin=NULL, ProjNa=NULL, FCthrs=NULL,
   compNa=NULL, batchFig=FALSE, cexMa=1.8, cexLa=0.7, limM=NULL, limA=NULL, cexPt=NULL, cexSub=NULL, useMar=c(6.2,4,4,2), callFrom="", silent=FALSE,debug=FALSE) {
   ## MA plot
   ## optional arguments for explicit title in batch-mode
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="MAplotW")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="MAplotW")
   opar <- graphics::par(no.readonly = TRUE) 
   on.exit(graphics::par(opar$mar)) 
   on.exit(graphics::par(opar$cex.main)) 
@@ -65,10 +65,15 @@ MAplotW <- function(Mvalue, Avalue=NULL, filtFin=NULL, ProjNa=NULL, FCthrs=NULL,
       ## look for M values
       Mcol <- wrMisc::naOmit(match(c("mvalue","mval","m"), tolower(names(Mvalue))))
       if(length(Mcol) <1) {
-        if("means" %in% names(Mvalue)) {
-          Mvalue$Mval <- Mvalue$means[,1] - Mvalue$means[,2]
+        if("means" %in% names(Mvalue)) {          
+          chCompNa <- if(length(compNa)==2) wrMisc::naOmit(match(compNa,colnames(Mvalue$means))) else NULL
+          if(length(chCompNa)==2) Mvalue$Mval <- Mvalue$means[,chCompNa[1]] -Mvalue$means[,chCompNa[2]] 
+          if(length(chCompNa)==0) { compNa <- colnames(Mvalue$means)[1:2]
+            Mvalue$Mval <- Mvalue$means[,1] - Mvalue$means[,2]          
+          }
           Mcol <- which(names(Mvalue)=="Mval")
-          if(!silent & ncol(Mvalue$means) >2) message("Could not find explicit field for M-values, using 1st and 2nd of group-means for calulating M-values")
+          subTxt <- c(subTxt, wrMisc::pasteC(colnames(Mvalue$means)[1:2],quoteC="'"))
+          if(!silent & ncol(Mvalue$means) >2) message(fxNa," Using 1st and 2nd of group-means (", wrMisc::pasteC(colnames(Mvalue$means)[1:2],quoteC="'"), ") for calulating M-values")  
         } else stop("Could not find suitable field for M-values in '",namesIn[1],"' !") }    
       ## look for A values
       if(length(Avalue) >0) if(length(as.numeric(Avalue)) != length(as.numeric(Mvalue[[Mcol]]))) {
@@ -77,11 +82,12 @@ MAplotW <- function(Mvalue, Avalue=NULL, filtFin=NULL, ProjNa=NULL, FCthrs=NULL,
       }
       if(length(Avalue) <1) {
         ## no explicit Avalue, try to extract from MArrayLM-object (Mvalue)
-        Acol <- wrMisc::naOmit(match(c("amean","avalue","aval","a"),tolower(names(Mvalue))))
+        Acol <- wrMisc::naOmit(match(c("amean","avalue","aval","a"), tolower(names(Mvalue))))
         if(length(Acol) >0) Avalue <- Mvalue[[Acol[1]]] else {
           if("means" %in% names(Mvalue)) {
-            Avalue <- rowMeans(Mvalue$means[,1:2])
-            if(!silent & ncol(Mvalue$means) >2) message("Could not find explicit field for A-values,",
+            chCompNa <- if(length(compNa) ==2) wrMisc::naOmit(match(compNa,colnames(Mvalue$means))) else NULL            
+            Avalue <- rowMeans(Mvalue$means[,if(length(chCompNa)==2) chCompNa else 1:2]) 
+            if(!silent &length(compNa) <2) message("Could not find explicit field for A-values,",
               " using 1st and 2nd of group-means for calulating A-values")
             } else stop("Could not find suitable field for A-values in '",namesIn[1],"' !") }
         if(length(dim(Avalue)) >1) { ANa <- rownames(Avalue)
@@ -159,8 +165,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, filtFin=NULL, ProjNa=NULL, FCthrs=NULL,
     ## start plotting
     graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa,cex.lab=cexLa,las=1 )
     baseCol <- if(grayIncrem) grDevices::rgb(0.95,0.95,0.95) else grDevices::rgb(0.7,0.7,0.7)
-    graphics::plot(Avalue,Mvalue,pch=16,cex=useCex,main=tit1,xlab="A-value (average log2 intensity)",col=baseCol,ylab=xLab,cex.lab=cexLa,ylim=limM,xlim=limA)
-    graphics::abline(h=0,lty=2,col="seagreen")
+    graphics::plot(Avalue, Mvalue, pch=16, cex=useCex, main=tit1, xlab="A-value (average log2 intensity)",col=baseCol,ylab=xLab,cex.lab=cexLa,ylim=limM,xlim=limA)
+    graphics::abline(h=0, lty=2, col="seagreen")
     if(sum(filtFin,na.rm=TRUE) <1){
       if(!silent) message(fxNa," 0 elements/lines passing 'filtFin' !!")
       FCthrs <- NULL }
@@ -168,17 +174,17 @@ MAplotW <- function(Mvalue, Avalue=NULL, filtFin=NULL, ProjNa=NULL, FCthrs=NULL,
       FCthrs <- log2(FCthrs)
       graphics::abline(h=c(-1,1)*FCthrs+c(0.01,-0.02), col=grDevices::rgb(0.87,0.72,0.72),lty=2)}
     if(grayIncrem & sum(filtFin,na.rm=TRUE) >0) { if(length(FCthrs) <1) {       # no FCthrs, grey incement only on filtFin
-      graphics::points(Avalue[filtFin],Mvalue[filtFin],pch=16,cex=useCex,col=grDevices::rgb(0.5,0.5,0.5,alph))
+      graphics::points(Avalue[filtFin], Mvalue[filtFin], pch=16, cex=useCex, col=grDevices::rgb(0.5,0.5,0.5,alph))
     } else  {
       passFC <- which(filtFin & abs(Mvalue) > FCthrs)
       alph2 <- max(round(1.3/(10+sum(filtFin)^0.25),2),alph+0.05)
       if(!silent) message(" n=",length(Mvalue),"  FCthrs=",signif(2^FCthrs,2),"  filt=",sum(filtFin),
         "  passFC=",length(passFC),"  range Mva ",wrMisc::pasteC(signif(range(Mvalue,na.rm=T),3)),"  alph=",alph,"  useCex=",useCex,"  alph2=",alph2)
       if(length(passFC) >0) {
-        if(length(passFC) < sum(filtFin)) graphics::points(Avalue[-passFC],Mvalue[-passFC],pch=16,cex=useCex,col=grDevices::rgb(0.5,0.5,0.5,alph))
-        graphics::points(Avalue[passFC],Mvalue[passFC],col=grDevices::rgb(0.8,0.01,0.01,alph2),pch=16,cex=useCex)        # red point (only passing filtFin)
-      } else graphics::points(Avalue[filtFin],Mvalue[filtFin],pch=16,cex=useCex,col=grDevices::rgb(0.5,0.5,0.5,alph))
+        if(length(passFC) < sum(filtFin)) graphics::points(Avalue[-passFC], Mvalue[-passFC], pch=16, cex=useCex,col=grDevices::rgb(0.5,0.5,0.5,alph))
+        graphics::points(Avalue[passFC], Mvalue[passFC], col=grDevices::rgb(0.8,0.01,0.01,alph2), pch=16,cex=useCex)        # red point (only passing filtFin)
+      } else graphics::points(Avalue[filtFin], Mvalue[filtFin], pch=16, cex=useCex, col=grDevices::rgb(0.5,0.5,0.5,alph))
       graphics::mtext(paste(if(!is.null(subTxt)) paste("plot",subTxt,"data; "),"n =",length(Mvalue),"; ",
-        length(passFC),"(red) point(s) passing filtering (FCthr=",signif(2^FCthrs,2),")"),cex=0.75,line=0.2)
+        length(passFC),"(red) point(s) passing filtering (FCthr=",signif(2^FCthrs,2),")"), cex=0.75,line=0.2)
     }} }}
     

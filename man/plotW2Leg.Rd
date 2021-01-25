@@ -63,13 +63,13 @@ plotW2Leg(
 graphical output only
 }
 \description{
-This is a modified version of \code{\link[base]{plot}} for 2-dimensional data,
-allowing to choose symbols and colors of points according to an additional columns of \code{dat}.
+This is a modified version of \code{plot} for 2-dimensional data,
+allowing to choose symbols and colors of points according to two additional columns of \code{dat}.
 }
 \examples{
 x1 <- cbind(x=c(2,1:7), y=8:1 +runif(8), grade=rep(1:4,2))
 plotW2Leg(x1,useCol=c("x","y","y","grade"))
 }
 \seealso{
-\code{\link[base]{plot}}
+(standard plots) \code{plot} from the package \code{base}
 }

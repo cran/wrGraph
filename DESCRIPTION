@@ -1,9 +1,9 @@
 Package: wrGraph
-Version: 1.1.1
+Version: 1.2.0
 Title: Graphics in the Context of Analyzing High-Throughput Data
-Authors@R: person("Wolfgang", "Raffelsberger", email = "w.raffelsberger@unistra.fr", role = c("aut", "cre"))
+Authors@R: person("Wolfgang", "Raffelsberger", email = "w.raffelsberger@gmail.com", role = c("aut", "cre"))
 Author: Wolfgang Raffelsberger [aut, cre]
-Maintainer: Wolfgang Raffelsberger <w.raffelsberger@unistra.fr>
+Maintainer: Wolfgang Raffelsberger <w.raffelsberger@gmail.com>
 Description: Additional options for making graphics in the context of analyzing high-throughput data are available here.
   This includes automatic segmenting of the current device (eg window) to accommodate multiple new plots, 
   automatic checking for optimal location of legends in plots, small histograms to insert as legends, 
@@ -21,6 +21,6 @@ LazyData: true
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-12-03 17:29:57 UTC; wraff
+Packaged: 2021-01-25 19:24:38 UTC; wraff
 Repository: CRAN
-Date/Publication: 2020-12-03 17:50:03 UTC
+Date/Publication: 2021-01-25 21:40:02 UTC

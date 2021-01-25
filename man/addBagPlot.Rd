@@ -78,20 +78,20 @@ in addition, one could use the option to re-plot all (non-outlyer) points (argum
 }
 \examples{
 set.seed(2020); dat1 <- matrix(round(rnorm(2000),3),ncol=2); rownames(dat1) <- 1:nrow(dat1)
-dat1 <- dat1+ 5*matrix(rep(c(0,1,1,0,0,0,1,1),nrow(dat1)/4),byrow=TRUE,ncol=2)
-col1 <- rgb(red=c(153,90,203,255 ),green=c(143,195,211,125),blue=c(204,186,78,115),
-  alpha=90,maxColorValue=255)
+dat1 <- dat1+ 5*matrix(rep(c(0,1,1,0,0,0,1,1),nrow(dat1)/4), byrow=TRUE, ncol=2)
+col1 <- rgb(red=c(153,90,203,255), green=c(143,195,211,125), blue=c(204,186,78,115),
+  alpha=90, maxColorValue=255)
 ## suppose we know the repartition into 4 subgroups which we would like to highlight them
-grp1 <- rep(1:4,nrow(dat1)/4)
-plot(dat1,col=grey(0.8),xlab="x",ylab="y",las=1,pch=grp1)
-for(i in 1:4) addBagPlot(dat1[which(grp1==i),],bagCol=col1[i])
+grp1 <- rep(1:4, nrow(dat1)/4)
+plot(dat1, col=grey(0.8), xlab="x", ylab="y", las=1, pch=grp1)
+for(i in 1:4) addBagPlot(dat1[which(grp1==i),], bagCol=col1[i])
 ## slightly improved
 library(wrMisc)
-col2 <- convColorToTransp(col1,255)
-plot(dat1,col=grey(0.8),xlab="x",ylab="y",las=1,pch=grp1)
-for(i in 1:4) addBagPlot(dat1[which(grp1==i),],bagCol=col1[i],outlPch=i,
-  outlCol=col2[i],bagLwd=3)
+col2 <- convColorToTransp(col1, 255)
+plot(dat1, col=grey(0.8), xlab="x", ylab="y", las=1, pch=grp1)
+for(i in 1:4) addBagPlot(dat1[which(grp1==i),], bagCol=col1[i], outlPch=i,
+  outlCol=col2[i], bagLwd=3)
 }
 \seealso{
-\code{\link{plotPCAw}},  \code{\link[stats]{princomp}}
+\code{\link{plotPCAw}}, \code{\link[stats]{princomp}}
 }

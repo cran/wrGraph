@@ -31,11 +31,18 @@ suppressPackageStartupMessages({
     library(factoextra)
 })
 ```
+
 This package is available from [CRAN](https://cran.r-project.org/), you might also have to install [wrMisc](https://CRAN.R-project.org/package=wrMisc), too.
 If not yet installed, the lastest versions of this package can be installed like this : 
 
 ```{r setup2, echo=TRUE, eval=FALSE}
 install.packages("wrGraph")
+```
+
+You cat start the vignette for this package by typing :
+```{r vignBrowse, echo=TRUE, eval=FALSE}
+# access vignette :
+browseVignettes("wrGraph")    #  ... and the select the html output
 ```
 
 
@@ -65,7 +72,6 @@ This might be useful in particular when during an analysis-pipeline it's not kno
 (part <- partitionPlot(ncol(iris)-1))
 layout(part)
 for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
-
 ```
 
 ## Optimal Legend Location
@@ -114,7 +120,6 @@ layout(1)
 plot(iris[,1:2],main="Iris data")
 legendHist(iris[,1], loc="br", legTit=colnames(iris)[1],cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
-
 ```
 
 ## Violin Plots
@@ -146,7 +151,6 @@ Thus the resultant plot does not suffer from deformation due to binning or smoot
 
 ```{r cumFrqPlot1, echo=TRUE}
 cumFrqPlot(iris[,1:4])
-
 ```
 
 For example, the iris-data are rounded. As a result in the plot above the line is not progressing smooth but with more marked character of steps of stairs. 
@@ -188,7 +192,6 @@ irisC <- cbind(thr,t(irisC))
 staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-data")
 staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data")
 staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data (log-scale)", logScale=TRUE)
-
 ```
 
 
@@ -208,7 +211,6 @@ This plot is not well adopted to big data (it will get too crowded).
 dat <- iris[which(iris$Species %in% c("setosa","versicolor")),]
 plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5), yLab="Sepal.Length")
-
 ```
 
 ## Plotting Linear Regression and Confidence Intervals
@@ -277,9 +279,9 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
 ```
 
 
-## MA-plot
+## MA-Plot
 
-The aim of [MA-plots](https://en.wikipedia.org/wiki/Bagplot) is to display a relative change on one axis (ordinate) while 
+The aim of [MA-plots](https://en.wikipedia.org/wiki/MA_plot) consists in displaying a relative change on one axis (ordinate) while 
 showing the absolute (mean) value on the other axis (abscissa). 
 This plot is very useful when inspecting larger data-sets for random or systematic effects,
 numerous implementations for specific applications exist (eg *plotMA* in [DEseq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)).
@@ -315,7 +317,7 @@ In the last plot one can see easily the 80 points that have been increased in th
 exceed a (based on linear data) fold-change of 1.5 (which on log2 scale apprears at 0.58).
 
 
-## Volcano-plot
+## Volcano-Plot
 
 The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate) and outcome of statistical test on the other axis (abscissa). Typically the statistical values are represented as negative log10.
 
@@ -342,7 +344,6 @@ tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
 
 VolcanoPlotW(tRes2)
 VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
-
 ```
 
 ```{r Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE}
@@ -409,6 +410,10 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 ## Now we are ready to open the html file using any browser ..
 #from within R# browseURL(htmFile) 
 ```
+
+## Acknowledgements
+
+The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](http://www.cnrs.fr/), [Universite de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](http://proteomics.igbmc.fr/).
 
 Thank you for you interest in this package.
 This package is still under development, new functions will be added to the next version.

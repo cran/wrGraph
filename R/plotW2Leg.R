@@ -1,7 +1,7 @@
 #' x-y plot with 2 legends  
 #'
-#' This is a modified version of \code{\link[base]{plot}} for 2-dimensional data,
-#' allowing to choose symbols and colors of points according to an additional columns of \code{dat}. 
+#' This is a modified version of \code{plot} for 2-dimensional data,
+#' allowing to choose symbols and colors of points according to two additional columns of \code{dat}. 
 #'   
 #' 
 #'
@@ -22,7 +22,7 @@
 #' @param legHiTi (character) optional title for histomgram-legend
 #' @param silent (logical) suppress messages
 #' @param callFrom (character) allow easier tracking of message(s) produced
-#' @seealso \code{\link[base]{plot}}   
+#' @seealso (standard plots) \code{plot} from the package \code{base}   
 #' @return graphical output only
 #' @examples
 #' x1 <- cbind(x=c(2,1:7), y=8:1 +runif(8), grade=rep(1:4,2))

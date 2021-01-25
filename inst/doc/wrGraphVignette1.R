@@ -12,6 +12,10 @@ suppressPackageStartupMessages({
 ## ----setup2, echo=TRUE, eval=FALSE--------------------------------------------
 #  install.packages("wrGraph")
 
+## ----vignBrowse, echo=TRUE, eval=FALSE----------------------------------------
+#  # access vignette :
+#  browseVignettes("wrGraph")    #  ... and the select the html output
+
 ## ----setup3, echo=TRUE--------------------------------------------------------
 library("wrMisc")
 library("wrGraph")
@@ -23,7 +27,6 @@ packageVersion("wrGraph")
 (part <- partitionPlot(ncol(iris)-1))
 layout(part)
 for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
-
 
 ## ----LegLoc1, echo=TRUE-------------------------------------------------------
 dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
@@ -53,13 +56,11 @@ plot(iris[,1:2],main="Iris data")
 legendHist(iris[,1], loc="br", legTit=colnames(iris)[1],cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
 
-
 ## ----vioplot1, echo=TRUE------------------------------------------------------
 vioplotW(iris[,-5],tit="Iris-data")
 
 ## ----cumFrqPlot1, echo=TRUE---------------------------------------------------
 cumFrqPlot(iris[,1:4])
-
 
 ## ----imageW, echo=TRUE--------------------------------------------------------
 imageW(as.matrix(iris[1:40,1:4]))
@@ -74,12 +75,10 @@ staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-data")
 staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data")
 staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data (log-scale)", logScale=TRUE)
 
-
 ## ----plotBy2Groups1, echo=TRUE------------------------------------------------
 dat <- iris[which(iris$Species %in% c("setosa","versicolor")),]
 plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5), yLab="Sepal.Length")
-
 
 ## ----plotLinReg1, echo=TRUE---------------------------------------------------
 plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
@@ -139,7 +138,6 @@ tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
 
 VolcanoPlotW(tRes2)
 VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
-
 
 ## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
 ## assume 3 groups with 3 samples each
