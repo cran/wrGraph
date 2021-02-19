@@ -1,13 +1,13 @@
-8971b6b149d49e1edf39aa3a93d6ff32 *DESCRIPTION
+0206edce55f23ce1eef4ef2b421383b0 *DESCRIPTION
 70fc567092d7ebe165354f108b49926c *NAMESPACE
 14e5a3ae7f70994a490e345fe06cee83 *R/MAplotW.R
-3374ace261157f1c505d31704f48fc20 *R/VolcanoPlotW.R
+e1e8d60d2f574347eef8a6e8b36c8325 *R/VolcanoPlotW.R
 069658dd6560cbf984ba9ab73b5b9336 *R/addBagPlot.R
 e6ed8d57cf83dc7ad430eb05c68397a3 *R/checkForLegLoc.R
 c8c5843a0a095fc372c200f4b0866bf3 *R/convertPlotCoordPix.R
 a1ffffc9ce31e2650487ce97d81626ba *R/cumFrqPlot.R
 d3dc51e3035e776eef00495fb8b345c4 *R/histW.R
-504ae911ee247c302bba8d4006316b60 *R/imageW.R
+02616fd9f97771b2baa13f77b07af22f *R/imageW.R
 22e08b4853cb59a1de91f6f47b280aa7 *R/legendHist.R
 7b085d6092949475161cb645862622e1 *R/mouseOverHtmlFile.R
 bb66f97952af9809b8c28d68127c13af *R/partitionPlot.R
@@ -20,8 +20,8 @@ fe02deb626270b96a87b4c0b6ec5973e *R/staggerdCountsPlot.R
 3089f9cab068ba14768b0b6a3952064d *R/vioplotW.R
 4a1f615b55d7410a4d9e1c594164f377 *build/vignette.rds
 08a7e77b4d513339e594adbcc2f24e6b *inst/doc/wrGraphVignette1.R
-92bd15e1791d1f05624a371aa27a853e *inst/doc/wrGraphVignette1.Rmd
-a85f4a713515e98b286d6ebbefd807c2 *inst/doc/wrGraphVignette1.html
+aa26679e47f7c4b2194557b09ac85c27 *inst/doc/wrGraphVignette1.Rmd
+f5b67a317a439a42a906a00fe80700c6 *inst/doc/wrGraphVignette1.html
 950b831b8c2e44e2f75cd14bcb5d5e43 *man/MAplotW.Rd
 e0a28e3bb76a433607574b8656e8408e *man/VolcanoPlotW.Rd
 c09c07ff1b3de1e2c1d3e48d75bd9a6e *man/addBagPlot.Rd
@@ -29,7 +29,7 @@ c09c07ff1b3de1e2c1d3e48d75bd9a6e *man/addBagPlot.Rd
 ce5067b18b089261b571098cebd12325 *man/convertPlotCoordPix.Rd
 ed9b59d8489404d2dd0149dbd92b1606 *man/cumFrqPlot.Rd
 c3783d6440e133a60ca0bad00c7ca69e *man/histW.Rd
-708fe90afffbc4ec30bc4b409fc39ff7 *man/imageW.Rd
+95ce4ead7384e6f32b4feb657ab35aaa *man/imageW.Rd
 50795bea96690ee4d960fd981b5bbc0b *man/legendHist.Rd
 042bde072998b123e0d9a4932030005c *man/mouseOverHtmlFile.Rd
 ed375bd26a6d55f40e12a33245d7e6c2 *man/partitionPlot.Rd
@@ -40,4 +40,4 @@ e3e2cb00dba766b853f82854254e0752 *man/plotW2Leg.Rd
 5cbc3e7c8a38ad111aeb21a82dded173 *man/profileAsClu.Rd
 cda983552c3c9e9e1d48b83f5d47c9af *man/staggerdCountsPlot.Rd
 81d3ce1f3aa866c7130d0c03c5d2aca5 *man/vioplotW.Rd
-92bd15e1791d1f05624a371aa27a853e *vignettes/wrGraphVignette1.Rmd
+aa26679e47f7c4b2194557b09ac85c27 *vignettes/wrGraphVignette1.Rmd

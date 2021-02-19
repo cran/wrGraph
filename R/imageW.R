@@ -10,6 +10,8 @@
 #' @param rowNa (character) optional custom rownames
 #' @param colNa (character) optional custom colnames
 #' @param tit (character) custom figure title
+#' @param xLab (character) optional custom names for x-axis
+#' @param yLab (character) optional custom names for y-axis
 #' @param cexXlab (numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})
 #' @param cexAxs (numeric) cex-like expansion factor for x- and y-axis text/labels (see also \code{\link[graphics]{par}})
 #' @param cexYlab (numeric) cex-like expansion factor for y-axis labels  (see also \code{\link[graphics]{par}})
@@ -21,7 +23,7 @@
 #' @examples
 #' imageW(as.matrix(iris[1:40,1:4]))
 #' @export
-imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, cexXlab=0.7, cexAxs=NULL, cexYlab=1, cexTit=1.6, NAcol=grDevices::grey(0.8), las=2) {
+imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NULL, yLab=NULL, cexXlab=0.7, cexAxs=NULL, cexYlab=1, cexTit=1.6, NAcol=grDevices::grey(0.8), las=2) {
   ## improved version if image()
   dat <- dat[,ncol(dat):1]
   if(length(col) <1) col <- rev(grDevices::heat.colors(15))
@@ -33,7 +35,7 @@ imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, cexXlab=0.7,
   if(length(rowNa) <1) rowNa <- 1:nrow(dat)
   if(length(colNa) <ncol(dat)) colNa <- colnames(dat)
   if(length(colNa) <1) rowNa <- 1:ncol(dat)  
-  graphics::image(dat, col=col, xaxt="n", yaxt="n", main=tit, cex.main=cexTit)
+  graphics::image(dat, col=col, xaxt="n", yaxt="n", main=tit, xlab=xLab, ylab=yLab, cex.main=cexTit)
   graphics::mtext(at=(0:(length(colNa)-1))/(length(colNa)-1), colNa, side=2, line=0.3, las=las, cex=cexYlab)   # on left  , cex=cexAxs
   graphics::mtext(at=(0:(length(rowNa)-1))/(length(rowNa)-1), rowNa, side=1, line=0.3, las=las, cex=cexXlab)   # on bottom  , cex=cexAxs
   graphics::box(col=grDevices::grey(0.8)) }

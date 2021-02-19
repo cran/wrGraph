@@ -78,17 +78,22 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   namesIn <- c(deparse(substitute(Mvalue)), deparse(substitute(pValue)), deparse(substitute(filtFin)))
   basRGB <- c(0.3,0.3,0.3)           # grey
   fcRGB <- c(1,0,0)                  # red        for points passing  FC filt line
-  splNa <- annot <- ptType <- colPass <- ptBg <- grpMeans <- NULL      # initialize  
+  splNa <- annot <- ptType <- colPass <- ptBg <- grpMeans <- pcol <- NULL      # initialize  
   if(debug) silent <- FALSE
   if(length(Mvalue) <1) message(" nothing to do, 'Mvalue' seems to be empty !") else  {
     ## data seem valid to make MAplot
     if(length(cexTxLab) <0) cexTxLab <- 0.7
     if("MArrayLM" %in% class(Mvalue)) {
-      ## no pValues provided : extract from MArrayLM-object (Mvalue)
+      ## try working based on MArrayLM-object (Mvalue)
+      ## initial check of  useComp
+      if(length(useComp) >1) { useComp <- wrMisc::naOmit(useComp)[1]
+        if(!silent) message(fxNa," argument 'useComp' should be integer of length=1; using only 1st entry") }
+      if(length(useComp) <1) { useComp <- 1
+        if(!silent) message(fxNa," argument 'useComp' invalid, setting to 1") }
       if(length(pValue) <1) {
-        ## no explicit pValue, try to extract from MArrayLM-object (Mvalue) => take pValue from MArrayLM-object 
+        ## no spearate pValues provided : extract from MArrayLM-object (Mvalue)
         pcol <- wrMisc::naOmit(match(c("p.value","pvalue","pval","p"), tolower(names(Mvalue))))
-        if(length(pcol) >0) pValue <- Mvalue[[pcol[1]]] else stop("can't find suitable element for p-Values")
+        if(length(pcol) >0) pValue <- Mvalue[[pcol[1]]] else stop("can't find suitable element for p-Values from MArrayLM-object")
         if(length(dim(pValue)) >0) if(colnames(pValue)[1]=="(Intercept)" & ncol(pValue) >1) {
           ## extract 2nd col if result from wrMisc::moderTest2grp() 
           pNa <- rownames(pValue)
@@ -96,42 +101,39 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           names(pValue) <- pNa 
         } else {
           ## need to find corresponding of multiple comparisons
-          names(useComp) <- colnames(pValue)[useComp]
-          splNa <- unlist(strsplit(colnames(pValue)[useComp], "-"))
-          pNa <- rownames(pValue)
-          if(ncol(pValue) >1) { if(useComp > ncol(pValue)) { useComp <- 1
-            names(useComp) <- colnames(pValue)[useComp]
+          if(useComp > ncol(pValue)) { useComp <- 1
             if(!silent) message(fxNa," argument 'useComp' for pValues invalid or too high; reset to 1") }
+          names(useComp) <- colnames(pValue)[useComp]
+          pNa <- rownames(pValue)
           pValue <- as.numeric(pValue[,useComp])
-          if(length(pNa) >0) names(pValue) <- pNa }}
-      }      
+          if(length(pNa) >0) names(pValue) <- pNa }
+      }  ## otherwise spearate pValue was provided
       ## look for M-values (need to create if not available - using useComp checked when extracting pValue)
       Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","m"), tolower(names(Mvalue))))   # which list-element
       if(length(Melem) >0) { Mvalue$Mval <- Mvalue[[Melem]]
-        if(length(dim(Mvalue$Mval)) >0) if(ncol(Mvalue$Mval) >1) {
-          if(length(useComp) <1) {message(fxNa," set missing 'useComp' to 1"); useComp <- 1 }
-          if(useComp[1] > ncol(Mvalue$Mval)) { if(!silent) message(fxNa," re-set invalid 'useComp' to 1"); useComp <- 1 }
-          Mvalue$Mval <- Mvalue$Mval[,useComp[1]]}
-      } else {
+        if(length(dim(Mvalue$Mval)) >0) if(ncol(Mvalue$Mval) >1) {          ## M-values are available
+          if(useComp[1] > ncol(Mvalue$Mval)) { if(!silent) message(fxNa," 'useComp' is too high, set to 1"); useComp <- 1 }
+          Mvalue$Mval <- Mvalue$Mval[,useComp]}
+      } else {                               #  need to construct M-values based on means
         if("means" %in% names(Mvalue)) {
-          if(debug) message(fxNa, "Reconstructing Mvalues based on group-means")
-          if(length(splNa) <1) splNa <- NULL
-          if(ncol(Mvalue$means) >2 & length(splNa) >1) {
-            chMe <- lapply(splNa, function(x) colnames(Mvalue$means) %in% x)
-            if(any(sapply(chMe,sum,na.rm=TRUE) <1)) stop("Can't find/match columns of means designated by 'useComp' : ",
-              wrMisc::pasteC(useComp[which(sapply(chMe,sum,na.rm=TRUE) <1)], quoteC="'"))
-            if(any(sapply(chMe,sum,na.rm=TRUE) >1) & !silent) message(fxNa," Some expected column-names of Mvalue$means appear multiple times ! (using first)")
-            grpMeans <- cbind(mean1=Mvalue$means[,which(chMe[[1]])[1]], mean2=Mvalue$means[,which(chMe[[2]])[1]])
-          } else grpMeans <- Mvalue$means 
-          Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]
-          Melem <- which(names(Mvalue)=="Mval")
+          ## identify sammple-groups to comparsison(s)
+          meanCol <- if(ncol(Mvalue$means)==2 | colnames(Mvalue$p.value)[1] =="(Intercept)") 1:2 else {
+            wrMisc::matchSampToPairw(colnames(Mvalue$means), colnames(Mvalue$p.value)[useComp]) }
+          grpMeans <- cbind(mean1=Mvalue$means[,meanCol[1]], mean2=Mvalue$means[,meanCol[2]])
+          Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]                           
+          Melem <- which(names(Mvalue)=="Mval")                # update
         } else stop("Could not find suitable field '$means' in '",namesIn[1],"' to construct M-values !")    
       }
-      ## pValues : if provided separately, check Corresp p-values & Mvalues
-      if(length(pValue) >0) if(length(as.numeric(pValue)) != length(as.numeric(Mvalue[[Melem]]))) {
-        if(!silent) message(fxNa,"Content of 'pValue' seems not to fit to 'Mvalue', ignore and try to use p-values from '",namesIn[1],"' ")
-        pValue <- NULL
+      ## now one can check if 'pValue' & Mvalue match
+      chPM <- length(pValue) >0 & length(as.numeric(pValue)) == length(as.numeric(Mvalue[[Melem]]))
+      if(!chPM) {
+        if(length(pcol) >0) {            # pVal avilable in Mvalue 
+          if(length(as.numeric(Mvalue[[pcol[1]]][,useComp])) ==length(as.numeric(Mvalue[[Melem]]))) {  # pVal from Mvalue seems to fit => use
+             pValue <- as.numeric(Mvalue[[pcol[1]]][,useComp])          
+          } else stop("'pValue' & 'Mvalue' don't match")  
+        } else stop("'pValue' & 'Mvalue' don't match (no field in MArrayLM-object available)") 
       }
+       
       ## extract FDR from MArrayLM-object 
       if(length(FdrList) <1) {
         ## no explicit pValue, try to extract from MArrayLM-object (Mvalue)
@@ -155,7 +157,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       }
       ## recuperate filtering - if present, but only when no custom filtering provided
       if(length(filtFin) <1 | identical(filtFin, FALSE)) {
-        Fcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"),tolower(names(Mvalue))))
+        Fcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"), tolower(names(Mvalue))))
         if(length(Fcol) >0) filtFin <- Mvalue[[Fcol[1]]]
       }
       ## recuperate $annot if present and use for symbol
@@ -173,13 +175,15 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       if(length(pch)==1) pch <- rep(as.integer(pch), length(pValue))        
       
       ## recuperate M values (& dismiss rest of MArrayLM-object)  
-      Mvalue <- Mvalue[[Melem[1]]]
-      if(length(dim(Mvalue)) >1) {MNa <- rownames(Mvalue)
+      Mvalue <- Mvalue$Mval
+      if(length(dim(Mvalue)) >1) { MNa <- rownames(Mvalue)
         Mvalue <- as.numeric(Mvalue)
         if(length(MNa) >0) names(Mvalue) <- MNa }
+      ## additional check for length 
       chpM <- length(Mvalue)==length(pValue)  
       if(!chpM & !silent) message("p- and M- values have different length !!  (M=",length(Mvalue)," vs p=",length(pValue),")")
-      ## done with extracing MArrayLM-object
+
+      ## done with extracing MArrayLM-object    
       if(!silent) message(fxNa,"Successfully extracted  ",length(Mvalue)," Mvalues and  ",length(pValue)," pValues", if(length(annot) >0) c(" plus anotation"))      
     } else {
       ## thus argument 'Mvalue' is not 'MArrayLM'-object
@@ -192,7 +196,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         names(pValue) <- pNa} 
       if(length(FdrList) <1) {
         FDRvalue <- NULL
-      }  
+      } else FDRvalue <- FdrList  
     } 
     
     ## need to introduce -log10 to pValue
@@ -213,6 +217,8 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         if(length(Mvalue) != length(pValue)) stop("p- and M- values have different length, but no names to match !!  (M=",length(Mvalue)," vs p=",length(pValue),")")
       }
     if(length(grpMeans) <1) grpMeans <- matrix(rep(NA,2*length(Mvalue)), ncol=2, dimnames=list(names(Mvalue),c("mean1","mean2")))
+    
+    ## start creating merged data for plot (& export)
     merg <- if(length(annot) >0) data.frame(ID=NA, grpMeans, Mvalue=Mvalue, pValue=pValue, FDR=if(length(FDRvalue) >0) FDRvalue else rep(NA,length(pValue)), 
       filtFin=rep(TRUE,length(pValue)), annot, stringsAsFactors=FALSE) else {data.frame(ID=NA, grpMeans, Mvalue=Mvalue, pValue=pValue, stringsAsFactors=FALSE) }
     if(length(names(Mvalue)) >0) merg[,1] <- names(Mvalue) else {if(length(names(pValue)) >0) merg[,1] <- names(pValue)}
@@ -224,7 +230,8 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     if(length(col) >1 & length(col) <length(Mvalue)) {
       if(!silent) message(fxNa,"argument 'col' should be either length=1 or correspond to length of data, reset to default=NULL")
       col <- NULL }
-    ## integrate filtering
+
+    ## integrate FILTERING
     if(length(filtFin) >0) {
       ## if filtFin is matrix use each line with min 1 instance of TRUE,
       if(length(dim(filtFin)) >1) filtFin <- rowSums(as.logical(as.matrix(filtFin)[,useComp])) >0    # use rows with >= 1 TRUE
@@ -233,23 +240,22 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         if(length(matchNa)==nrow(merg)) merg[,"filtFin"] <- filtFin[matchNa]
       } else if(length(filtFin)==nrow(merg)) merg[,"filtFin"] <- filtFin        # no proof that order of filtFin is correct
     } else filtFin <- rep(TRUE, nrow(merg)) 
-    if(debug) message(fxNa," ++ DONE extracing columns : ",wrMisc::pasteC(colnames(merg),quo="'"))
+    if(debug) message(fxNa," ++ DONE extracting columns : ",wrMisc::pasteC(colnames(merg),quo="'"))
     ##
     msg <- " data provided in 'Mvalue' and 'pValue' "
     if(!silent & nrow(merg) < round(length(Mvalue)/10)) message(" .. note : less than 10% of",msg," were matched") else {
       if(!silent & nrow(merg) < length(Mvalue)/2) message(" .. NOTE : less than 50% of",msg," were matched !!")}
-    if(debug) message(msg," were matched to ",nrow(merg)," common entries")
-    
-    ## apply filtering
-    if(length(filtFin) >0 & !identical(filtFin,FALSE)) {                         #  use filtering provided
+    if(debug) message(msg," were matched to ",nrow(merg)," common entries")    
+    ## apply filtering (keep all lines where at least one condition passes)
+    if(length(filtFin) >0 & !identical(filtFin, FALSE)) {                         #  use filtering provided
       if(sum(filtFin) >0 & sum(filtFin) < nrow(merg)) { 
         whFilt <- which(merg$filtFin)
         if(length(pch) >1) pch <- pch[whFilt]
         if(length(col) >1) col <- col[whFilt]
         merg <- merg[whFilt,]
         if(!silent) message(fxNa," filtered (based on 'filtFin') from ",length(filtFin)," to  ",nrow(merg)," lines")
-        }
-    } else filtFin <- rep(TRUE,nrow(merg))
+      }
+    } else filtFin <- rep(TRUE, nrow(merg))
     nIDco <- sum(c("ID","nredID","uniqID") %in% colnames(merg))                   #  number of heading columns in 'merg'
     Mvalue <- as.numeric(if("Mvalue" %in% colnames(merg)) merg[,"Mvalue"] else merg[,nIDco+1])
     pValue <- as.numeric(if("pValue" %in% colnames(merg)) merg[,"pValue"] else {
@@ -277,9 +283,9 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           alph2 <- max(round(4/(10 +sum(filtFin)^0.25),2), alph) 
           alph3 <- max(round(1.3/(10 +sum(filtFin)^0.25),2), alph +0.05)                 # alternative for alph2 
       useCol <- if(grayIncrem) grDevices::rgb(0.35,0.35,0.35,alph) else grDevices::rgb(0.7,0.7,0.7)
-      useCex <- if(length(cexPt) >0) cexPt else max(round(0.8 +2/(1 +sum(filtFin,na.rm=TRUE))^0.28,2), 1.1)
+      useCex <- if(length(cexPt) >0) cexPt else max(round(0.8 + 2/(1 +sum(filtFin, na.rm=TRUE))^0.28,2), 1.1)
       colPass <- grDevices::rgb(0.8,0.01,0.01, alph2)                 # (default) red
-      whCol <- rep(1,length(Mvalue))
+      whCol <- rep(1, length(Mvalue))
       if(any(passAll)) whCol[which(passAll)] <- 2                     # assign color for those passing
       useCol <- c(useCol,colPass)[whCol]  
     } else useCol <- col
@@ -288,13 +294,12 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     if(any(chPch)) {ptBg <- col ; col[which(chPch)] <- grDevices::rgb(0.2,0.2,0.2, max(alph,0.4)) }
     
     ## main graphic
-    #graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, cex.lab=cexLa, las=1)
     graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, las=1)
-    #graphics::plot(Mvalue, pValue, pch=pch, cex=useCex, main=tit1, ylab="- log10 p-value (uncorrected)", col=useCol,xlab=xLab,cex.lab=cexLa,xlim=limM,ylim=limp)
-    graphics::plot(Mvalue, pValue, pch=pch, cex=useCex, main=tit1, ylab="- log10 p-value (uncorrected)", col=useCol, xlab=xLab,cex.lab=cexLa,xlim=limM,ylim=limp,pt.bg=ptBg)
+    graphics::plot(Mvalue, pValue, pch=pch, cex=useCex, main=tit1, ylab="- log10 p-value (uncorrected)", col=useCol, xlab=xLab, cex.lab=cexLa, xlim=limM,ylim=limp, pt.bg=ptBg)
     sTxt <- paste(if(length(splNa) >0) paste(names(useComp),": "), if(!is.null(subTxt)) paste("plot",subTxt,"data; "), "n =",length(Mvalue),
-      if(!all(is.na(c(FCthrs,FdrThrs)))) paste("; ",sum(passAll, na.rm=TRUE),"(red) points passing thresholds (FCthr=",as.character(FCthrs),
-        ", FdrThrs=",as.character(FdrThrs),")"))
+      if(!all(is.na(c(FCthrs,FdrThrs)))) paste(";",sum(passAll, na.rm=TRUE),"(red) points passing",
+        if(!is.na(FCthrs)) paste0("(FCthr=", as.character(FCthrs),",") else "(",
+        paste0("FdrThrs=",as.character(FdrThrs),")")))
     graphics::mtext(sTxt,cex=0.75,line=0.2)
     if(!all(is.na(c(FCthrs,FdrThrs)))) { 
       if(debug) message(fxNa," n=",length(Mvalue),"  FCthrs=",as.character(FCthrs),"  filt.ini=", sum(filtFin, na.rm=TRUE),

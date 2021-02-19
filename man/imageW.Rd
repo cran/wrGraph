@@ -10,6 +10,8 @@ imageW(
   rowNa = NULL,
   colNa = NULL,
   tit = NULL,
+  xLab = NULL,
+  yLab = NULL,
   cexXlab = 0.7,
   cexAxs = NULL,
   cexYlab = 1,
@@ -28,6 +30,10 @@ imageW(
 \item{colNa}{(character) optional custom colnames}
 
 \item{tit}{(character) custom figure title}
+
+\item{xLab}{(character) optional custom names for x-axis}
+
+\item{yLab}{(character) optional custom names for y-axis}
 
 \item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
 
