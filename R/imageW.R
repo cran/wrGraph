@@ -1,8 +1,8 @@
 #' Display numeric content of matrix as image  
 #'
 #' To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.
-#' Such an output can be referred to as heatmap.
-#' The function \code{\link[graphics]{image}} provides the basic support to do so.  
+#' Such an output can also be referred to as heatmap (note that the term 'hatmap' is also frequently associated with graphical display of hierarchcal clustering results).
+#' The function \code{\link[graphics]{image}} provides the basic support to do so (ie heatmap without rearranging rows and columns by clustering).  
 #' To do this more conveniently, the function \code{imageW} offers additional options for displaying row- and column-names or displaying NA-values as custom-color.
 #'
 #' @param dat (list) main input
@@ -23,7 +23,7 @@
 #' @examples
 #' imageW(as.matrix(iris[1:40,1:4]))
 #' @export
-imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NULL, yLab=NULL, cexXlab=0.7, cexAxs=NULL, cexYlab=1, cexTit=1.6, NAcol=grDevices::grey(0.8), las=2) {
+imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NA, yLab=NA, cexXlab=0.7, cexAxs=NULL, cexYlab=1, cexTit=1.6, NAcol=grDevices::grey(0.8), las=2) {
   ## improved version if image()
   dat <- dat[,ncol(dat):1]
   if(length(col) <1) col <- rev(grDevices::heat.colors(15))
@@ -34,7 +34,9 @@ imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NULL, y
   if(length(rowNa) <nrow(dat)) rowNa <- rownames(dat)
   if(length(rowNa) <1) rowNa <- 1:nrow(dat)
   if(length(colNa) <ncol(dat)) colNa <- colnames(dat)
-  if(length(colNa) <1) rowNa <- 1:ncol(dat)  
+  if(length(colNa) <1) rowNa <- 1:ncol(dat)
+  if(is.null(xLab)) xLab <- ""
+  if(is.null(yLab)) yLab <- ""
   graphics::image(dat, col=col, xaxt="n", yaxt="n", main=tit, xlab=xLab, ylab=yLab, cex.main=cexTit)
   graphics::mtext(at=(0:(length(colNa)-1))/(length(colNa)-1), colNa, side=2, line=0.3, las=las, cex=cexYlab)   # on left  , cex=cexAxs
   graphics::mtext(at=(0:(length(rowNa)-1))/(length(rowNa)-1), rowNa, side=1, line=0.3, las=las, cex=cexXlab)   # on bottom  , cex=cexAxs

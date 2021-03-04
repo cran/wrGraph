@@ -166,7 +166,8 @@ To get a quick overview of the distribution of data and, in particular, of local
 The function _image()_ from the graphic-package provides basic help. Such an output can be referred to as heatmap. The function _imageW()_ from this package offers convenient options for displaying row- and column-names.
 
 ```{r imageW, echo=TRUE}
-imageW(as.matrix(iris[1:40,1:4]))
+par(mar=c(4, 5.5, 4, 1))  
+imageW(as.matrix(iris[1:40,1:4]), tit="Iris-data")
 ```
 
 Heatmaps are well known for displaying the results of hierarchical clustering, see also for example _heatmap()_ (stats-package) or _heatmap.2()_ from the [gplots-package](https://CRAN.R-project.org/package=wrMisc). In these case rows and columns of the data also get reorganized and dendrograms attached.
@@ -415,9 +416,10 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 ## Acknowledgements
 
 The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](http://www.cnrs.fr/), [Universite de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](http://proteomics.igbmc.fr/).
+The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.
-This package is still under development, new functions will be added to the next version.
+This package is constantly evolving, new functions will be added to the next version.
 
 
 ## Appendix: Session-Info

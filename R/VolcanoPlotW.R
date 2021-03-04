@@ -10,7 +10,7 @@
 #' @param Mvalue (numeric or matrix) data to plot; M-values are typically calculated as difference of log2-abundance values and 'pValue' the mean of log2-abundance values;
 #'   M-values and p-values may be given as 2 columsn of a matrix, in this case the argument \code{pValue} should remain NULL 
 #' @param pValue (numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the p-values to be used
-#' @param useComp (integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})  
+#' @param useComp (integer, length=1) choice of which of multiple comparisons to present in \code{Mvalue} (if generated using \code{moderTestXgrp()})  
 #' @param filtFin (matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied 
 #' @param ProjNa (character) custom title
 #' @param FCthrs (numeric) Fold-Change threshold (display as line) give as Fold-change and NOT log2(FC), default at 1.5, set to \code{NA} for omitting
@@ -78,7 +78,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   namesIn <- c(deparse(substitute(Mvalue)), deparse(substitute(pValue)), deparse(substitute(filtFin)))
   basRGB <- c(0.3,0.3,0.3)           # grey
   fcRGB <- c(1,0,0)                  # red        for points passing  FC filt line
-  splNa <- annot <- ptType <- colPass <- ptBg <- grpMeans <- pcol <- NULL      # initialize  
+  splNa <- annot <- ptType <- colPass <- ptBg <- grpMeans <- pcol <- FDRvalue <- NULL      # initialize  
   if(debug) silent <- FALSE
   if(length(Mvalue) <1) message(" nothing to do, 'Mvalue' seems to be empty !") else  {
     ## data seem valid to make MAplot
@@ -110,15 +110,17 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       }  ## otherwise spearate pValue was provided
       ## look for M-values (need to create if not available - using useComp checked when extracting pValue)
       Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","m"), tolower(names(Mvalue))))   # which list-element
-      if(length(Melem) >0) { Mvalue$Mval <- Mvalue[[Melem]]
-        if(length(dim(Mvalue$Mval)) >0) if(ncol(Mvalue$Mval) >1) {          ## M-values are available
+      Fcol <- wrMisc::naOmit(match(c("fdr","bh","lfdr","by","p.value"), tolower(names(Mvalue))))    # needed for matching means to pair-wise names and for extracting FDR values
+      if(length(Fcol) <1) stop("can't find elment suitable for statistical values'") else Fcol <- Fcol[1]
+      if(length(Melem) >0) {            ## M-values are available
+        Mvalue$Mval <- Mvalue[[Melem]]
+        if(length(dim(Mvalue$Mval)) >0) if(ncol(Mvalue$Mval) >1) {          
           if(useComp[1] > ncol(Mvalue$Mval)) { if(!silent) message(fxNa," 'useComp' is too high, set to 1"); useComp <- 1 }
           Mvalue$Mval <- Mvalue$Mval[,useComp]}
       } else {                               #  need to construct M-values based on means
         if("means" %in% names(Mvalue)) {
           ## identify sammple-groups to comparsison(s)
-          meanCol <- if(ncol(Mvalue$means)==2 | colnames(Mvalue$p.value)[1] =="(Intercept)") 1:2 else {
-            wrMisc::matchSampToPairw(colnames(Mvalue$means), colnames(Mvalue$p.value)[useComp]) }
+          meanCol <- .sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol) 
           grpMeans <- cbind(mean1=Mvalue$means[,meanCol[1]], mean2=Mvalue$means[,meanCol[2]])
           Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]                           
           Melem <- which(names(Mvalue)=="Mval")                # update
@@ -137,7 +139,6 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       ## extract FDR from MArrayLM-object 
       if(length(FdrList) <1) {
         ## no explicit pValue, try to extract from MArrayLM-object (Mvalue)
-        Fcol <- wrMisc::naOmit(match(c("FDR","BH","lfdr","BY"), tolower(names(Mvalue))))
         if(length(Fcol) >0) { FDRvalue <- Mvalue[[Fcol[1]]]
           ## extract 2nd col if result from wrMisc::moderTest2grp() 
           if(length(dim(FDRvalue)) >0) if(colnames(FDRvalue)[1]=="(Intercept)" & ncol(FDRvalue) >1) {
@@ -158,7 +159,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       ## recuperate filtering - if present, but only when no custom filtering provided
       if(length(filtFin) <1 | identical(filtFin, FALSE)) {
         Fcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"), tolower(names(Mvalue))))
-        if(length(Fcol) >0) filtFin <- Mvalue[[Fcol[1]]]
+        filtFin <- if(length(Fcol) >0) Mvalue[[Fcol[1]]] else rep(TRUE,length(pValue))
       }
       ## recuperate $annot if present and use for symbol
       if("annot" %in% names(Mvalue)) {
@@ -220,7 +221,8 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     
     ## start creating merged data for plot (& export)
     merg <- if(length(annot) >0) data.frame(ID=NA, grpMeans, Mvalue=Mvalue, pValue=pValue, FDR=if(length(FDRvalue) >0) FDRvalue else rep(NA,length(pValue)), 
-      filtFin=rep(TRUE,length(pValue)), annot, stringsAsFactors=FALSE) else {data.frame(ID=NA, grpMeans, Mvalue=Mvalue, pValue=pValue, stringsAsFactors=FALSE) }
+      filtFin=filtFin, annot, stringsAsFactors=FALSE) else {
+      data.frame(ID=NA, grpMeans, Mvalue=Mvalue, pValue=pValue, FDR=FDRvalue, filtFin=filtFin, stringsAsFactors=FALSE) }
     if(length(names(Mvalue)) >0) merg[,1] <- names(Mvalue) else {if(length(names(pValue)) >0) merg[,1] <- names(pValue)}
 
     ## adjust col & pch
@@ -230,18 +232,19 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     if(length(col) >1 & length(col) <length(Mvalue)) {
       if(!silent) message(fxNa,"argument 'col' should be either length=1 or correspond to length of data, reset to default=NULL")
       col <- NULL }
-
-    ## integrate FILTERING
+       
+    ## prepare/integrate FILTERING
     if(length(filtFin) >0) {
       ## if filtFin is matrix use each line with min 1 instance of TRUE,
-      if(length(dim(filtFin)) >1) filtFin <- rowSums(as.logical(as.matrix(filtFin)[,useComp])) >0    # use rows with >= 1 TRUE
+      if(length(dim(filtFin)) >1) filtFin <- as.logical(as.matrix(filtFin)[,useComp])    # use rows with >= 1 TRUE
       if(length(names(filtFin)) >0) {
         matchNa <- wrMisc::naOmit(match(rownames(merg), names(filtFin)))       
         if(length(matchNa)==nrow(merg)) merg[,"filtFin"] <- filtFin[matchNa]
       } else if(length(filtFin)==nrow(merg)) merg[,"filtFin"] <- filtFin        # no proof that order of filtFin is correct
     } else filtFin <- rep(TRUE, nrow(merg)) 
     if(debug) message(fxNa," ++ DONE extracting columns : ",wrMisc::pasteC(colnames(merg),quo="'"))
-    ##
+    
+    ## apply filtering
     msg <- " data provided in 'Mvalue' and 'pValue' "
     if(!silent & nrow(merg) < round(length(Mvalue)/10)) message(" .. note : less than 10% of",msg," were matched") else {
       if(!silent & nrow(merg) < length(Mvalue)/2) message(" .. NOTE : less than 50% of",msg," were matched !!")}
@@ -271,9 +274,9 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     if(length(FCthrs) <1) FCthrs <- 1.5 
     if(length(FdrThrs) <1) FdrThrs <- 0.05 
     ## count no of passing
-    passFC <- if(length(FCthrs) ==1 & !any(is.na(FCthrs))) abs(Mvalue) > log2(FCthrs) else filtFin      ## convert FCthrs to log2
-    passFdr <- if(length(FdrThrs) ==1 & !any(is.na(FdrThrs))) FDRvalue <= FdrThrs else filtFin
-    passAll <- filtFin & passFC & passFdr
+    passFC <- if(length(FCthrs) ==1 & !any(is.na(FCthrs))) abs(Mvalue) > log2(FCthrs) else merg[,"filtFin"]      ## convert FCthrs to log2
+    passFdr <- if(length(FdrThrs) ==1 & !any(is.na(FdrThrs))) {merg[,"FDR"] <= FdrThrs} else merg[,"filtFin"]
+    passAll <- merg[,"filtFin"] & passFC & passFdr
     chNA <- is.na(passAll)                              # passFdr may contain NAs
     if(any(chNA)) passAll[which(chNA)] <- FALSE 
     if(debug) message(fxNa,"  ",sum(passFC,na.rm=TRUE)," passing FCthrs ; ",sum(passFdr,na.rm=TRUE)," passing FdrThrs ; combined ",sum(passAll,na.rm=TRUE))
@@ -296,10 +299,10 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## main graphic
     graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, las=1)
     graphics::plot(Mvalue, pValue, pch=pch, cex=useCex, main=tit1, ylab="- log10 p-value (uncorrected)", col=useCol, xlab=xLab, cex.lab=cexLa, xlim=limM,ylim=limp, pt.bg=ptBg)
-    sTxt <- paste(if(length(splNa) >0) paste(names(useComp),": "), if(!is.null(subTxt)) paste("plot",subTxt,"data; "), "n =",length(Mvalue),
-      if(!all(is.na(c(FCthrs,FdrThrs)))) paste(";",sum(passAll, na.rm=TRUE),"(red) points passing",
-        if(!is.na(FCthrs)) paste0("(FCthr=", as.character(FCthrs),",") else "(",
-        paste0("FdrThrs=",as.character(FdrThrs),")")))
+    sTxt <- if(length(subTxt) ==1) subTxt else {if(length(names(useComp)) >0) names(useComp) else paste("useComp",useComp)}
+    sTxt <- paste0(sTxt,"; n=",length(Mvalue),
+      if(!all(is.na(c(FCthrs,FdrThrs)))) paste("; ",sum(passAll, na.rm=TRUE)," (red) points passing",
+        if(!is.na(FCthrs)) paste0(" (FCthr=", as.character(FCthrs),", ") else " (", paste0("FdrThrs=",as.character(FdrThrs),")")))
     graphics::mtext(sTxt,cex=0.75,line=0.2)
     if(!all(is.na(c(FCthrs,FdrThrs)))) { 
       if(debug) message(fxNa," n=",length(Mvalue),"  FCthrs=",as.character(FCthrs),"  filt.ini=", sum(filtFin, na.rm=TRUE),
@@ -352,8 +355,30 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       graphics::legend(legLoc$loc, legend=rev(legLab), col=rev(ptCol), text.col=1, pch=rev(wrMisc::naOmit(unique(pch))), if(length(ptBg) >0) pt.bg=ptBg, 
         cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)        # as points
     }
-
   ## export results
-  if(returnData) cbind(merg[,1:5],FDRvalue=FDRvalue,merg[,-(1:5)]) 
+  if(returnData) cbind(merg[,1:5], FDRvalue=FDRvalue, merg[,-(1:5)]) 
   } }
+     
+#' @export
+.sampNoDeMArrayLM <- function(MArrayObj, useComp, groupSep="-",lstMeans="means",lstP="BH",silent=FALSE,callFrom=NULL) {
+  ## locate sample index from index or name of pair-wise comparisons in list or MArrayLM-object
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa=".sampNoDeMArrayLM")
+  errMsg <- c("argument 'MArrayObj' is ","empty","doesn't contain the list-element needed  ('",lstMeans,"') !")
+  if(length(MArrayObj) <1) stop(errMsg[1:2])
+  if(length(MArrayObj[[lstMeans]]) <1) stop(errMsg[-2])
+  if(length(colnames(MArrayObj[[lstMeans]])) <1)  stop(" problem with 'MArrayObj$lstMeans' (does not contain matrix of means)")
+  if(ncol(MArrayObj[[lstMeans]])==2) {             # only 2 mean-values, no other choice, don't need to try matching anything
+    if(!identical(as.character(useComp),"1") & !silent) message(fxNa,"Only 2 columns of mean-values available, can't interpret properly 'useComp=",useComp,"'")
+    out <- 1:2
+  } else {
+    if(length(lstP) <0) stop(" 'lstP' is empty !")
+    if(length(colnames(MArrayObj[[lstP]])) <1)  stop(" problem with 'MArrayObj' (does not contain matrix of p-values)")
+    ## convert/locate names to index 
+    if(is.character(useComp) & length(grep("[[:alpha:]]",useComp)) >0) useComp <- wrMisc::naOmit(match(useComp, MArrayObj[[lstP]] ))
+    if(length(useComp) <1) stop("argument 'useComp' is empty or can't locate in comparison-names")
+    ## main
+    out <- if(ncol(MArrayObj[[lstP]])==2 & colnames(MArrayObj[[lstP]])[1] =="(Intercept)") 1:2 else {
+      wrMisc::matchSampToPairw(grpNa=colnames(MArrayObj[[lstMeans]]), pairwNa=colnames(MArrayObj[[lstP]])[useComp], sep=groupSep,silent=silent,callFrom=fxNa)}
+    if(length(useComp)==1) out <- as.integer(out)}
+  out }
     

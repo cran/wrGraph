@@ -63,7 +63,8 @@ vioplotW(iris[,-5],tit="Iris-data")
 cumFrqPlot(iris[,1:4])
 
 ## ----imageW, echo=TRUE--------------------------------------------------------
-imageW(as.matrix(iris[1:40,1:4]))
+par(mar=c(4, 5.5, 4, 1))  
+imageW(as.matrix(iris[1:40,1:4]), tit="Iris-data")
 
 ## ----cumulCountPlot1, echo=TRUE-----------------------------------------------
 thr <- seq(min(iris[,1:4]), max(iris[,1:4])+0.1,length.out=100)

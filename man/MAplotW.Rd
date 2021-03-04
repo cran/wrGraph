@@ -12,6 +12,7 @@ MAplotW(
   FCthrs = NULL,
   subTxt = NULL,
   grayIncrem = TRUE,
+  useComp = 1,
   compNa = NULL,
   batchFig = FALSE,
   cexMa = 1.8,
@@ -42,7 +43,9 @@ M-values and A-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points as increased shades of gray}
 
-\item{compNa}{(character) names of groups compared (as colnames of Mvalue$means)}
+\item{useComp}{(integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
+
+\item{compNa}{depreciated, please use \code{useComp} instead}
 
 \item{batchFig}{(logical) if \code{TRUE} figure title and axes legends will be kept shorter for display on fewer splace}
 

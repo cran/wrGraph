@@ -44,7 +44,7 @@ M-values and p-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{pValue}{(numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the p-values to be used}
 
-\item{useComp}{(integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
+\item{useComp}{(integer, length=1) choice of which of multiple comparisons to present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
 
 \item{filtFin}{(matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied}
 

@@ -10,8 +10,8 @@ imageW(
   rowNa = NULL,
   colNa = NULL,
   tit = NULL,
-  xLab = NULL,
-  yLab = NULL,
+  xLab = NA,
+  yLab = NA,
   cexXlab = 0.7,
   cexAxs = NULL,
   cexYlab = 1,
@@ -52,8 +52,8 @@ graphical output only
 }
 \description{
 To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.
-Such an output can be referred to as heatmap.
-The function \code{\link[graphics]{image}} provides the basic support to do so.  
+Such an output can also be referred to as heatmap (note that the term 'hatmap' is also frequently associated with graphical display of hierarchcal clustering results).
+The function \code{\link[graphics]{image}} provides the basic support to do so (ie heatmap without rearranging rows and columns by clustering).  
 To do this more conveniently, the function \code{imageW} offers additional options for displaying row- and column-names or displaying NA-values as custom-color.
 }
 \examples{
