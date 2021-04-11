@@ -20,7 +20,7 @@
 #' @param reCol (character or integer) color for replotting (non-outlyer) points, default set to \code{NULL} for not replotting
 #' @param rePch (integer) symbol for replotting (non-outlyer) points, default set to \code{NULL} for not re-plotting (see also \code{\link[graphics]{par}})
 #' @param reCex (numeric) cex type expansion factor for lfor replotting (non-outlyer) points, default set to \code{NULL} for not replotting
-#' @param ctrPch (integer) symbol for shwing group center (see also \code{\link[graphics]{par}})
+#' @param ctrPch (integer) symbol for showing group center (see also \code{\link[graphics]{par}})
 #' @param ctrCex (numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})
 #' @param ctrCol (character or integer) color for group center symbol
 #' @param returnOutL (logical) decide if rownames of (potential) outlyer values should be returned when running the function

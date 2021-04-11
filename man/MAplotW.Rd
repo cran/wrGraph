@@ -7,31 +7,43 @@
 MAplotW(
   Mvalue,
   Avalue = NULL,
+  useComp = 1,
   filtFin = NULL,
   ProjNa = NULL,
   FCthrs = NULL,
   subTxt = NULL,
   grayIncrem = TRUE,
-  useComp = 1,
+  col = NULL,
+  pch = 16,
   compNa = NULL,
   batchFig = FALSE,
   cexMa = 1.8,
-  cexLa = 0.7,
+  cexLa = 1.1,
   limM = NULL,
   limA = NULL,
+  annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species",
+    "Contam"),
+  annColor = NULL,
   cexPt = NULL,
   cexSub = NULL,
+  cexTxLab = 0.7,
+  namesNBest = NULL,
+  NbestCol = 1,
+  NaSpecTypeAsContam = TRUE,
   useMar = c(6.2, 4, 4, 2),
-  callFrom = "",
+  returnData = FALSE,
+  callFrom = NULL,
   silent = FALSE,
   debug = FALSE
 )
 }
 \arguments{
-\item{Mvalue}{(numeric or matrix) data to plot; M-values are typically calculated as difference of log2-abundance values and 'Avalue' the mean of log2-abundance values;
-M-values and A-values may be given as 2 columsn of a matrix, in this case the argument \code{Avalue} should remain NULL}
+\item{Mvalue}{(numeric, list or MArrayLM-object) main data to plot; if numeric, the content will be used as M-values (and A-values must be provided separateley);
+if list or MArrayLM-object, it must conatin list-elements named \code{Mvalue} and \code{means} to extract all information needed for plotting}
 
-\item{Avalue}{(numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the A-values to be used}
+\item{Avalue}{(numeric, list or data.frame) if \code{NULL} it is assumed that M-values can be extracted form argument \code{Avalue}}
+
+\item{useComp}{(integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
 
 \item{filtFin}{(matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied}
 
@@ -41,27 +53,45 @@ M-values and A-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{subTxt}{(character) custom sub-title}
 
-\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points as increased shades of gray}
+\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points (not exceeding threshold) as increased shades of gray}
 
-\item{useComp}{(integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
+\item{col}{(character) custom color(s) for points of plot (see also \code{\link[graphics]{par}})}
+
+\item{pch}{(integer) type of symbol(s) to plot (default=16) (see also \code{\link[graphics]{par}})}
 
 \item{compNa}{depreciated, please use \code{useComp} instead}
 
 \item{batchFig}{(logical) if \code{TRUE} figure title and axes legends will be kept shorter for display on fewer splace}
 
-\item{cexMa}{(numeric) expansion factor for font-size of title (see also \code{\link[graphics]{par}})}
+\item{cexMa}{(numeric) font-size of title, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
-\item{cexLa}{(numeric) expansion factor \code{cex} for labels (see also \code{\link[graphics]{par}})}
+\item{cexLa}{(numeric) size of axis-labels, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
 \item{limM}{(numeric, length=2) range of axis M-values}
 
 \item{limA}{(numeric, length=2) range of axis A-values}
 
-\item{cexPt}{(numeric)  expansion factor \code{cex} for points (see also \code{\link[graphics]{par}})}
+\item{annotColumn}{(character) column names of annotation to be extracted (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot).
+The first entry (typically 'SpecType') is used for different symbols in figure, the second (typically 'GeneName') is used as prefered text for annotating the best points (if \code{namesNBest} allows to do so.)}
 
-\item{cexSub}{(numeric)  expansion factor \code{cex} for subtitle (see also \code{\link[graphics]{par}})}
+\item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
+
+\item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
+
+\item{cexSub}{(numeric) size of subtitle, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
+
+\item{cexTxLab}{(numeric) size of text-labels for points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
+
+\item{namesNBest}{(integer or character, length=1) number of best points to add names in figure; if 'passThr' all points passing FC-filter will be selected; 
+if the initial object \code{Mvalue} contains a list-element called 'annot' the second of the column specified in argument \code{annotColumn} will be used as text}
+
+\item{NbestCol}{(character or integer) colors for text-labels of best points}
+
+\item{NaSpecTypeAsContam}{(logical) consider lines/proteins with \code{NA} in Mvalue$annot[,"SpecType"] as contaminants (if a 'SpecType' for contaminants already exits)}
 
 \item{useMar}{(numeric,length=4) custom margings (see also \code{\link[graphics]{par}})}
+
+\item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, Avalue, FDRvalue, passFilt)}
 
 \item{callFrom}{(character) allow easier tracking of message(s) produced}
 
@@ -73,23 +103,22 @@ M-values and A-values may be given as 2 columsn of a matrix, in this case the ar
 MA-plot only
 }
 \description{
-This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.
-Basically one would like to compare numerous independent measures (ie gene transcript or protein abundance values) of 2 samples/data-sets,
-it is usual to compare a change ('Minus'=M) versus absolute mean value ('Average'=A).
-In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-value represents a relative change.
-Besides, output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} can be directly read to produce MA plots for diagnostic reasons.
-Please note, that plotting a very number of points in transparency (eg >10000) may take several seconds.
+This type of plot for display of relative changes versus (mean) absolute abundance is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.
+Basically one compares two independent series of measures (ie gene transcript or protein abundance values) of 2 samples/data-sets or the means of 2 groups of replicates.
+And the log-fold-change ('Minus'=M) is plotted againts the absolute mean value ('Average'=A).
+Furthermore, output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} or \code{\link[wrMisc]{moderTestXgrp}} can be directly read to produce MA plots for diagnostic purpose.
+Please note, that plotting a very high number of points in transparency (eg >10000) may take several seconds.
 }
 \examples{
 library(wrMisc)
-set.seed(2005); mat <- matrix(round(runif(600),1),ncol=6)
-rownames(mat) <- c(rep(letters[1:25],each=3),letters[2:26])
-MAplotW(mat[,2]-mat[,1], rowMeans(mat))
+set.seed(2005); mat <- matrix(round(runif(600),2), ncol=6)
+rownames(mat) <- c(rep(letters[1:25],each=3), letters[2:26])
+MAplotW(mat[,2] -mat[,1], A=rowMeans(mat))
 ## assume 2 groups with 3 samples each
 matMeans <- rowGrpMeans(mat, gr=gl(2,3,labels=LETTERS[3:4]))
-MAplotW(matMeans[,2]-matMeans[,1], matMeans) 
+MAplotW(M=matMeans[,2] -matMeans[,1], A=matMeans) 
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
-tRes <- moderTest2grp(mat,gl(2,3))
+tRes <- moderTest2grp(mat, gl(2,3))
 MAplotW(tRes$Mval, tRes$Amean)                          
 MAplotW(M=tRes$Mval, A=tRes$means, FCth=1.3) 
 MAplotW(tRes)

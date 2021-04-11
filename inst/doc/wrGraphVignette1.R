@@ -34,27 +34,29 @@ grp <- c("abc","efghijk")
 (legLoc <- checkForLegLoc(dat1, grp)) 
 
 # now with more graphical parameters (using just the best location information)
-plot(dat1, cex=3, col=rep(2:3,3),pch=rep(2:3,3))
+plot(dat1, cex=2.5, col=rep(2:3,3),pch=rep(2:3,3))
 legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
 legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 
-## ----Hist1, echo=TRUE---------------------------------------------------------
-set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
+## ----Hist1, out.width="110%", out.heigth="110%", echo=TRUE--------------------
+set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5), rlnorm(300,2,0.5), rnorm(100,17)),2)
 dat1 <- dat1[which(dat1 <50 & dat1 > 0.2)]
-histW(dat1, br="FD", isLog=FALSE, silent=TRUE)
+histW(dat1, br="FD", isLog=FALSE)
+
+## ----Hist2, out.width="110%", out.heigth="110%", echo=TRUE--------------------
 ## view as log, but x-scale in linear
 histW(log2(dat1), br="FD", isLog=TRUE, silent=TRUE)
 
-## ----Hist2, out.width="110%", out.heigth="150%", echo=TRUE--------------------
+## ----Hist4, out.width="110%", out.heigth="150%", echo=TRUE--------------------
 ## quick overview of distributions  
 layout(partitionPlot(4))
 for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 
-## ----Hist3, out.width="110%", out.heigth="150%", echo=TRUE--------------------
+## ----Hist5, out.width="110%", out.heigth="150%", echo=TRUE--------------------
 layout(1)
-plot(iris[,1:2],main="Iris data")
-legendHist(iris[,1], loc="br", legTit=colnames(iris)[1],cex=0.5)
-legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
+plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris data")
+legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
+legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 
 ## ----vioplot1, echo=TRUE------------------------------------------------------
 vioplotW(iris[,-5],tit="Iris-data")
@@ -107,22 +109,26 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
   tit="Iris data", rowTyName="types of leaves", cexTxt=2)
 
 
-## ----MA1, echo=TRUE-----------------------------------------------------------
-## let's generate some toy data
+## ----MA0, echo=TRUE-----------------------------------------------------------
+## toy data
 set.seed(2005); mat <- matrix(round(runif(2400),3), ncol=6)
 mat[11:90,4:6] <- mat[11:90,4:6] +round(abs(rnorm(80)),3)
 mat[11:90,] <- mat[11:90,] +0.3
 dimnames(mat) <- list(paste("li",1:nrow(mat),sep="_"),paste(rep(letters[1:2],each=3),1:6,sep=""))
 ## assume 2 groups with 3 samples each
 matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
-MAplotW(matMeans[,1] -matMeans[,2], rowMeans(mat)) 
 
-## ----MA5, echo=TRUE-----------------------------------------------------------
+## ----MA1, echo=TRUE-----------------------------------------------------------
+## now we are ready to plot, M-values can be obtained by subtracting thr group-means
+MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
+
+## ----MA4, echo=TRUE-----------------------------------------------------------
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
-## 
-## convenient way, add fold-change threshold and mark who is beyond
-MAplotW(tRes, FCth=1.5, cexLa=1)    
+
+## ----MA5, echo=TRUE-----------------------------------------------------------
+## convenient way, change fold-change threshold to 2x and mark who is beyond :
+MAplotW(tRes, FCth=2, namesNBest="passFC")    
 
 ## ----Volc1, echo=TRUE---------------------------------------------------------
 ## let's generate some toy data
@@ -138,14 +144,13 @@ gr3 <- gl(3,3,labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
 
 VolcanoPlotW(tRes2)
-VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
+VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass")
 
 ## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
 ## assume 3 groups with 3 samples each
 tRes <- moderTestXgrp(mat, gr3)
 
-layout(matrix(1:3, nrow=1))
-VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
+layout(matrix(1:2, nrow=1))
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 

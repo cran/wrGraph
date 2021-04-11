@@ -53,7 +53,7 @@ addBagPlot(
 
 \item{reCex}{(numeric) cex type expansion factor for lfor replotting (non-outlyer) points, default set to \code{NULL} for not replotting}
 
-\item{ctrPch}{(integer) symbol for shwing group center (see also \code{\link[graphics]{par}})}
+\item{ctrPch}{(integer) symbol for showing group center (see also \code{\link[graphics]{par}})}
 
 \item{ctrCol}{(character or integer) color for group center symbol}
 

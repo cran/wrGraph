@@ -14,6 +14,8 @@ histW(
   subTi = NULL,
   xLab = NULL,
   yLab = NULL,
+  las = NULL,
+  xcex = 0.7,
   imgxSize = 900,
   useCol = NULL,
   useBord = NULL,
@@ -21,8 +23,9 @@ histW(
   cexSubTi = NULL,
   cropHist = TRUE,
   parDefault = TRUE,
-  callFrom = NULL,
-  silent = FALSE
+  silent = FALSE,
+  debug = FALSE,
+  callFrom = NULL
 )
 }
 \arguments{
@@ -44,6 +47,10 @@ histW(
 
 \item{yLab}{(character) custom y-axes label}
 
+\item{las}{(integer) optional fixed text orientation of x-axis numbers : use 1 for horizontal and 2 for perpendicular, see also \code{\link[graphics]{par}}}
+
+\item{xcex}{(numeric) cex-type expansion factor for x-axis numbers, see also \code{\link[graphics]{par}}}
+
 \item{imgxSize}{(integer) width of image when saving to file, see also \code{\link[graphics]{par}}}
 
 \item{useCol}{(character or integer) custom colors, see also \code{\link[graphics]{par}}}
@@ -58,13 +65,15 @@ histW(
 
 \item{parDefault}{(logical) to automatic adjusting par(marg=,cex.axis=0.8), see also \code{\link[graphics]{par}}}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
-
 \item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) additonal messagesfor debugging}
+
+\item{callFrom}{(character) allow easier tracking of message(s) produced}
 }
 \description{
 This function proposes a few special tweaks to the general \code{\link[graphics]{hist}} function :
-In a number of settings data are treated and plotted as log-data. This function allows feeding directly data which are already log2 and displaying the x-axis   
+In a number of settings data are treated and plotted as log-data. This function allows feeding directly log2-data and displaying the x-axis   
 (re-translated) in linear scale (see argument \code{isLog}). 
 The default settings allow making (very) small histograms ('low resolution'), which may be used as a rough overview of bandwidth and distribution of values in \code{dat}. 
 Similar to \code{\link[graphics]{hist}}, by changing the parameters \code{nBars} and/or \code{breaks} very 'high resolution' histograms can be produced.

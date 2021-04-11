@@ -2,7 +2,9 @@
 
 export(.addTextToPoints)
 export(.bestLegendLoc)
+export(.colorByPvalue)
 export(.determFigMargPix)
+export(.levIndex)
 export(.predPointsPix)
 export(.sampNoDeMArrayLM)
 export(.serachColName)

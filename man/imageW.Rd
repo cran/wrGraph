@@ -14,16 +14,16 @@ imageW(
   yLab = NA,
   cexXlab = 0.7,
   cexAxs = NULL,
-  cexYlab = 1,
+  cexYlab = 0.9,
   cexTit = 1.6,
   NAcol = grDevices::grey(0.8),
   las = 2
 )
 }
 \arguments{
-\item{dat}{(list) main input}
+\item{dat}{(matrix or dtaa.frame) main input}
 
-\item{col}{(character or integer) colors, default is heat.colors in 15 shades}
+\item{col}{(character or integer) colors, default is 60 shades 'RdYlBu' RColorBrewer, if 'heat.colors' use  heat.colors in min 15 shades}
 
 \item{rowNa}{(character) optional custom rownames}
 
@@ -55,6 +55,9 @@ To get a quick overview of the distribution of data and, in particular, of local
 Such an output can also be referred to as heatmap (note that the term 'hatmap' is also frequently associated with graphical display of hierarchcal clustering results).
 The function \code{\link[graphics]{image}} provides the basic support to do so (ie heatmap without rearranging rows and columns by clustering).  
 To do this more conveniently, the function \code{imageW} offers additional options for displaying row- and column-names or displaying NA-values as custom-color.
+}
+\details{
+If the main input \code{dat} is numeric vector (an not matrix or data.frame) the values will be displayed as multiple columns and single row.
 }
 \examples{
 imageW(as.matrix(iris[1:40,1:4]))

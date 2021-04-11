@@ -27,7 +27,8 @@ plotPCAw(
 )
 }
 \arguments{
-\item{dat}{(matrix, list or data.frame) data to plot. Note: \code{NA}-values cannot be processed - all lines with non-finite data (eg \code{NA}) will be omitted !}
+\item{dat}{(matrix, data.frame, MArrayLM-object or list) data to plot. Note: \code{NA}-values cannot be processed - all lines with non-finite data (eg \code{NA}) will be omitted !
+In case of  MArrayLM-object or list \code{dat} must conatain list-element named 'datImp','dat' or 'data'.}
 
 \item{sampleGrp}{(character or factor) should be factor describing groups of replicates, NAs are not supported}
 

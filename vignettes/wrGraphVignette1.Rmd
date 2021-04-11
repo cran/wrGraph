@@ -85,7 +85,7 @@ grp <- c("abc","efghijk")
 (legLoc <- checkForLegLoc(dat1, grp)) 
 
 # now with more graphical parameters (using just the best location information)
-plot(dat1, cex=3, col=rep(2:3,3),pch=rep(2:3,3))
+plot(dat1, cex=2.5, col=rep(2:3,3),pch=rep(2:3,3))
 legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
 legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 ```
@@ -98,16 +98,20 @@ display numbers calculated back to linear values on the x-axis.
 
 Default settings aim to give rather a quick overview, for "high resolution" representations one could set a high number of breaks or one might also consider other/alternative graphical representations. Some of the alternatives are shown later in this vignette.
 
-```{r Hist1, echo=TRUE}
-set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
+```{r Hist1, out.width="110%", out.heigth="110%", echo=TRUE}
+set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5), rlnorm(300,2,0.5), rnorm(100,17)),2)
 dat1 <- dat1[which(dat1 <50 & dat1 > 0.2)]
-histW(dat1, br="FD", isLog=FALSE, silent=TRUE)
+histW(dat1, br="FD", isLog=FALSE)
+```
+
+One interesting feature is the fact that this fucntions can handle log-data (and display x-axis classes as linear) :
+```{r Hist2, out.width="110%", out.heigth="110%", echo=TRUE}
 ## view as log, but x-scale in linear
 histW(log2(dat1), br="FD", isLog=TRUE, silent=TRUE)
 ```
 
-Now we can combine this with the previous segmentation :
-```{r Hist2, out.width="110%", out.heigth="150%", echo=TRUE}
+Now we can combine this with the previous segmentation to accomodate 4 histograms :
+```{r Hist4, out.width="110%", out.heigth="150%", echo=TRUE}
 ## quick overview of distributions  
 layout(partitionPlot(4))
 for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
@@ -115,11 +119,13 @@ for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 
 ### Small Histogram(s) as Legend
 
-```{r Hist3, out.width="110%", out.heigth="150%", echo=TRUE}
+With some plots it may be useful to add small histograms for the x- and/or y-data.
+
+```{r Hist5, out.width="110%", out.heigth="150%", echo=TRUE}
 layout(1)
-plot(iris[,1:2],main="Iris data")
-legendHist(iris[,1], loc="br", legTit=colnames(iris)[1],cex=0.5)
-legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2],cex=0.5)
+plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris data")
+legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
+legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 ```
 
 ## Violin Plots
@@ -283,39 +289,45 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
 ## MA-Plot
 
 The aim of [MA-plots](https://en.wikipedia.org/wiki/MA_plot) consists in displaying a relative change on one axis (ordinate) while 
-showing the absolute (mean) value on the other axis (abscissa). 
+showing the absolute (mean) value on the x-axis (abscissa). 
 This plot is very useful when inspecting larger data-sets for random or systematic effects,
 numerous implementations for specific applications exist (eg *plotMA* in [DEseq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)).
 The version presented here is rather generic and uses transparent points to avoid getting plots too crowded.
 
-
-```{r MA1, echo=TRUE}
-## let's generate some toy data
+First, let's generate some toy data:
+```{r MA0, echo=TRUE}
+## toy data
 set.seed(2005); mat <- matrix(round(runif(2400),3), ncol=6)
 mat[11:90,4:6] <- mat[11:90,4:6] +round(abs(rnorm(80)),3)
 mat[11:90,] <- mat[11:90,] +0.3
 dimnames(mat) <- list(paste("li",1:nrow(mat),sep="_"),paste(rep(letters[1:2],each=3),1:6,sep=""))
 ## assume 2 groups with 3 samples each
 matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
-MAplotW(matMeans[,1] -matMeans[,2], rowMeans(mat)) 
 ```
 
-The function *MAplotW* may also be used to conveniently inspect results from t-tests performed with the package [wrMisc](https://CRAN.R-project.org/package=wrMisc)
+One way of using the function _MAplotW()_ is by providing (explicitely) the M- and A-values.
+By default a threshold-line is drawn for a fold-change of 1.5x (which on log2 scale apprears at +/- 0.58).
+```{r MA1, echo=TRUE}
+## now we are ready to plot, M-values can be obtained by subtracting thr group-means
+MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
+```
+
+The function _MAplotW_ may also be used to conveniently inspect results from t-tests performed with the package [wrMisc](https://CRAN.R-project.org/package=wrMisc)
 or from the very popular package [limma](https://www.bioconductor.org/packages/release/bioc/html/limma.html).
 
-It is possible to add lines for a given fold-change threshold (which is meant to be on linear data ratios,
-thus 1.5 will draw a lines at +0.58 and -0.58).
-
-```{r MA5, echo=TRUE}
+```{r MA4, echo=TRUE}
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
-## 
-## convenient way, add fold-change threshold and mark who is beyond
-MAplotW(tRes, FCth=1.5, cexLa=1)    
+```
+ 
+This object conatains data for different types of plots (MA-plot, Volcano-Plot, etc ..), let's also mark the names of those passing the fold-change threshold.
+```{r MA5, echo=TRUE}
+## convenient way, change fold-change threshold to 2x and mark who is beyond :
+MAplotW(tRes, FCth=2, namesNBest="passFC")    
 ```
                           
-In the last plot one can see easily the 80 points that have been increased in the second group, many of them 
-exceed a (based on linear data) fold-change of 1.5 (which on log2 scale apprears at 0.58).
+In the plot above one can see easily most of the points from the second group which have been increased in lines 11 to 90, 
+many of them exceed a (based on linear data) fold-change of 2 (which on log2 scale appears at 1.0).
 
 
 ## Volcano-Plot
@@ -344,16 +356,16 @@ gr3 <- gl(3,3,labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
 
 VolcanoPlotW(tRes2)
-VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2)
+VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass")
 ```
+
 Note, that this exampe is very small and for this reason the function _fdrtool()_ used internally issues some warnings since the estimation of lfdr is not optimal.
 
 ```{r Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE}
 ## assume 3 groups with 3 samples each
 tRes <- moderTestXgrp(mat, gr3)
 
-layout(matrix(1:3, nrow=1))
-VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
+layout(matrix(1:2, nrow=1))
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 ```
@@ -415,7 +427,7 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 
 ## Acknowledgements
 
-The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](http://www.cnrs.fr/), [Universite de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](http://proteomics.igbmc.fr/).
+The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](http://www.cnrs.fr/), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](http://proteomics.igbmc.fr/).
 The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.

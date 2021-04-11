@@ -29,8 +29,9 @@ vioplotW(
   rectCol = "black",
   at = 0,
   add = FALSE,
-  wex = 1,
+  wex = NULL,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -87,6 +88,8 @@ vioplotW(
 
 \item{silent}{(logical) suppress messages}
 
+\item{debug}{(logical) additional messages for debugging}
+
 \item{callFrom}{(character) allow easier tracking of message(s) produced}
 }
 \value{
@@ -102,9 +105,13 @@ Many arguments are kept similar to \href{https://CRAN.R-project.org/package=viop
 Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).    
 Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas
 }
+\details{
+The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applieds to all profiles drawn.
+ Please note that different n (eg for different columns) will not be shown, so far.
+}
 \examples{
 set.seed(2013)
-dat6 <- matrix(round(rnorm(300)+3,1), ncol=6, 
+dat6 <- matrix(round(rnorm(300) +3, 1), ncol=6, 
 	 dimnames=list(paste("li",1:50,sep=""), letters[19:24])) 
 vioplotW(dat6)
 ## variable number of elements (each n is displayed)

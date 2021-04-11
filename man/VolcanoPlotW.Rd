@@ -13,6 +13,7 @@ VolcanoPlotW(
   FCthrs = NULL,
   FdrList = NULL,
   FdrThrs = NULL,
+  FdrType = NULL,
   subTxt = NULL,
   grayIncrem = TRUE,
   col = NULL,
@@ -23,14 +24,16 @@ VolcanoPlotW(
   cexLa = 1.1,
   limM = NULL,
   limp = NULL,
-  annotColumn = c("SpecType", "ProteinName", "Accession", "Species", "Contam",
-    "Description"),
+  annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species",
+    "Contam"),
   annColor = NULL,
   cexPt = NULL,
   cexSub = NULL,
   cexTxLab = 0.7,
   namesNBest = NULL,
   NbestCol = 1,
+  sortLeg = "descend",
+  NaSpecTypeAsContam = TRUE,
   useMar = c(6.2, 4, 4, 2),
   returnData = FALSE,
   callFrom = NULL,
@@ -56,9 +59,12 @@ M-values and p-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{FdrThrs}{(numeric) FDR threshold (display as line), default at 0.05, set to \code{NA} for omitting}
 
+\item{FdrType}{(character) FDR-type to extract if \code{Mvalue} is 'MArrayLM'-object (eg produced by from \code{moderTest2grp} etc);
+if \code{NULL} it will search for suitable fields/values in this order : 'FDR','BH','lfdr' and 'BY'}
+
 \item{subTxt}{(character) custom sub-title}
 
-\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points as increased shades of gray}
+\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points  (not exceeding thresholds) as increased shades of gray}
 
 \item{col}{(character) custom color(s) for points of plot (see also \code{\link[graphics]{par}})}
 
@@ -74,11 +80,12 @@ M-values and p-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{limM}{(numeric, length=2) range of axis M-values}
 
-\item{limp}{(numeric, length=2) range of axis p-values}
+\item{limp}{(numeric, length=2) range of axis FDR / p-values}
 
-\item{annotColumn}{(character) column names of annotation to be extracted (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
+\item{annotColumn}{(character) column names of annotation to be extracted (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot).
+The first entry (typically 'SpecType') is used for different symbols in figure, the second (typically 'GeneName') is used as prefered text for annotating the best points (if \code{namesNBest} allows to do so.)}
 
-\item{annColor}{(character or integer) colors for specific groups of annoatation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
+\item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
 
 \item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
@@ -86,9 +93,14 @@ M-values and p-values may be given as 2 columsn of a matrix, in this case the ar
 
 \item{cexTxLab}{(numeric) size of text-labels for points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
-\item{namesNBest}{(integer or character) number of best points (by pValue to display names in figure); if 'passThr' all points passing FDR and FC-filtes will be selected}
+\item{namesNBest}{(integer or character) for display of labels to points in figure: if 'pass','passThr' or 'signif' all points passing thresholds; if numeric (length=1) this number of best points will get labels 
+if the initial object \code{Mvalue} contains a list-element called 'annot' the second of the column specified in argument \code{annotColumn} will be used as text}
 
 \item{NbestCol}{(character or integer) colors for text-labels of best points}
+
+\item{sortLeg}{(character) sorting of 'SpecType' annotation either ascending ('ascend') or descending ('descend'), no sorting if \code{NULL}}
+
+\item{NaSpecTypeAsContam}{(logical) consider lines/proteins with \code{NA} in Mvalue$annot[,"SpecType"] as contaminants (if a 'SpecType' for contaminants already exits)}
 
 \item{useMar}{(numeric,length=4) custom margings (see also \code{\link[graphics]{par}})}
 
@@ -105,17 +117,17 @@ MA-plot only
 }
 \description{
 This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/Volcano_plot_(statistics)}{Volcano-plot}.
-Basically, this plot allows comparing the outcome of a statistical test to the differential of the group means (ie log fold-change),
+Basically, this plot allows comparing the outcome of a statistical test to the relative change (ie log fold-change, M-value).
 }
 \details{
-In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-value represents a relative change.
-Besides, output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} or \code{\link[wrMisc]{moderTestXgrp}} can be directly read to produce Volcano plots for diagnostic reasons.
-Please note, that plotting a very number of points in transparency (eg >10000) may take several seconds.
+In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-values (obtained by subtrating two group means) represent a relative change.
+Output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} or \code{\link[wrMisc]{moderTestXgrp}} can be directly read to produce Volcano plots for diagnostic reasons.
+Please note, that plotting a very high number of points (eg >10000) in transparency may take several seconds.
 }
 \examples{
 library(wrMisc)
 set.seed(2005); mat <- matrix(round(runif(900),2), ncol=9)
-rownames(mat) <- paste0(rep(letters[1:25],each=4), rep(letters[2:26],4))
+rownames(mat) <- paste0(rep(letters[1:25], each=4), rep(letters[2:26],4))
 mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
 mat[3:7,4:9] <- mat[3:7,4:9] + 0.7
 mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
@@ -136,5 +148,5 @@ VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
  
 }
 \seealso{
-(for PCA) \code{\link{plotPCAw}}
+(for PCA) \code{\link{plotPCAw}})
 }
