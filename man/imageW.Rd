@@ -17,7 +17,9 @@ imageW(
   cexYlab = 0.9,
   cexTit = 1.6,
   NAcol = grDevices::grey(0.8),
-  las = 2
+  las = 2,
+  silent = FALSE,
+  callFrom = NULL
 )
 }
 \arguments{
@@ -46,6 +48,10 @@ imageW(
 \item{NAcol}{(character or integer) custom color fro NA-values, default is grey}
 
 \item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}})}
+
+\item{silent}{(logical) suppress messages}
+
+\item{callFrom}{(character) allow easier tracking of message(s) produced}
 }
 \value{
 graphical output only

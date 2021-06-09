@@ -6,7 +6,6 @@
 #' @param colRamp (character or integer) set of colors, default is rainbow-like
 #' @param location (character) for location of histogram inside existing plot (may be 'br','bl','tl','tr','bottomright', 'bottomleft','topleft','topright') 
 #' @param legTit (character, length=1) optional title for histogram-insert
-#' @param border (logical) draw border around histogram-insert
 #' @param cex (numeric) expansion factor (see also \code{\link[graphics]{par}})
 #' @param srt (numeric) angle for histogram text labels (90 will give vertical label) (see also \code{\link[graphics]{par}})
 #' @param offS (\code{NULL} or numeric, length=5) fine-tuning of where histogram-insert will be placed and how elements therein are ditributed 

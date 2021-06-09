@@ -23,6 +23,7 @@
 #' @param ctrPch (integer) symbol for showing group center (see also \code{\link[graphics]{par}})
 #' @param ctrCex (numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})
 #' @param ctrCol (character or integer) color for group center symbol
+#' @param addSubTi (logical) decide if subtitle (stating that potential outlyers were displayed separatetly) should be added in plot
 #' @param returnOutL (logical) decide if rownames of (potential) outlyer values should be returned when running the function
 #' @param callFrom (character) allow easier tracking of messages produced
 #' @param silent (logical) suppress messages
@@ -45,25 +46,24 @@
 #'   outlCol=col2[i], bagLwd=3)
 #' @export
 addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagLwd=1.5, nCore=4, outlCol=2, outlPch=NULL, outlCex=0.6, reCol=NULL, rePch=NULL, reCex=NULL,
-  ctrPch=NULL, ctrCol=NULL, ctrCex=NULL, returnOutL=FALSE, callFrom=NULL, silent=TRUE) {            # colOutL  colCont=NULL,colOutlP=2,colOutlT=2,
+  ctrPch=NULL, ctrCol=NULL, ctrCex=NULL, addSubTi=TRUE, returnOutL=FALSE, callFrom=NULL, silent=TRUE) {            # colOutL  colCont=NULL,colOutlP=2,colOutlT=2,
   ##  'x' should be matrix or dataframe (use 1st & 2nd column, ie x & y coord for points) to draw simple bag-plot
   ## 'lev1' gives the min % of points to be included to core (shaded using 'bagCol'), as long as >nCore data-points available
   ## "outliers" are determined similar to boxplots using the 'outCoef'-parameter and then shown in color 'colOutL' and their names may be exported
   ## optional: overall contour (wo outliers) if 'colCont' (=color for contour) given, show center (median) if 'ctrPch' given
   fxNa <- wrMisc::.composeCallName(callFrom,newNa=".addBagPlot")
-  msg <- " 'x' must be matrix or data.frame (with at least 1 row and 2 columns)"
+  msg <- " 'x' must be numeric matrix or data.frame (with at least 1 row and 2 columns)"
   if(is.null(x) <0) stop(msg)
-  if(!"matrix" %in% class(x)) x <- try(as.matrix(x))
+  if(!"matrix" %in% class(x)) x <- try(as.matrix(x), silent=TRUE)
   if(any(class(x) =="try-error")) stop(msg," - could not transform 'x' using as.matrix()")
-  if(length(dim(x)) <2) {
-    x <- matrix(x, ncol=length(x))
-    if(!silent) message(fxNa," : trying to transform .. since ",msg)
-  } else if(length(dim(x)) >2) {x <- as.matrix(x[,,1])
-    if(!silent) message(fxNa," 'x' is >2 dimensions, reducing to 1st and second (x[,,1])")}
-  msg <- "'x' should be matrix or data.frame and have at least 2 rows and 2 columns"  
-  if(any(length(dim(x)) !=2, dim(x) < 1)) stop(msg)
-  if(is.data.frame(x)) x <- as.matrix(x)
-  if(ncol(x) >2 & !silent) { message(fxNa," : only the first 2 columns of data will be used"); x <- x[,1:2]}
+  if(length(x) <2) stop(msg)
+  if(length(dim(x)) >2) {x <- as.matrix(x[,,1])
+    if(!silent) message(fxNa," 'x' is >2 dimensions, removing last (as x[,,1])")}
+  if(ncol(x) <2) {
+    x <- try(matrix(as.numeric(x), ncol=2), silent=TRUE)
+    if(any(class(x) =="try-error")) stop(msg," - could not transform 'x' to numeric matrix with 2 columns")
+    if(!silent) message(fxNa," : trying to transform .. since ",msg) }  
+
   chNA <- is.na(x)
   if(any(chNA)) {
     rmLi <- which(rowSums(chNA) >0)
@@ -80,13 +80,13 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
     chdNA <- is.na(keepX)
     if(any(chdNA)) keepX[which(chdNA)] <- FALSE
     if(sum(keepX) <1) { keepX <- rep(TRUE, nrow(x))
-      if(!silent) message("problem defining non-outlyer part of data, keep all")}
+      if(!silent) message("Problem defining non-outlyer part of data, keep all")}
     ## define outlyers
     outL <- matrix(x[which(!keepX),], ncol=2)
     if(nrow(outL) >0) rownames(outL) <- rownames(x)[which(!keepX)]
     offS <- if(nrow(x) >1) apply(x, 2, function(z) max(abs(range(z, finite=TRUE)), na.rm=TRUE))/70 else x/70               # 
     if(!silent)  {if(nrow(x) > 2) message(fxNa," keep ",sum(keepX)," out of ",nrow(x)," and consider ",
-      sum(!keepX)," as outliers") else message(fxNa," too few data, use all columns")}
+      sum(!keepX)," as outliers") else message(fxNa,"Too few data, use all columns")}
     if(sum(keepX) < nrow(x)) { x <- x[which(keepX),]
       di <- di[which(keepX)] }
     ## chull around core data
@@ -114,7 +114,7 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
     ## highlight outliers
     if(length(outlCol) >0 & nrow(outL) >0) {
       if(length(outlPch) >0) graphics::points(outL, pch=outlPch, col=outlCol)
-      if(length(outlCex) >0) graphics::mtext(paste("names of ",sum(!sapply(outL,is.null),na.rm=TRUE),
+      if(addSubTi & length(outlCex) <1) graphics::mtext(paste("names of ",sum(!sapply(outL,is.null),na.rm=TRUE),
         " elements looking like potential outlyers were displayed"), cex=0.55, line=-0.8, col=grDevices::grey(0.4))
       if(length(outlCex) >0) graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21))
       }

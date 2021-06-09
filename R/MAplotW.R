@@ -129,7 +129,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       if("means" %in% names(Mvalue)) {
         ## identify sample-groups to comparsison(s) - needed lateron
         if(debug) message(" identify sample-groups to comparsison(s)")
-        pairwCol <- .sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=names(Mvalue)[FDRcol[1]], callFrom=fxNa,silent=silent) 
+        pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=names(Mvalue)[FDRcol[1]], callFrom=fxNa,silent=silent) 
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])  
         ## are all group-means needed (for exporting) ??
       } else warning("Could not find suitable field '$means' in '",namesIn[1],"'")    
@@ -334,7 +334,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         useCol[which(passAll)] <- .colorByPvalue(merg$FDR[which(passAll)])
         
         } else {
-        useCol[which(passAll)] <- colPass[ if(length(unique(merg[which(passAll),annotColumn[1]])) >1) .levIndex(
+        useCol[which(passAll)] <- colPass[ if(length(unique(merg[which(passAll),annotColumn[1]])) >1) wrMisc::levIndex(
           merg[which(passAll),annotColumn[1]]) else rep(1,sum(passAll))] } }  # assign colors for those passing 
     } else useCol <- col
         

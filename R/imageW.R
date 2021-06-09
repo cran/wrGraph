@@ -21,17 +21,29 @@
 #' @param cexTit (numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})
 #' @param NAcol (character or integer) custom color fro NA-values, default is grey
 #' @param las (numeric) style of axis labels (see also \code{\link[graphics]{par}})
+#' @param silent (logical) suppress messages
+#' @param callFrom (character) allow easier tracking of message(s) produced
 #' @seealso \code{\link[graphics]{image}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from  \href{https://CRAN.R-project.org/package=gplots}{gplots}   
 #' @return graphical output only
 #' @examples
 #' imageW(as.matrix(iris[1:40,1:4]))
 #' @export
-imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NA, yLab=NA, cexXlab=0.7, cexAxs=NULL, cexYlab=0.9, cexTit=1.6, NAcol=grDevices::grey(0.8), las=2) {
+imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NA, yLab=NA, cexXlab=0.7, cexAxs=NULL, cexYlab=0.9, cexTit=1.6, NAcol=grDevices::grey(0.8), 
+  las=2, silent=FALSE, callFrom=NULL) {
   ## improved version if image()
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="imageW")
   if(length(dim(dat)) <2) dat <- matrix(as.numeric(dat), ncol=1, dimnames=list(names(dat), NULL))
   if(ncol(dat) >1) dat <- dat[,ncol(dat):1]
   if(identical(col,"heat.colors") | identical(col,"heatColors")) col <- rev(grDevices::heat.colors(sort(c(15, prod(dim(dat)) +2))[2] ))
-  if(length(col) <1) col <- grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(n=7, name="RdYlBu")))(60)  
+  chRCo <- requireNamespace("RColorBrewer", quietly=TRUE) 
+  msgRCo <- c(fxNa,": package 'RColorBrewer' not installed",", ignore argument 'col'")
+  if(identical(col,"YlOrRd"))  {if(chRCo) col <- RColorBrewer::brewer.pal(9,"YlOrRd") else { col <- NULL; if(!silent) message(msgRCo) }}
+  if(identical(col,"RdYlGn"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"RdYlGn") else { col <- NULL; if(!silent) message(msgRCo) }}
+  if(identical(col,"Spectral"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"Spectral") else { col <- NULL; if(!silent) message(msgRCo) }}
+  if(identical(col,"RdBu"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"RdBu") else { col <- NULL; if(!silent) message(msgRCo) }}
+  
+  if(length(col) <1) { if(!chRCo) message(msgRCo[1:2]," using rainbow colors instead of 'RdYlBu'") 
+    col <- if(chRCo) grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(n=7, name="RdYlBu")))(60) else grDevices::rainbow(60)}  
   chNa <- is.na(dat)  
   if(any(chNa) & length(NAcol) >0) { if(!is.matrix(dat)) dat <- as.matrix(dat)
     mi <- min(dat,na.rm=TRUE)
@@ -41,7 +53,7 @@ imageW <- function(dat, col=NULL, rowNa=NULL, colNa=NULL, tit=NULL, xLab=NA, yLa
   if(length(dim(dat)) <2) dat <- matrix(dat, ncol=1, dimnames=list(names(dat),NULL))
   if(length(rowNa) <nrow(dat)) rowNa <- rownames(dat) 
   if(length(rowNa) <1) rowNa <- if(length(nrow(dat)) >1) 1:nrow(dat) else ""
-  if(length(colNa) <ncol(dat)) colNa <- colnames(dat)
+  if(length(colNa) < ncol(dat)) colNa <- colnames(dat)
   if(length(colNa) <1) colNa <- if(length(ncol(dat)) >1) 1:ncol(dat) else ""
   if(is.null(xLab)) xLab <- ""
   if(is.null(yLab)) yLab <- ""

@@ -65,6 +65,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
   doPlot <- TRUE
   if(debug) silent <- FALSE
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="vioplotW")
+  msg <- NULL
   rangeVa <- 1.5                                                   # how much to extent fitted distribution beyond real min/max (for ra2)
   if(is.null(pointCol)) pointCol <- grDevices::rgb(1,1,1,0.9)      # color of (white) point to mark median
   if(is.null(cexPt)) cexPt <- 1.7
@@ -78,8 +79,17 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     "lty","tit","lwd","rectCol","at","add","wex","drawRect",  "colMed","pchMed","wex","silent","debug","callFrom") 
   colNx <- if(length(dim(x)) >1) colnames(x) else argN[1]
   datas <- wrMisc::asSepList(list(x, ...), asNumeric=TRUE, fxArg=argN, callFrom=fxNa)
+  if(length(datas) >0) {
+    datas <- lapply(datas, wrMisc::naOmit)
+    chLe <- sapply(datas, length)
+    if(TRUE & any(chLe <4)) {
+      ## simply remove all entries with less than 4 values (makes no sense to plot density
+      msg <- paste0(" NOTE: ",sum(chLe <4)," (out of ",length(chLe),") entries have <4 values, eliminated from data to plot")
+      if(!silent) message(fxNa,msg)
+      datas <- datas[which(chLe >3)]
+    }  
+  } else doPlot <- FALSE
   n <- length(datas)
-
   if(doPlot & length(n) >0){  
     if("rainbow" %in% col) col <- grDevices::rainbow(round(n*1.08))[1:n]
     if("grayscale" %in% col) col <- grDevices::gray.colors(n)
@@ -232,6 +242,8 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
         if(horizontal) graphics::mtext(paste(nDisp[,2],nDisp[,1],sep="\n\n"), at=(1:nrow(nDisp))+0.01, side=3-horizontal, cex=0.7, line=-1.5, las=1) else {
           graphics::mtext(paste(nDisp[,1],nDisp[,2],sep=" , "), at=1:nrow(nDisp), side=3, cex=0.7, line=-0.8)}
       } else graphics::mtext(nDisp, at=(1:n)+horizontal/9, side=3-horizontal, las=1, cex=0.7, line=-0.8-horizontal)
-    }}
+    }
+  if(length(msg) >0) graphics::mtext(msg, side=1, cex=0.7,las=1)    # add note about groups/columns of data not plotted
+  }
 }
     

@@ -16,6 +16,7 @@ plotPCAw(
   displBagPl = TRUE,
   getOutL = FALSE,
   cexTxt = 1,
+  cexSub = 0.6,
   showLegend = TRUE,
   nGrpForMedian = 6,
   pointLabelPar = NULL,
@@ -23,7 +24,8 @@ plotPCAw(
   rotatePC = NULL,
   suplFig = TRUE,
   callFrom = NULL,
-  silent = FALSE
+  silent = FALSE,
+  debug = FALSE
 )
 }
 \arguments{
@@ -51,6 +53,8 @@ Alternatively, a vector of length equal the number of columns of x can be suppli
 
 \item{cexTxt}{(integer) expansion factor for text (see also \code{\link[graphics]{par}})}
 
+\item{cexSub}{(integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}})}
+
 \item{showLegend}{(logical) toggle to display legend}
 
 \item{nGrpForMedian}{(integer) decide if group center should be displayed via its average or median value: If group has less than 'nGrpForMedian' values, the average will be used, otherwise the median; if \code{NULL} no group centers will be displayed}
@@ -67,32 +71,44 @@ Alternatively, a vector of length equal the number of columns of x can be suppli
 \item{callFrom}{(character) allow easier tracking of message(s) produced}
 
 \item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) display additional messages for debugging}
 }
 \value{
 plot and optional matrix of outlyer-data
 }
 \description{
-Function to plot \href{https://en.wikipedia.org/wiki/Principal_component_analysis}{principal components analysis (PCA)}, 
+This function allows to plot \href{https://en.wikipedia.org/wiki/Principal_component_analysis}{principal components analysis (PCA)}, 
 with options to show center and potential outliers for each of the groups (columns of data).
-One of the specificities of this implementation is the integration of bag-plots to better visualize different groups of points 
+The main points of this implementation consist in offering bagplots to highlight groups of columns/samples and support to (object-oriented) 
+ output from \href{https://bioconductor.org/packages/release/bioc/html/limma.html}{limma} and \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}.
+}
+\details{
+One of the motivations for this implementation comes from integrating the idea of bag-plots to better visualize different groups of points 
 (if they can be organized so beforehand as distinct groups) :
 The main body of data is shown as 'bag-plots' (a bivariate boxplot, see \href{https://en.wikipedia.org/wiki/Bagplot}{Bagplot})
 with different transparent colors to highlight the core part of different groups (if they contain more than 2 values per group).
 Furthermore, group centers are shown as average or median (see 'nGrpForMedian') with stars & index-number (if <25 groups).
 Layout is automatically set to 2 or 4 subplots (if plotting more than 2 principal components makes sense).
+
+The other motivation for this implementation came from plotting PCA based on MArrayLM-objects (or lists) 
+created by \href{https://bioconductor.org/packages/release/bioc/html/limma.html}{limma} and \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} in a convenient way.
+
 Note : This function uses for calulating PCA \code{\link[stats]{prcomp}} with default \code{center=TRUE} and \code{scale.=FALSE}, (different to princomp() which standardizes by default).
+
 Note: \code{NA}-values cannot (by definition) be processed by PCA - all lines with any non-finite values/content (eg \code{NA}) will be omitted !
-Note : Package RColorBrewer may be used if avaialble.
-Finally, note that several other packages dedicated to PCA exist, for example \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR} offers 
+
+Note : Package RColorBrewer may be used if available.
+
  a very wide spectrum of possibiities, in particular for combined numeric and categorical data.
 }
 \examples{
 set.seed(2019); dat1 <- matrix(round(c(rnorm(1000), runif(1000,-0.9,0.9)),2), 
   ncol=20, byrow=TRUE) + matrix(rep(rep(1:5,6:2), each=100), ncol=20)
-biplot(prcomp(dat1))      # traditional plot
+biplot(prcomp(dat1))        # traditional plot
 (grp = factor(rep(LETTERS[5:1],6:2)))
 plotPCAw(dat1, grp)
 }
 \seealso{
-(used in this function for the PCA underneith:) \code{\link[stats]{prcomp}}, \code{\link[stats]{princomp}}, the package \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR}
+\code{\link[stats]{prcomp}} (used here for the PCA underneith) , \code{\link[stats]{princomp}}, see the package \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR} for multiple plotting options or ways of combining categorical and numeric data
 }

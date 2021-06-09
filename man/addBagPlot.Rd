@@ -21,6 +21,7 @@ addBagPlot(
   ctrPch = NULL,
   ctrCol = NULL,
   ctrCex = NULL,
+  addSubTi = TRUE,
   returnOutL = FALSE,
   callFrom = NULL,
   silent = TRUE
@@ -58,6 +59,8 @@ addBagPlot(
 \item{ctrCol}{(character or integer) color for group center symbol}
 
 \item{ctrCex}{(numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})}
+
+\item{addSubTi}{(logical) decide if subtitle (stating that potential outlyers were displayed separatetly) should be added in plot}
 
 \item{returnOutL}{(logical) decide if rownames of (potential) outlyer values should be returned when running the function}
 

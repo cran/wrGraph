@@ -431,7 +431,7 @@ The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/)
 The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.
-This package is constantly evolving, new functions will be added to the next version.
+This package is constantly evolving, new functions may get added to the next version.
 
 
 ## Appendix: Session-Info

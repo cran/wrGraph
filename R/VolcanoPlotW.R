@@ -31,6 +31,8 @@
 #' @param annotColumn (character) column names of annotation to be extracted (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot).
 #'   The first entry (typically 'SpecType') is used for different symbols in figure, the second (typically 'GeneName') is used as prefered text for annotating the best points (if \code{namesNBest} allows to do so.)
 #' @param annColor (character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)
+#' @param expFCarrow (logical or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
+#'  if \code{numeric} an arrow will be drawn at this M-value
 #' @param cexPt (numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})
 #' @param cexSub (numeric) size of subtitle, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})
 #' @param cexTxLab (numeric) size of text-labels for points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})
@@ -71,7 +73,7 @@
 #' @export
 VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, FCthrs=NULL, FdrList=NULL, FdrThrs=NULL, FdrType=NULL,
   subTxt=NULL, grayIncrem=TRUE, col=NULL, pch=16, compNa=NULL, batchFig=FALSE, cexMa=1.8, cexLa=1.1, limM=NULL, limp=NULL,
-  annotColumn=c("SpecType","GeneName","EntryName","Accession","Species","Contam"), annColor=NULL, cexPt=NULL, cexSub=NULL, 
+  annotColumn=c("SpecType","GeneName","EntryName","Accession","Species","Contam"), annColor=NULL, expFCarrow=FALSE,cexPt=NULL, cexSub=NULL, 
   cexTxLab=0.7, namesNBest=NULL, NbestCol=1, sortLeg="descend", NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE,debug=FALSE) {
   ## MA plot
   ## optional arguments for explicit title in batch-mode
@@ -129,7 +131,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       ## look for group-means & identify column association to current question/pairwise comparison
       if("means" %in% names(Mvalue)) {
         ## identify sammple-groups to comparsison(s) - needed lateron
-        pairwCol <- .sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol,callFrom=fxNa,silent=silent) 
+        pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol,callFrom=fxNa,silent=silent) 
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])  
         ## are all group-means needed (for exporting) ??
       } else warning("Could not find suitable field '$means' in '",namesIn[1],"'")    
@@ -347,10 +349,8 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         colPass <- colPass[match(names(annColor), uniTy)]
       }
       
-      
-      
       ## assign color for those passing
-      if(any(passAll)) useCol[which(passAll)] <- colPass[if(length(unique(merg[which(passAll),annotColumn[1]])) >1) .levIndex(merg[which(passAll),annotColumn[1]]) else rep(1,sum(passAll))]  # assign colors for those passing 
+      if(any(passAll)) useCol[which(passAll)] <- colPass[if(length(unique(merg[which(passAll),annotColumn[1]])) >1) wrMisc::levIndex(merg[which(passAll),annotColumn[1]]) else rep(1,sum(passAll))]  # assign colors for those passing 
     } else useCol <- col
     ## adjust fill color for open symbols
     chPch <- pch %in% c(21:25)
@@ -426,20 +426,37 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       chNa <- is.na(legLab)
       if(any(chNa)) legLab[chNa] <- "NA"
       legOr <- if(length(legLab) >1) order(legLab) else 1   # not used so far 
-      legLoc <- checkForLegLoc(cbind(Mvalue, pValue), sampleGrp=legLab, showLegend=FALSE)
+      legLoc <- wrGraph::checkForLegLoc(cbind(Mvalue, pValue), sampleGrp=legLab, showLegend=FALSE)
       legCex <- stats::median(c(useCex,cexTxLab,1.2), na.rm=TRUE)
       graphics::legend(legLoc$loc, legend=legLab, col=legCol, text.col=1, pch=legPch, if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)  # as points
     }
-
-  ## export results
-  if(returnData) {
-    merg <- merg[,-1*c(1,ncol(merg))]        # remove col 'ID' 'redundant' & 'pch'
-    annCo <- wrMisc::naOmit(match(annotColumn, colnames(merg)))
-    if(length(annCo) >0) cbind(merg[,annCo],  merg[,-annCo]) else merg }
+    ## arrow for expected ratio
+    if(identical(TRUE, expFCarrow)) {
+       cat(" .. ",names(useComp),"  -> ",unlist(strsplit(names(useComp), "-")),"\n")
+        regStr <-"[[:space:]]*[[:alpha:]]+[[:punct:]]*[[:alpha:]]*"
+        expM <- sub(paste0("^",regStr),"", sub(paste0(regStr,"$"), "", unlist(strsplit(names(useComp), "-"))) )   # assume '-' separator from pairwise comparison
+        chN2 <- try(as.numeric(expM), silent=TRUE)
+        if(!"try-error" %in% class(chN2) & length(chN2)==2) {
+          expM <- log2(chN2[2] / chN2[1])                     # transform to ratio
+        } else expM <- NA  
+        if(is.finite(expM)) {
+          figCo <- graphics::par("usr")                         #  c(x1, x2, y1, y2)
+          arr <- c(0.019,0.14)                                  # start- and end-points of arrow (as relative to entire plot)
+          graphics::arrows(expM, figCo[3] + arr[1]*(figCo[4] -figCo[3]), expM, figCo[3] + arr[2]*(figCo[4] -figCo[3]), 
+            col=legCol[min(2,length(legCol))],lwd=1,length=0.1)
+          graphics::mtext(paste("expect at",signif(expM,3)), at=expM, side=1, adj=0.5, col=legCol[min(2,length(legCol))], cex=cexLa*0.7, line=-0.9)
+        } else { if(!silent) message(fxNa," Unable to extract expexted M-value)") }       
+    }  
+    ## export data used for plotting
+    if(returnData) {
+      merg <- merg[,-1*c(1,ncol(merg))]        # remove col 'ID' 'redundant' & 'pch'
+      annCo <- wrMisc::naOmit(match(annotColumn, colnames(merg)))
+      if(length(annCo) >0) cbind(merg[,annCo],  merg[,-annCo]) else merg }
   } }
      
 #' @export
 .sampNoDeMArrayLM <- function(MArrayObj, useComp, groupSep="-", lstMeans="means", lstP="BH", silent=FALSE, callFrom=NULL) {
+  ## old version,not used any more
   ## locate sample index from index or name of pair-wise comparisons in list or MArrayLM-object
   fxNa <- wrMisc::.composeCallName(callFrom, newNa=".sampNoDeMArrayLM")
   errMsg <- c("argument 'MArrayObj' is ","empty","doesn't contain the list-element needed  ('",lstMeans,"') !")
@@ -464,16 +481,6 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   out }
     
 #' @export
-.levIndex <- function(dat,asSortedLevNa=FALSE) {
-  ## transform levels into index; should get integrated to wrMisc
-  if(asSortedLevNa) out <- as.integer(as.factor(dat)) else {
-    out <- dat
-    levU <- wrMisc::naOmit(unique(out))     # levels in orig order (non-alpahbetical)
-    for(i in 1:length(levU)) out[which(out==levU[i])] <- i
-    out <- as.integer(out)}
-  out }
-
-#' @export
 .colorByPvalue <- function(x,br=NULL,col=NULL,asIndex=FALSE) {
   ## this function should ultimately get incormporated to wtMisc::colorAccording2 as option "pValue" or "FDR"
   ## colors significant (***,**,*) as red-tones, 0.05-0.075 as pale orange, others as blue-tones
@@ -495,3 +502,14 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     if(any(chNa)) out[which(chNa)] <- grDevices::grey(0.4) }
   out }
   
+#' @export
+.levIndex <- function(dat,asSortedLevNa=FALSE) {
+  ## transform levels into index; should get integrated to wrMisc
+  ## depreciated, please use wrMisc::levIndex() instead  
+  if(asSortedLevNa) out <- as.integer(as.factor(dat)) else {
+    out <- dat
+    levU <- wrMisc::naOmit(unique(out))     # levels in orig order (non-alpahbetical)
+    for(i in 1:length(levU)) out[which(out==levU[i])] <- i
+    out <- as.integer(out)}
+  out }
+   

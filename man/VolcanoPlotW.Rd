@@ -27,6 +27,7 @@ VolcanoPlotW(
   annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species",
     "Contam"),
   annColor = NULL,
+  expFCarrow = FALSE,
   cexPt = NULL,
   cexSub = NULL,
   cexTxLab = 0.7,
@@ -86,6 +87,9 @@ if \code{NULL} it will search for suitable fields/values in this order : 'FDR','
 The first entry (typically 'SpecType') is used for different symbols in figure, the second (typically 'GeneName') is used as prefered text for annotating the best points (if \code{namesNBest} allows to do so.)}
 
 \item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
+
+\item{expFCarrow}{(logical or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
+if \code{numeric} an arrow will be drawn at this M-value}
 
 \item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
