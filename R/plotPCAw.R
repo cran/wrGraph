@@ -39,7 +39,7 @@
 #' @param cexSub (integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}}) 
 #' @param displBagPl (logical) if \code{TRUE}, show bagPlot (group-center) if >3 points per group otherwise the average-confidence-interval  
 #' @param getOutL (logical) return outlyer samples/values 
-#' @param showLegend (logical) toggle to display legend 
+#' @param showLegend (logical or character) toggle to display legend , if character it designes the location within the plot to display the legend ('bottomleft','topright', etc..)
 #' @param nGrpForMedian (integer) decide if group center should be displayed via its average or median value: If group has less than 'nGrpForMedian' values, the average will be used, otherwise the median; if \code{NULL} no group centers will be displayed
 #' @param pointLabelPar (character) define formatting for optional labels next to points in main figure (ie PC1 vs PC2); may be \code{TRUE} or list containing elments 'textLabel','textCol','textCex',
 #'  'textOffSet','textAdj' for fine-tuning
@@ -140,15 +140,22 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
     chRo <- rotatePC >0 & rotatePC <= ncol(dat)
     if(any(!rotatePC)) rotatePC <- rotatePC[which(rotatePC)]
     if(length(rotatePC) >0) pca$x[,rotatePC] <- -1*pca$x[,rotatePC] }  
-  if(debug) {message("plotPCAw_5") }
+  if(debug) {message("plotPCAw_5 .. lab123: ",wrMisc::pasteC(lab123)) }
   ## start plot
-  graphics::plot(pca$x[,c(1,2)], main=useTit, cex.axis=0.7*cexTxt, cex.lab=cexTxt*0.75, cex.main=if(ncol(dat) > 3) 1.4 else 0.85, xlab=lab123[1], ylab=lab123[2], las=1, type="n")       # empty plot
-  displLeg <- wrGraph::checkForLegLoc(matr=pca$x, sampleGrp=sampleGrp, showLegend=showLegend, suplSpace=5.5, callFrom=callFrom)
+  graphics::plot(pca$x[,c(1,2)], main=useTit, cex.axis=0.7*cexTxt, cex.lab=cexTxt*0.75, cex.main=if(ncol(dat) > 3) 1.4 else 0.85, xlab=lab123[1], ylab=lab123[2], las=1, type="n")   # empty plot
+  ## check for legend-location (if legend should be drawn) 
+  if(is.character(showLegend) & length(showLegend)==1) { 
+    chL <- showLegend %in% c("bottomleft","bottomright","topright","topleft")
+    if(!chL) showLegend <- TRUE   
+  }
+  displLeg <- if(is.logical(showLegend)) {if(showLegend) wrGraph::checkForLegLoc(matr=pca$x, sampleGrp=sampleGrp, showLegend=showLegend, suplSpace=5.5, callFrom=callFrom) else list(FALSE)
+  } else { if(is.character(showLegend)) list(TRUE,showLegend) else list(FALSE)}
+  
   if(displLeg[[1]] & showLegend) graphics::legend(displLeg[[2]], pch=useSymb.ori, col=colBase,
     paste(1:length(levels(sampleGrp)),"..",substr(unique(averNa3),1,25)), text.col=colBase,
     cex=cexTxt*max(0.4, round(0.75 -((length(unique(sampleGrp)) %/% 5)/31),3)), xjust=0.5, yjust=0.5)
   graphics::points(pca$x[,c(1,2)], pch=useSymb,col=useCol,cex=0.8)
-  if(debug) {message("plotPCAw_6") }
+  if(debug) { message("plotPCAw_6 .. displLeg: ",unlist(displLeg[1:2])) }
   ## prepare for labels on points
   if(length(pointLabelPar) >0) {
     chLe <- sapply(pointLabelPar,length) %in% c(1,ncol(dat))

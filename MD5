@@ -1,8 +1,8 @@
-c6e9d3d73901c040c16967f2a4b0d921 *DESCRIPTION
+7e8dedbff17e20801c7e647eb389b6f5 *DESCRIPTION
 2dce2a9b2a5d3730b77779a2b14e273a *NAMESPACE
 c1faaa49593a8841c6c5ef3706580954 *R/MAplotW.R
-8fe847ae2b6a6aa5d63254ccf7485a99 *R/VolcanoPlotW.R
-98f40da3cf5eb962ced12750941acfd5 *R/addBagPlot.R
+c8543065b1361816534f0764691c166d *R/VolcanoPlotW.R
+63aa443c2a821cd06fb712428ecba0b3 *R/addBagPlot.R
 e6ed8d57cf83dc7ad430eb05c68397a3 *R/checkForLegLoc.R
 c8c5843a0a095fc372c200f4b0866bf3 *R/convertPlotCoordPix.R
 a1ffffc9ce31e2650487ce97d81626ba *R/cumFrqPlot.R
@@ -14,7 +14,7 @@ d3ad236e1657bd6057d5bbac2e04cc0f *R/imageW.R
 bb66f97952af9809b8c28d68127c13af *R/partitionPlot.R
 93dd89b61fecb01f266aec5ad883b6b2 *R/plotBy2Groups.R
 342f2cb75e7a22645000a4430eb3c76d *R/plotLinReg.R
-0d68e0585f2a374cf87e78b9d8ad7eaf *R/plotPCAw.R
+a7ad7dadf3f5fdce7c6e3e28ca4bcb49 *R/plotPCAw.R
 0fe01cbd4607139c36cce6fdce723f2a *R/plotW2Leg.R
 a9103b6551eb4af936a0102ad538cf67 *R/profileAsClu.R
 fe02deb626270b96a87b4c0b6ec5973e *R/staggerdCountsPlot.R
@@ -22,7 +22,7 @@ fe02deb626270b96a87b4c0b6ec5973e *R/staggerdCountsPlot.R
 5979ec5066e78453242a1a2684b07972 *build/vignette.rds
 cd6811e3b4201c04023486437b9693b1 *inst/doc/wrGraphVignette1.R
 36e34baae4b5ce314f07520f1c73160d *inst/doc/wrGraphVignette1.Rmd
-4b745ca08b9cfc42f615e9fe84e81246 *inst/doc/wrGraphVignette1.html
+eff2b6fd27bc316a386b51ae65b8bd07 *inst/doc/wrGraphVignette1.html
 8b217ed14706f2f3e6190b4ce4ca055b *man/MAplotW.Rd
 f6f6e60934de99558f789de37d07dc33 *man/VolcanoPlotW.Rd
 1e73941c10b707eaf499f7a1168780d2 *man/addBagPlot.Rd
@@ -37,7 +37,7 @@ ed9b59d8489404d2dd0149dbd92b1606 *man/cumFrqPlot.Rd
 ed375bd26a6d55f40e12a33245d7e6c2 *man/partitionPlot.Rd
 b6666540d889111ba81356183dfb541b *man/plotBy2Groups.Rd
 06625bb8a8c3b06147bc56b357bf8001 *man/plotLinReg.Rd
-ad9e28b9bec0f1c3ecc58b44cda519f1 *man/plotPCAw.Rd
+6059756801b1f91d734fa8baaa75a3fc *man/plotPCAw.Rd
 e3e2cb00dba766b853f82854254e0752 *man/plotW2Leg.Rd
 5cbc3e7c8a38ad111aeb21a82dded173 *man/profileAsClu.Rd
 cda983552c3c9e9e1d48b83f5d47c9af *man/staggerdCountsPlot.Rd

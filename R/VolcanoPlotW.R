@@ -83,7 +83,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   on.exit(graphics::par(opar$cex.main)) 
   on.exit(graphics::par(opar$cex.lab)) 
   on.exit(graphics::par(opar$las)) 
-  plotByFdr <- TRUE  #
+  plotByFdr <- TRUE        #
   namesIn <- c(deparse(substitute(Mvalue)), deparse(substitute(pValue)), deparse(substitute(filtFin)))
   basRGB <- c(0.3,0.3,0.3)           # grey
   fcRGB <- c(1,0,0)                  # red        for points passing  FC filt line
@@ -104,7 +104,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         ## no spearate pValues provided : extract from MArrayLM-object (Mvalue)
         pcol <- wrMisc::naOmit(match(c("p.value","pvalue","pval","p"), tolower(names(Mvalue))))
         if(length(pcol) >0) pValue <- Mvalue[[pcol[1]]] else stop("can't find suitable element for p-Values from MArrayLM-object")
-        if(length(dim(pValue)) >0) if(colnames(pValue)[1]=="(Intercept)" & ncol(pValue) >1) {
+        if(length(dim(pValue)) >0) if(colnames(pValue)[1] =="(Intercept)" & ncol(pValue) >1) {
           ## extract 2nd col if result from wrMisc::moderTest2grp() 
           pNa <- rownames(pValue)
           pValue <- as.numeric(pValue[,2])
@@ -121,7 +121,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       }  ## .. otherwise spearate pValue was provided
       ## look for M-values (need to create if not available - using useComp checked when extracting pValue)
       Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","m"), tolower(names(Mvalue))))      # which list-element
-      Fcol <- wrMisc::naOmit(match(if(length(FdrType) <1) c("fdr","bh","lfdr","by","p.value") else FdrType, tolower(names(Mvalue))))    # needed for matching means to pair-wise names and for extracting FDR values
+      Fcol <- wrMisc::naOmit(match(if(length(FdrType) <1) c("fdr","bh","lfdr","by","p.value") else tolower(FdrType), tolower(names(Mvalue))))    # needed for matching means to pair-wise names and for extracting FDR values
       if(length(Fcol) <1) stop("Can't find elment suitable for statistical values", if(length(FdrType)==1) c(" to '",FdrType,"'")) else Fcol <- Fcol[1]
       if(!silent & length(FdrType) <1) message(fxNa,"Using element '",names(Mvalue)[Fcol],"' as FDR-values for plot")
       if("lfdr" %in% names(Mvalue)[Fcol]) {   # switch from directly plotting FDR-values to uncorrected p-values
@@ -131,7 +131,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       ## look for group-means & identify column association to current question/pairwise comparison
       if("means" %in% names(Mvalue)) {
         ## identify sammple-groups to comparsison(s) - needed lateron
-        pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol,callFrom=fxNa,silent=silent) 
+        pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol, callFrom=fxNa, silent=silent) 
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])  
         ## are all group-means needed (for exporting) ??
       } else warning("Could not find suitable field '$means' in '",namesIn[1],"'")    
@@ -145,7 +145,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         if("means" %in% names(Mvalue)) {
           ## construct Mvalue based on means (only one/current pairwise comparison needed)
           Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]                           
-          Melem <- which(names(Mvalue)=="Mval")                # update
+          Melem <- which(names(Mvalue) =="Mval")                # update
         } else stop("Can't construct M-values since suitable field '$means' missing in '",namesIn[1],"' !")    
       }
       ## now one can check if 'pValue' & Mvalue match
@@ -162,7 +162,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         ## no explicit pValue, try to extract from MArrayLM-object (Mvalue)
         if(length(Fcol) >0) { FDRvalue <- Mvalue[[Fcol[1]]]
           ## extract 2nd col if result from wrMisc::moderTest2grp() 
-          if(length(dim(FDRvalue)) >0) if(colnames(FDRvalue)[1]=="(Intercept)" & ncol(FDRvalue) >1) {
+          if(length(dim(FDRvalue)) >0) if(colnames(FDRvalue)[1] =="(Intercept)" & ncol(FDRvalue) >1) {
             pNa <- rownames(FDRvalue)
             FDRvalue <- as.numeric(FDRvalue[,2])
             names(FDRvalue) <- pNa 
@@ -238,10 +238,10 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     nIni <- c(M=length(Mvalue),p=length(pValue))
     if(length(chNa$MNa) >0 & length(chNa$pNa) >0) {        # ie both have names, so one can match names
       if(!identical(chNa$MNa,chNa$pNa)) {
-        matchNa <- wrMisc::naOmit(match(chNa$MNa,chNa$pNa))
+        matchNa <- wrMisc::naOmit(match(chNa$MNa, chNa$pNa))
         if(length(matchNa) <1) stop("Both 'Mvalue' and 'pValue' have names, but none of them match !!")
         pValue <- pValue[matchNa]
-        Mvalue <- wrMisc::naOmit(Mvalue[match(names(pValue),names(Mvalue))])
+        Mvalue <- wrMisc::naOmit(Mvalue[match(names(pValue), names(Mvalue))])
       } } else {
         if(length(Mvalue) != length(pValue)) stop("p- and M- values have different length, but no names to match !!  (M=",length(Mvalue)," vs p=",length(pValue),")")
       }
@@ -274,7 +274,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       if(length(names(filtFin)) >0) {
         matchNa <- wrMisc::naOmit(match(rownames(merg), names(filtFin)))       
         if(length(matchNa)==nrow(merg)) merg[,"filtFin"] <- filtFin[matchNa]
-      } else if(length(filtFin)==nrow(merg)) merg[,"filtFin"] <- filtFin        # no proof that order of filtFin is correct
+      } else if(length(filtFin) ==nrow(merg)) merg[,"filtFin"] <- filtFin        # no proof that order of filtFin is correct
     } else filtFin <- rep(TRUE, nrow(merg)) 
     if(debug) message(fxNa," ++ DONE extracting columns : ",wrMisc::pasteC(colnames(merg),quo="'"))
 
@@ -345,7 +345,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
 
       ## integrate names of annColor as order of colPass
       if(length(names(annColor)) >0) {
-        uniTy <- unique(merg[which(passAll),annotColumn[1]])
+        uniTy <- unique(merg[which(passAll), annotColumn[1]])
         colPass <- colPass[match(names(annColor), uniTy)]
       }
       
@@ -416,23 +416,26 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## legend (if multiple symbols)
     pch[which(is.na(pch))] <- -2
     ch1 <- unique(pch)
-    if(length(ch1) >1) {
+    if(length(ch1) >1 & sum(passAll) >0) {
       legInd <- which(!duplicated(merg[which(passAll), annotColumn[1]], fromLast=FALSE))
+      if(length(legInd) <1 & !silent) message(fxNa," Trouble ahead : Can't find non-duplicated ",annotColumn[1]," for ",sum(passAll)," points passing thresholds ! (ie as 'legInd')")
       legPch <- pch[which(passAll)[legInd]]
       legCol <- useCol[which(passAll)[legInd]]
       legBg <- ptBg[which(passAll)[legInd]]
       if(alph2 <1) {legCol <- substr(legCol,1,7); legBg <- substr(legBg,1,7)}  # reset to no transparency
-      legLab <- merg[which(passAll)[legInd], annotColumn[1]]
+      legLab <- merg[which(passAll)[legInd], annotColumn[1]]  
       chNa <- is.na(legLab)
       if(any(chNa)) legLab[chNa] <- "NA"
       legOr <- if(length(legLab) >1) order(legLab) else 1   # not used so far 
       legLoc <- wrGraph::checkForLegLoc(cbind(Mvalue, pValue), sampleGrp=legLab, showLegend=FALSE)
-      legCex <- stats::median(c(useCex,cexTxLab,1.2), na.rm=TRUE)
-      graphics::legend(legLoc$loc, legend=legLab, col=legCol, text.col=1, pch=legPch, if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)  # as points
+      legCex <- stats::median(c(useCex, cexTxLab, 1.2), na.rm=TRUE)
+      if(length(legLab) >0) { chLeg <- try(graphics::legend(legLoc$loc, legend=legLab, col=legCol, text.col=1, pch=legPch, 
+        if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5), silent=TRUE)  # as points
+        if("try-error" %in% class(chLeg)) message(fxNa,"Note: Failed to add legend .. ",if(!silent) chLeg) } 
     }
     ## arrow for expected ratio
     if(identical(TRUE, expFCarrow)) {
-       cat(" .. ",names(useComp),"  -> ",unlist(strsplit(names(useComp), "-")),"\n")
+        if(debug) message(fxNa," .. ",names(useComp),"  -> ",paste(unlist(strsplit(names(useComp), "-")),collapse=" "),"\n")
         regStr <-"[[:space:]]*[[:alpha:]]+[[:punct:]]*[[:alpha:]]*"
         expM <- sub(paste0("^",regStr),"", sub(paste0(regStr,"$"), "", unlist(strsplit(names(useComp), "-"))) )   # assume '-' separator from pairwise comparison
         chN2 <- try(as.numeric(expM), silent=TRUE)
@@ -492,7 +495,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   if(length(col) != length(br) -1 & length(br) >0) { br <- col <- NULL
     message(fxNa, "entries for 'col' and 'br' don't match, ignoring") }
   if(length(col) <1) {
-    col <- grDevices::colorRampPalette((RColorBrewer::brewer.pal(n=7, name="RdYlBu")))(22)[c(2:4,7,17:20)]  
+    col <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=7, name="RdYlBu"),22)[c(2:4,7,17:20)]  
     if(length(col) != length(br)) br <- sort(c(1e-20,10^(-3:0), 0.05,0.075,0.2,0.3))
     }
   out <- if(asIndex) as.numeric(cut(x, br)) else col[as.numeric(cut(x, br))]

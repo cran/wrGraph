@@ -55,7 +55,7 @@ Alternatively, a vector of length equal the number of columns of x can be suppli
 
 \item{cexSub}{(integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}})}
 
-\item{showLegend}{(logical) toggle to display legend}
+\item{showLegend}{(logical or character) toggle to display legend , if character it designes the location within the plot to display the legend ('bottomleft','topright', etc..)}
 
 \item{nGrpForMedian}{(integer) decide if group center should be displayed via its average or median value: If group has less than 'nGrpForMedian' values, the average will be used, otherwise the median; if \code{NULL} no group centers will be displayed}
 

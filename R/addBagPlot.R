@@ -109,11 +109,12 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
     ## show group-center (only if ctrPch defined)
     if(is.null(ctrCol)) ctrCol <- bagCol
     if(!is.null(ctrPch)) {            
-      if(is.null(ctrCex)) ctrCex <- 1.5
+      if(is.null(ctrCex)) ctrCex <- 1.5                                   
       graphics::points(ctr[1], ctr[2], pch=ctrPch, col=ctrCol, cex=ctrCex) }
     ## highlight outliers
     if(length(outlCol) >0 & nrow(outL) >0) {
       if(length(outlPch) >0) graphics::points(outL, pch=outlPch, col=outlCol)
+      if(length(addSubTi) <1 | !is.logical(addSubTi)) addSubTi <- FALSE
       if(addSubTi & length(outlCex) <1) graphics::mtext(paste("names of ",sum(!sapply(outL,is.null),na.rm=TRUE),
         " elements looking like potential outlyers were displayed"), cex=0.55, line=-0.8, col=grDevices::grey(0.4))
       if(length(outlCex) >0) graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21))
