@@ -39,6 +39,14 @@ If not yet installed, the lastest versions of this package can be installed like
 install.packages("wrGraph")
 ```
 
+During this vignette we'll also use the packages [FactoMineR](https://CRAN.R-project.org/package=FactoMineR) and [factoextra](https://CRAN.R-project.org/package=factoextra), let's test if they are installed and install if not yet present.  
+
+```{r setup3, echo=TRUE, eval=FALSE}
+if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
+if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
+```
+
+
 You cat start the vignette for this package by typing :
 ```{r vignBrowse, echo=TRUE, eval=FALSE}
 # access vignette :
@@ -49,12 +57,16 @@ browseVignettes("wrGraph")    #  ... and the select the html output
 To get started, we need to load the packages [wrMisc](https://CRAN.R-project.org/package=wrMisc) and [wrGraph (this package)](https://CRAN.R-project.org/package=wrGraph).
 
 
-```{r setup3, echo=TRUE}
+```{r setup4, echo=TRUE}
 library("wrMisc")
 library("wrGraph")
 # This is version no:
 packageVersion("wrGraph")
 ```
+
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 
 
@@ -90,10 +102,16 @@ legLoc <- checkForLegLoc(dat1, grp, showLegend=FALSE)
 legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 ```
 
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+
+
 ## One More Histogram Function ...
 
 Histograms are a very versatile tool for rapidly gaining insights in the distribution of data.
-This package presents a histogram function allowing to conveniently  work with log2-data and (if desired) 
+This package presents a histogram function allowing to conveniently **work with log2-data** and (if desired) 
 display numbers calculated back to linear values on the x-axis.
 
 Default settings aim to give rather a quick overview, for "high resolution" representations one could set a high number of breaks or one might also consider other/alternative graphical representations. Some of the alternatives are shown later in this vignette.
@@ -128,6 +146,11 @@ legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 ```
 
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+
 ## Violin Plots
 
 [Violin plots](https://en.wikipedia.org/wiki/Violin_plot) or vioplots are basically an adaptation of plotting the
@@ -141,8 +164,16 @@ However, when working with data-sets containing NAs, or simply when working with
 
 
 ```{r vioplot1, echo=TRUE}
-vioplotW(iris[,-5],tit="Iris-data")
+vioplotW(iris[,-5], tit="Iris-data")
 ```
+
+The smoothing of the curves uses default parameters from the function _sm.density_ from the package [sm](https://CRAN.R-project.org/package=sm). In some cases the kernel smoothing may appear to strong, this behaviour can be modified using the argument _hh_ (which is passed on as argument _h_ to the function _sm.density_).
+
+```{r vioplot2, echo=TRUE}
+## less sloothing
+vioplotW(iris[,-5], tit="Iris-data", hh=0.15)
+```
+
 
 ## Plotting Sorted Values ('Summed Frequency')
 
@@ -165,22 +196,56 @@ To get the same conclusion one would need to increase the number of bars in a hi
 At this plot you may note that the curves patal.width and petal.length look differently. 
 On the previous vioplots you may have noticed the bimodal character of the values, again this plot may be helpful to identify distributions which are very difficult to see well using boxplots.
 
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+
 
 ## Color-Code Numeric Content of Matrix (Heatmap)
 
-To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.
-The function _image()_ from the graphic-package provides basic help. Such an output can be referred to as heatmap. The function _imageW()_ from this package offers convenient options for displaying row- and column-names.
+To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes. The function _image()_ from the graphic-package provides basic help. 
+
+Generally this type of display is called _heatmap_, however, most functions in R combine this directly with organizing by hierarchical clustering (_heatmap()_ (package stats) or _heatmap.2()_ from package [gplots](https://CRAN.R-project.org/package=wrMisc)).
+
+Simple plotting without reorganizing rows and columns can be done using the function _imageW()_ from this package, offering convenient options for displaying row- and column-names. 
+Using the argument _transp_ you can decide if the data should be shown _as is_ or rotated by 90 degrees (as in example below). 
+Furthermore, the output can be produced using stadard graphics or using the trellis/lattice framework. The latter includes also an automatic legend for the color-codes.
+Below, the first 40 lines of the Iris-dataset are used :
 
 ```{r imageW, echo=TRUE}
 par(mar=c(4, 5.5, 4, 1))  
-imageW(as.matrix(iris[1:40,1:4]), tit="Iris-data")
+imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-data (head)")
 ```
 
-Heatmaps are well known for displaying the results of hierarchical clustering, see also for example _heatmap()_ (stats-package) or _heatmap.2()_ from the [gplots-package](https://CRAN.R-project.org/package=wrMisc). In these case rows and columns of the data also get reorganized and dendrograms attached.
- 
+Here again the iris-data plotted using the lattice/trellis framework :
+
+```{r imageW2, fig.height=2.5, fig.width=9, fig.align="center", echo=TRUE}
+imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, transp=FALSE, col=c("blue","red"), 
+  rotXlab=45, yLab="Observation no", tit="Iris-data (head)")
+```
+Note, by default this version forces the _aspect_ argument of _levelplot()_ to square shapes.
+In some cases it may be desirable to pass the color-gradient through the value of 0 at a predefined color (use the center element of tha argument _col_).
+One can also display the (rounded) values and choose a custom color for NA-values. 
+
+```{r imageW3, fig.height=6, fig.width=5, echo=TRUE}
+ma1 <- matrix(-7:16,nc=4,dimnames=list(letters[1:6],LETTERS[1:4]))
+ma1[1,2:3] <- 0
+ma1[3,3] <- ma1[3:4,4] <- NA
+   
+imageW(ma1, latticeVersion=TRUE, col=c("blue","grey","red"), NAcol="grey92", 
+  rotXlab=0, cexDispl=0.8, tit="Balanced color gradient")   
+```
+
+By changing the number of desired color-steps we can get the value of 0 better centered to grey color.
+Below, the value of +1 is shown in grey as -1 in contrast to the example above.
+```{r imageW4, fig.height=6, fig.width=5, echo=TRUE}
+imageW(ma1, latticeVersion=TRUE, col=c("blue","grey","red"), NAcol="grey92", 
+  rotXlab=0, nColor=8, cexDispl=0.8, tit="Balanced color gradient")   
+```
+
 
 ## Examine Counts based on Variable Threshold Levels (for ROC curves)
-
 
 The next plot is dedicated to visualize counting results with moving thresholds. 
 While a given threshold criteria moves up or down the resulting number of values passing may not necessarily follow in a linear way. 
@@ -220,6 +285,10 @@ plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5), yLab="Sepal.Length")
 ```
 
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
 ## Plotting Linear Regression and Confidence Intervals
 
 The function _plotLinReg()_ provides help to display a series of bivariate points given in 'dat' (multiple data formats possible), to model a [linear regression](https://en.wikipedia.org/wiki/Linear_regression) and plot the results.
@@ -228,6 +297,10 @@ The function _plotLinReg()_ provides help to display a series of bivariate point
 ```{r plotLinReg1, echo=TRUE}
 plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
 ```
+
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 
 ## Principal Components Analysis (PCA)
@@ -249,10 +322,15 @@ biplot(iris.prc)              # traditional plot
 
 ```{r PCA3, echo=TRUE}
 ## via FactoMineR
-library(FactoMineR); library(dplyr); library(factoextra)
-iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
-fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
-  addEllipses=TRUE, legend.title="Groups" )
+chPa <- c(requireNamespace("FactoMineR", quietly=TRUE), requireNamespace("dplyr", quietly=TRUE), 
+  requireNamespace("factoextra", quietly=TRUE))
+if(all(chPa)) {
+  library(FactoMineR); library(dplyr); library(factoextra)
+  iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
+  fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
+    addEllipses=TRUE, legend.title="Groups" )
+} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure")  
+
 ```
 
 However, some sets of points do not always follow elliptic shapes. 
@@ -285,6 +363,23 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
 
 ```
 
+### Label all points in PCA
+
+In some cases it may be useful to identify all individual points on a plot.
+```{r PCA6, fig.height=12, fig.width=9, fig.align="center", echo=TRUE}
+## creat copy of data and add rownames
+irisD <- as.matrix(iris[,-5])
+rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
+plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris data", 
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2, pointLabelPar=list(textCex=0.45))
+```
+
+
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+
 
 ## MA-Plot
 
@@ -295,7 +390,7 @@ numerous implementations for specific applications exist (eg *plotMA* in [DEseq2
 The version presented here is rather generic and uses transparent points to avoid getting plots too crowded.
 
 First, let's generate some toy data:
-```{r MA0, echo=TRUE}
+```{r MA0, fig.height=6, fig.width=8, fig.align="center", echo=TRUE}
 ## toy data
 set.seed(2005); mat <- matrix(round(runif(2400),3), ncol=6)
 mat[11:90,4:6] <- mat[11:90,4:6] +round(abs(rnorm(80)),3)
@@ -307,7 +402,7 @@ matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
 
 One way of using the function _MAplotW()_ is by providing (explicitely) the M- and A-values.
 By default a threshold-line is drawn for a fold-change of 1.5x (which on log2 scale apprears at +/- 0.58).
-```{r MA1, echo=TRUE}
+```{r MA1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE}
 ## now we are ready to plot, M-values can be obtained by subtracting thr group-means
 MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
 ```
@@ -321,7 +416,7 @@ tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
 ```
  
 This object conatains data for different types of plots (MA-plot, Volcano-Plot, etc ..), let's also mark the names of those passing the fold-change threshold.
-```{r MA5, echo=TRUE}
+```{r MA5,fig.height=6, fig.width=8, fig.align="center",  echo=TRUE}
 ## convenient way, change fold-change threshold to 2x and mark who is beyond :
 MAplotW(tRes, FCth=2, namesNBest="passFC")    
 ```
@@ -342,9 +437,8 @@ The version presented here is rather generic and uses transparent points to avoi
 Furthermore, this version has the advantage to take all information needed directly in MArrayLM-objects, like the output of  moderTest2grp() or moderTestXgrp().
 
 
-```{r Volc1, echo=TRUE}
+```{r Volc1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE}
 ## let's generate some toy data
-library(wrMisc)
 set.seed(2005); mat <- matrix(round(runif(900),2), ncol=9)
 rownames(mat) <- paste0(rep(letters[1:25],each=4), rep(letters[2:26],4))
 mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
@@ -369,6 +463,10 @@ layout(matrix(1:2, nrow=1))
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 ```
+
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 
 
@@ -408,7 +506,6 @@ png(pngFile, width=800, height=600, res=72)
 plot(df1[,2:3], las=1, main="test01")
 dev.off()
 ## Note : Special characters should be converted for proper display in html during mouse-over
-library(wrMisc)
 df1$mou <- htmlSpecCharConv(df1$mou)
 ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
 df1 <- cbind(df1, convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600), plotRes=72))

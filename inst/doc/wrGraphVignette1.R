@@ -12,11 +12,15 @@ suppressPackageStartupMessages({
 ## ----setup2, echo=TRUE, eval=FALSE--------------------------------------------
 #  install.packages("wrGraph")
 
+## ----setup3, echo=TRUE, eval=FALSE--------------------------------------------
+#  if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
+#  if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
+
 ## ----vignBrowse, echo=TRUE, eval=FALSE----------------------------------------
 #  # access vignette :
 #  browseVignettes("wrGraph")    #  ... and the select the html output
 
-## ----setup3, echo=TRUE--------------------------------------------------------
+## ----setup4, echo=TRUE--------------------------------------------------------
 library("wrMisc")
 library("wrGraph")
 # This is version no:
@@ -59,14 +63,34 @@ legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 
 ## ----vioplot1, echo=TRUE------------------------------------------------------
-vioplotW(iris[,-5],tit="Iris-data")
+vioplotW(iris[,-5], tit="Iris-data")
+
+## ----vioplot2, echo=TRUE------------------------------------------------------
+## less sloothing
+vioplotW(iris[,-5], tit="Iris-data", hh=0.15)
 
 ## ----cumFrqPlot1, echo=TRUE---------------------------------------------------
 cumFrqPlot(iris[,1:4])
 
 ## ----imageW, echo=TRUE--------------------------------------------------------
 par(mar=c(4, 5.5, 4, 1))  
-imageW(as.matrix(iris[1:40,1:4]), tit="Iris-data")
+imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-data (head)")
+
+## ----imageW2, fig.height=2.5, fig.width=9, fig.align="center", echo=TRUE------
+imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, transp=FALSE, col=c("blue","red"), 
+  rotXlab=45, yLab="Observation no", tit="Iris-data (head)")
+
+## ----imageW3, fig.height=6, fig.width=5, echo=TRUE----------------------------
+ma1 <- matrix(-7:16,nc=4,dimnames=list(letters[1:6],LETTERS[1:4]))
+ma1[1,2:3] <- 0
+ma1[3,3] <- ma1[3:4,4] <- NA
+   
+imageW(ma1, latticeVersion=TRUE, col=c("blue","grey","red"), NAcol="grey92", 
+  rotXlab=0, cexDispl=0.8, tit="Balanced color gradient")   
+
+## ----imageW4, fig.height=6, fig.width=5, echo=TRUE----------------------------
+imageW(ma1, latticeVersion=TRUE, col=c("blue","grey","red"), NAcol="grey92", 
+  rotXlab=0, nColor=8, cexDispl=0.8, tit="Balanced color gradient")   
 
 ## ----cumulCountPlot1, echo=TRUE-----------------------------------------------
 thr <- seq(min(iris[,1:4]), max(iris[,1:4])+0.1,length.out=100)
@@ -93,10 +117,15 @@ biplot(iris.prc)              # traditional plot
 
 ## ----PCA3, echo=TRUE----------------------------------------------------------
 ## via FactoMineR
-library(FactoMineR); library(dplyr); library(factoextra)
-iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
-fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
-  addEllipses=TRUE, legend.title="Groups" )
+chPa <- c(requireNamespace("FactoMineR", quietly=TRUE), requireNamespace("dplyr", quietly=TRUE), 
+  requireNamespace("factoextra", quietly=TRUE))
+if(all(chPa)) {
+  library(FactoMineR); library(dplyr); library(factoextra)
+  iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
+  fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
+    addEllipses=TRUE, legend.title="Groups" )
+} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure")  
+
 
 ## ----PCA4, echo=TRUE----------------------------------------------------------
 ## via wrGraph, similar to FactoMineR but with bagplots
@@ -109,7 +138,14 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
   tit="Iris data", rowTyName="types of leaves", cexTxt=2)
 
 
-## ----MA0, echo=TRUE-----------------------------------------------------------
+## ----PCA6, fig.height=12, fig.width=9, fig.align="center", echo=TRUE----------
+## creat copy of data and add rownames
+irisD <- as.matrix(iris[,-5])
+rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
+plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris data", 
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2, pointLabelPar=list(textCex=0.45))
+
+## ----MA0, fig.height=6, fig.width=8, fig.align="center", echo=TRUE------------
 ## toy data
 set.seed(2005); mat <- matrix(round(runif(2400),3), ncol=6)
 mat[11:90,4:6] <- mat[11:90,4:6] +round(abs(rnorm(80)),3)
@@ -118,7 +154,7 @@ dimnames(mat) <- list(paste("li",1:nrow(mat),sep="_"),paste(rep(letters[1:2],eac
 ## assume 2 groups with 3 samples each
 matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
 
-## ----MA1, echo=TRUE-----------------------------------------------------------
+## ----MA1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE------------
 ## now we are ready to plot, M-values can be obtained by subtracting thr group-means
 MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
 
@@ -126,13 +162,12 @@ MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat))
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
 
-## ----MA5, echo=TRUE-----------------------------------------------------------
+## ----MA5,fig.height=6, fig.width=8, fig.align="center",  echo=TRUE------------
 ## convenient way, change fold-change threshold to 2x and mark who is beyond :
 MAplotW(tRes, FCth=2, namesNBest="passFC")    
 
-## ----Volc1, echo=TRUE---------------------------------------------------------
+## ----Volc1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE----------
 ## let's generate some toy data
-library(wrMisc)
 set.seed(2005); mat <- matrix(round(runif(900),2), ncol=9)
 rownames(mat) <- paste0(rep(letters[1:25],each=4), rep(letters[2:26],4))
 mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
@@ -165,7 +200,6 @@ png(pngFile, width=800, height=600, res=72)
 plot(df1[,2:3], las=1, main="test01")
 dev.off()
 ## Note : Special characters should be converted for proper display in html during mouse-over
-library(wrMisc)
 df1$mou <- htmlSpecCharConv(df1$mou)
 ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
 df1 <- cbind(df1, convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600), plotRes=72))

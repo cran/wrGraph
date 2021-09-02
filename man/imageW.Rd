@@ -5,27 +5,47 @@
 \title{Display numeric content of matrix as image}
 \usage{
 imageW(
-  dat,
-  col = NULL,
+  data,
+  latticeVersion = FALSE,
+  transp = TRUE,
+  NAcol = "grey95",
   rowNa = NULL,
   colNa = NULL,
   tit = NULL,
   xLab = NA,
   yLab = NA,
+  las = 2,
+  col = NULL,
+  nColor = 9,
+  balanceCol = TRUE,
+  gridCol = "grey75",
+  gridLty = 1,
+  centColShift = 0,
+  cexDispl = NULL,
+  panel.background.col = "white",
+  rotXlab = 0,
+  rotYlab = 0,
   cexXlab = 0.7,
   cexAxs = NULL,
   cexYlab = 0.9,
+  Xtck = 0,
+  Ytck = 0,
   cexTit = 1.6,
-  NAcol = grDevices::grey(0.8),
-  las = 2,
   silent = FALSE,
-  callFrom = NULL
+  debug = FALSE,
+  callFrom = NULL,
+  ...
 )
 }
 \arguments{
-\item{dat}{(matrix or dtaa.frame) main input}
+\item{data}{(matrix or data.frame) main input}
 
-\item{col}{(character or integer) colors, default is 60 shades 'RdYlBu' RColorBrewer, if 'heat.colors' use  heat.colors in min 15 shades}
+\item{latticeVersion}{(logical) use lattice for plotting (this will include a color-legend)}
+
+\item{transp}{(logical) decide if data should get transposed (if \code{TRUE} the data will be displayed exacetly same order as when printing the values as table); 
+set to \code{FALSE} to get behaviour prior to version 1.3.0.}
+
+\item{NAcol}{(character or integer) custom color for NA-values, default is light grey}
 
 \item{rowNa}{(character) optional custom rownames}
 
@@ -37,21 +57,48 @@ imageW(
 
 \item{yLab}{(character) optional custom names for y-axis}
 
+\item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}}); in case of \code{latticeVersion=TRUE} this argument will override default \code{rotXlab=0} and/or  \code{rotYlab=0}}
+
+\item{col}{(character or integer) colors; in lattice version 2 or 3 color-names to define central- and end-points of gradient (starting with color for lowest values, optional central color and color for highest values), default is 60 shades 'RdYlBu' RColorBrewer, if 'heat.colors' use  heat.colors in min 15 shades}
+
+\item{nColor}{(integer, only used in lattice version) number of color-blocks in color gradient (made based on central- and end-points from \code{col}}
+
+\item{balanceCol}{(logical, only used in lattice version) if \code{TRUE} the color-radient aims to color the value closest to 0 with the center color (from \code{col} (default gray)}
+
+\item{gridCol}{(character, only used in lattice version) define color of grid}
+
+\item{gridLty}{(integer, only used in lattice version) define line-type of grid (see also lty \code{\link[graphics]{par}})}
+
+\item{centColShift}{(integer, only used in lattice version) shift central (default grey) color element for negative scale up or down (ie increase or reduce number of color-blocks for negatve values), 
+used for correcting automatic scaling rounding issues to ensure the central elements captures 0}
+
+\item{cexDispl}{(numeric, length=1, only used in lattice version) define cex size for displaying (rounded) values in plot, set to \code{NULL} for omitting}
+
+\item{panel.background.col}{(character, only used in lattice version)}
+
+\item{rotXlab}{(numeric, 0 - 360, lattice version only) control rotation of x-axis labels}
+
+\item{rotYlab}{(numeric, 0 - 360, lattice version only) control rotation of y-axis labels}
+
 \item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
 
 \item{cexAxs}{(numeric) cex-like expansion factor for x- and y-axis text/labels (see also \code{\link[graphics]{par}})}
 
 \item{cexYlab}{(numeric) cex-like expansion factor for y-axis labels  (see also \code{\link[graphics]{par}})}
 
+\item{Xtck}{(numeric or logical) expansion factor for length of tick-marks on x-axis (default=0 for no tick-marks)}
+
+\item{Ytck}{(numeric or logical) expansion factor for length of tick-marks on y-axis}
+
 \item{cexTit}{(numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})}
-
-\item{NAcol}{(character or integer) custom color fro NA-values, default is grey}
-
-\item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}})}
 
 \item{silent}{(logical) suppress messages}
 
+\item{debug}{(logical) additional messages for debugging}
+
 \item{callFrom}{(character) allow easier tracking of message(s) produced}
+
+\item{...}{(only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
 }
 \value{
 graphical output only
@@ -63,11 +110,16 @@ The function \code{\link[graphics]{image}} provides the basic support to do so (
 To do this more conveniently, the function \code{imageW} offers additional options for displaying row- and column-names or displaying NA-values as custom-color.
 }
 \details{
-If the main input \code{dat} is numeric vector (an not matrix or data.frame) the values will be displayed as multiple columns and single row.
+If the main input \code{data} is numeric vector (an not matrix or data.frame) the values will be displayed as multiple columns and single row.
+This function allows two modes of operation : 1) plotting using standard R -graphics or 2) using the framework of grid- and lattice-graphics. (since version 1.2.6). 
+The latter version has comes integrate with a legend for the color-scale, allows adding grid-lines rotation of axis-labels and removing tick-marks.
+Please note that sometimes the center-color segment may not end up directly with the center-color, in thi case you may adjust using the argument \code{centColShift=-1}
 }
 \examples{
-imageW(as.matrix(iris[1:40,1:4]))
+imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris (head)")
+imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, col=c("blue","red"), 
+  rotXlab=45, yLab="Observation no", tit="Iris (head)")
 }
 \seealso{
-\code{\link[graphics]{image}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from  \href{https://CRAN.R-project.org/package=gplots}{gplots}
+\code{\link[graphics]{image}}, for the lattice version \code{\link[lattice]{levelplot}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from package \href{https://CRAN.R-project.org/package=gplots}{gplots}
 }
