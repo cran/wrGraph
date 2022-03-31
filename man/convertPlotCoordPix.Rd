@@ -42,20 +42,20 @@ Of course, the size of the plotting region is crucial and may not be changed aft
 In turn the function \code{\link{mouseOverHtmlFile}} will use the pixel-coordiantes, allowing to annotate given points of a plot for mouse-over interactive html.
 }
 \examples{
-df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
-  link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
+df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10),mou=paste("point",letters[1:10]),
+  link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)  
 ## Typically one wants to get pixel-coordinates for plots written to file.
 ## Here we'll use R's tempdir, later you may want to choose other locations
 pngFile <- file.path(tempdir(),"test01.png")
-png(pngFile,width=800, height=600,res=72)
+png(pngFile, width=800, height=600, res=72)
 ## here we'll just plot a set of horiontal points at default parameters ...
-plot(df1[,2:3],las=1,main="test01")
+plot(df1[,2:3], las=1, main="test01")
 dev.off()
 ## Note: Special characters should be converted for proper display in html during mouse-over
 library(wrMisc)
 df1$mou <- htmlSpecCharConv(df1$mou)
 ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
-df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2],y=df1[,3],plotD=c(800,600),plotRes=72))
+df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600),plotRes=72))
 head(df1)
 ## using mouseOverHtmlFile() one could now make an html document with interactive 
 ## display of names and clockable links to the coordinates we determined here ...

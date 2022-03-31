@@ -16,35 +16,36 @@
 #' @return matrix with x- and y-coordinates in pixels
 #' @seealso  \code{\link{mouseOverHtmlFile}}
 #' @examples
-#' df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
-#'   link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
+#' df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10),mou=paste("point",letters[1:10]),
+#'   link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)  
 #' ## Typically one wants to get pixel-coordinates for plots written to file.
 #' ## Here we'll use R's tempdir, later you may want to choose other locations
 #' pngFile <- file.path(tempdir(),"test01.png")
-#' png(pngFile,width=800, height=600,res=72)
+#' png(pngFile, width=800, height=600, res=72)
 #' ## here we'll just plot a set of horiontal points at default parameters ...
-#' plot(df1[,2:3],las=1,main="test01")
+#' plot(df1[,2:3], las=1, main="test01")
 #' dev.off()
 #' ## Note: Special characters should be converted for proper display in html during mouse-over
 #' library(wrMisc)
 #' df1$mou <- htmlSpecCharConv(df1$mou)
 #' ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
-#' df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2],y=df1[,3],plotD=c(800,600),plotRes=72))
+#' df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600),plotRes=72))
 #' head(df1)
 #' ## using mouseOverHtmlFile() one could now make an html document with interactive 
 #' ## display of names and clockable links to the coordinates we determined here ...
 #' @export
-convertPlotCoordPix <- function(x,y,useMar=c(6.2,4,4,2),plotDim=c(1400,800),plotRes=100,fromTop=TRUE,callFrom=NULL,silent=FALSE){
+convertPlotCoordPix <- function(x, y, useMar=c(6.2,4,4,2), plotDim=c(1400,800), plotRes=100,fromTop=TRUE,callFrom=NULL,silent=FALSE){
   ## convert point-coordinates 'x' and 'y' (of plot) in pixel coordinates  (eg for use with mouse-over tip in Html)
   ## return matrix with 2 columns :  pxX & pxY .. coresponding pixel coordinates (with length(x) rows)
   ## expecting 'useMar' as margins given in par() (as bottom,left,top,right) in inch
   ## 'plotDim' should be image size for png-device in pixels (width, height), 'plotRes' should be 'plotRes' for png()
   ## (default) 'fromTop'=TRUE : coordinates will be counted from top border of image
   ##  like png(plotDim[1],plotDim[2,plotRes=plotRes]
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa=" convertPlotCoordPix")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="convertPlotCoordPix")
+  if(!isTRUE(silent)) silent <- FALSE
   msg <- " arguments 'x' & 'y' should be finite numeric and of same length ! "
   if(any(length(x) != length(y),length(x) <1,length(y) <1)) stop(msg)
-  isFinit <- cbind(x=is.finite(x),y=is.finite(y))
+  isFinit <- cbind(x=is.finite(x), y=is.finite(y))
   if(any(!isFinit)) {
     if(all(!isFinit[,1]) | all(!isFinit[,2])) stop(msg)
     if(any(!isFinit[,1])) x[which(!isFinit[,1])] <- sum(x[which(isFinit[,1])])/length(isFinit[,1])
@@ -66,13 +67,13 @@ convertPlotCoordPix <- function(x,y,useMar=c(6.2,4,4,2),plotDim=c(1400,800),plot
   ##
   if(!silent) message(fxNa,"supl params : mar=",paste(useMar,collapse=","),"  dim=",
     plotDim[1],"x",plotDim[2],"   res=",plotRes)
-  out <- .predPointsPix(x,y,dimPng=plotDim,res=plotRes,marg=useMar,fromTop=fromTop)
+  out <- .predPointsPix(x, y, dimPng=plotDim, res=plotRes,marg=useMar,fromTop=fromTop)
   if(any(!isFinit[,1])) out[which(!isFinit[,1]),1] <- NA
   if(any(!isFinit[,2])) out[which(!isFinit[,2]),2] <- NA
   out }
 
 #' @export
-.determFigMargPix <- function(marg,res){
+.determFigMargPix <- function(marg, res){
   ## estimate size/distance of margin to edge of image (png) in pixel (return numeric vector)
   ## in case of 4 margin values it is assumed that these follow the order as in par() ie c(bottom,left,top,right)
   ## marg .. distance of margin in inch (as given in par(mar=c()),  )
@@ -86,7 +87,7 @@ convertPlotCoordPix <- function(x,y,useMar=c(6.2,4,4,2),plotDim=c(1400,800),plot
   dis }
 
 #' @export
-.predPointsPix <- function(x,y,dimPng,res,marg,fromTop=TRUE,scExt=0.04,displ=FALSE){
+.predPointsPix <- function(x, y, dimPng, res,marg, fromTop=TRUE,scExt=0.04,displ=FALSE){
   ## predict & return pixel location of points of (default) plot() (which uses 4% extension of scales)
   ## return 2 col matrix with columns 'xPix' and 'yPix' (with length(x) rows)
   ## 'x' & 'y' .. initial coordiantes for plot (to be made separately)

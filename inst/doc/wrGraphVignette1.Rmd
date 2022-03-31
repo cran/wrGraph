@@ -80,7 +80,7 @@ This might be useful in particular when during an analysis-pipeline it's not kno
 
 
 ```{r partitionPlot1, out.width="110%", out.heigth="110%", echo=TRUE}
-## as the last column of the iris-data is not numeric we choose -1
+## as the last column of the Iris-data is not numeric we choose -1
 (part <- partitionPlot(ncol(iris)-1))
 layout(part)
 for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
@@ -141,7 +141,7 @@ With some plots it may be useful to add small histograms for the x- and/or y-dat
 
 ```{r Hist5, out.width="110%", out.heigth="150%", echo=TRUE}
 layout(1)
-plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris data")
+plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris Data")
 legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 ```
@@ -159,19 +159,19 @@ Please note, that although smoothed distributions please the human eye, some dat
 
 Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
 the function provided here offers more flexibility for data-formats accepted (including data.frames and lists), coloring and display of n.
-In the case of the iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
+In the case of the Iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
 However, when working with data-sets containing NAs, or simply when working with lists the number of values per data-set/violin n may vary.
 
 
-```{r vioplot1, echo=TRUE}
-vioplotW(iris[,-5], tit="Iris-data")
+```{r vioplot1, fig.height=6, fig.width=8, echo=TRUE}
+vioplotW(iris[,-5], tit="Iris-Data Violin Plot")
 ```
 
-The smoothing of the curves uses default parameters from the function _sm.density_ from the package [sm](https://CRAN.R-project.org/package=sm). In some cases the kernel smoothing may appear to strong, this behaviour can be modified using the argument _hh_ (which is passed on as argument _h_ to the function _sm.density_).
+The smoothing of the curves uses default parameters from the function _sm.density_ from the package [sm](https://CRAN.R-project.org/package=sm). In some cases the Kernel smoothing may appear to strong, this behaviour can be modified using the argument _hh_ (which is passed on as argument _h_ to the function _sm.density_).
 
-```{r vioplot2, echo=TRUE}
-## less sloothing
-vioplotW(iris[,-5], tit="Iris-data", hh=0.15)
+```{r vioplot2, fig.height=6, fig.width=8, echo=TRUE}
+## less smoothing
+vioplotW(iris[,-5], tit="Iris-Data Violin Plot ('nervous')", hh=0.15)
 ```
 
 
@@ -190,7 +190,7 @@ Thus the resultant plot does not suffer from deformation due to binning or smoot
 cumFrqPlot(iris[,1:4])
 ```
 
-For example, the iris-data are rounded. As a result in the plot above the line is not progressing smooth but with more marked character of steps of stairs. 
+For example, the Iris-data are rounded. As a result in the plot above the line is not progressing smooth but with more marked character of steps of stairs. 
 To get the same conclusion one would need to increase the number of bars in a histogram very much which would makes it in our experience more difficult to evaluate the same time the global distribution character.
 
 At this plot you may note that the curves patal.width and petal.length look differently. 
@@ -215,14 +215,14 @@ Below, the first 40 lines of the Iris-dataset are used :
 
 ```{r imageW, echo=TRUE}
 par(mar=c(4, 5.5, 4, 1))  
-imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-data (head)")
+imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-Data (head)")
 ```
 
-Here again the iris-data plotted using the lattice/trellis framework :
+Here again the Iris-data plotted using the lattice/trellis framework :
 
 ```{r imageW2, fig.height=2.5, fig.width=9, fig.align="center", echo=TRUE}
 imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, transp=FALSE, col=c("blue","red"), 
-  rotXlab=45, yLab="Observation no", tit="Iris-data (head)")
+  rotXlab=45, yLab="Observation no", tit="Iris-Data (head)")
 ```
 Note, by default this version forces the _aspect_ argument of _levelplot()_ to square shapes.
 In some cases it may be desirable to pass the color-gradient through the value of 0 at a predefined color (use the center element of tha argument _col_).
@@ -249,7 +249,7 @@ imageW(ma1, latticeVersion=TRUE, col=c("blue","grey","red"), NAcol="grey92",
 
 The next plot is dedicated to visualize counting results with moving thresholds. 
 While a given threshold criteria moves up or down the resulting number of values passing may not necessarily follow in a linear way. 
-This function lets you follow multiple types of samples (eg type of leave in the iris-data) in a single plot. 
+This function lets you follow multiple types of samples (eg type of leave in the Iris-data) in a single plot. 
 In particular when constructing [ROC curves](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) it may also be helpful to visualize the (absolute) counting data used underneath before determining TP and FP ratios. 
 Typically used in context of benchmark-tests in proteomics.
 
@@ -261,9 +261,9 @@ irisC <- sapply(thr,function(x) colSums(iris[,1:4] < x))
 irisC <- cbind(thr,t(irisC))
 
   head(irisC)
-staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-data")
-staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data")
-staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data (log-scale)", logScale=TRUE)
+staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-Data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-Data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-Data (log-scale)", logScale=TRUE)
 ```
 
 
@@ -273,7 +273,7 @@ In real-world testing data have often some nested structure.
 For example repeated measures from a set of patients which can be organized as diseased and non-diseased.
 This plot allows to plot all values obtained from the each patient together, then organized by disease-groups.
 
-For this example suppose the iris-data were organized as 10 sets of 5 measures each (of course, in this case it is a pure hypothesis).
+For this example suppose the Iris-data were organized as 10 sets of 5 measures each (of course, in this case it is a pure hypothesis).
 Then, we can plot while highlighting the two factors (ie species and set of measurement).
 Basically we need to furnish with the main data two additional factors for the groupings.
 Note, that the 1st factor should contain the smaller sub-groups to visually inspect if there are any batch effects.
@@ -295,7 +295,7 @@ The function _plotLinReg()_ provides help to display a series of bivariate point
 
 
 ```{r plotLinReg1, echo=TRUE}
-plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
+plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-Data")
 ```
 
 &nbsp; 
@@ -311,7 +311,7 @@ Please note that several implementations exist in R (eg *prcomp()* in the base p
 [FactoMineR](https://CRAN.R-project.org/package=FactoMineR)).
 We'll start by looking at the plot produced with the basic function and FactoMineR, too.
 
-Let's look at the similarity of the 3 iris-species from the iris data-set.
+Let's look at the similarity of the 3 Iris-species from the Iris data-set.
 
 ```{r PCA1, fig.height=7, fig.width=7, echo=TRUE}
 ## the basic way
@@ -346,7 +346,7 @@ a simple line draws the contour of the most distant points.
 ```{r PCA4, echo=TRUE}
 ## via wrGraph, similar to FactoMineR but with bagplots
 plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2)
+  tit="Iris Data", rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2)
 ```
 
 Thus, you can see in this case, there is some intersection between *versicolor* and *virginica* species, 
@@ -359,19 +359,19 @@ You can also add the 3rd principal component and the Scree-plot :
 ```{r PCA5, fig.height=12, fig.width=9, fig.align="center", echo=TRUE}
 ## including 3rd component and Screeplot
 plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves", cexTxt=2)
+  tit="Iris Data PCA", rowTyName="types of leaves", cexTxt=2)
 
 ```
 
 ### Label all points in PCA
 
 In some cases it may be useful to identify all individual points on a plot.
-```{r PCA6, fig.height=12, fig.width=9, fig.align="center", echo=TRUE}
+```{r PCA6, fig.height=7, fig.width=9, fig.align="center", echo=TRUE}
 ## creat copy of data and add rownames
 irisD <- as.matrix(iris[,-5])
 rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
-plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris data", 
-  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2, pointLabelPar=list(textCex=0.45))
+plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris Data PCA", 
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.45))
 ```
 
 
@@ -524,7 +524,7 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 
 ## Acknowledgements
 
-The author wants to acknowledge the support by the [IGBMC](http://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](http://www.cnrs.fr/), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](http://proteomics.igbmc.fr/).
+The author wants to acknowledge the support by the [IGBMC](https://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](https://www.cnrs.fr/), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](https://proteomics.igbmc.fr/).
 The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.

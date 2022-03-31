@@ -73,6 +73,12 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
   if(length(sampleGrp) <1 | sum(is.na(sampleGrp))==length(sampleGrp)) stop("argument 'sampleGrp' seems to be empty (or all NA)")
   if(length(sampleGrp) != ncol(dat)) stop(fxNa," length of argument 'sampleGrp' must match number of columns of 'dat'")
   if(!is.factor(sampleGrp)) sampleGrp <- as.factor(sampleGrp)
+  if(!isFALSE(center)) center <- TRUE
+  if(!isFALSE(scale.)) scale. <- TRUE
+  if(!isFALSE(suplFig)) suplFig <- TRUE
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+  
   nGrpLim <- 25                      # decide/limit if group-centers are shown as stars
   ## reduce to columns defined by 'sampleGrp' (groups declared as NA will be removed) and to columns with finite data
   dat <- dat[,!is.na(sampleGrp)]

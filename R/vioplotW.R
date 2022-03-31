@@ -40,49 +40,59 @@
 #' @param add (logical) add to existing plot if \code{TRUE}
 #' @param wex (integer) relative expansion factor of the violin
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' @param debug (logical) additional messages for debugging 
-#' @return figure only
+#' @return This function plots a figure (to the current graphical device)
 #' @seealso the package \href{https://CRAN.R-project.org/package=vioplot}{vioplot}, \code{\link[sm]{sm}} is used for the density estimation
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' @examples
 #' set.seed(2013)
 #' dat6 <- matrix(round(rnorm(300) +3, 1), ncol=6, 
-#' 	 dimnames=list(paste("li",1:50,sep=""), letters[19:24])) 
+#' 	 dimnames=list(paste0("li",1:50), letters[19:24])) 
 #' vioplotW(dat6)
 #' ## variable number of elements (each n is displayed)
-#' dat6b <- apply(dat6,2,function(x) x[which(x <5)])
-#' dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
+#' dat6b <- apply(dat6, 2, function(x) x[which(x < 5)])
+#' dat6b[[4]] <- dat6b[[4]][dat6b[[4]] < 4]
 #' vioplotW(dat6b, col="Spectral")
 #' vioplotW(dat6b, col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
 #' vioplotW(dat6b, col="Spectral", halfViolin="pairwise", horizontal=FALSE)
 #' @export
 vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh=NULL, ylim=NULL, nameSer=NULL, cexNameSer=NULL, horizontal=FALSE,
 	col="rainbow", border="black", xlab=NULL, ylab=NULL, cexLab=NULL, cexAxis=NULL, lty=1, pointCol=NULL, cexPt=NULL,
-    tit=NULL, las=1, lwd=1, rectCol="black", at=0, add=FALSE, wex=NULL, silent=FALSE, debug=FALSE,callFrom=NULL) {
+    tit=NULL, las=1, lwd=1, rectCol="black", at=0, add=FALSE, wex=NULL, silent=FALSE, debug=FALSE, callFrom=NULL) {
   ## wr variant for violin-plots, inspired&extended based on https://r.789695.n4.nabble.com/Removing-NAs-from-dataframe-for-use-in-Vioplot-td4720274.html
   ## 'col'.. individual fill-colors, may specify gradients (default 'rainbow','grayscale','Spectral','Paired')
   ## default display (short)column names and n
   doPlot <- TRUE
-  if(debug) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+  if(!isTRUE(silent)) silent <- FALSE
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="vioplotW")
   msg <- NULL
   rangeVa <- 1.5                                                   # how much to extent fitted distribution beyond real min/max (for ra2)
   if(is.null(pointCol)) pointCol <- grDevices::rgb(1,1,1,0.9)      # color of (white) point to mark median
   if(is.null(cexPt)) cexPt <- 1.7
   argN <- c(x=deparse(substitute(x)), sup=deparse(substitute(...)))
-  chSm <- try(find.package("sm"), silent=TRUE)
-  if("try-error" %in% class(chSm)) { doPlot <- FALSE
-    message("Cannot find package 'sm' which is needed for function ",fxNa)} 
-  if(length(x) <1) { warning(fxNa,"input 'x' seems empty !"); doPlot <- FALSE} 
+  chPa <- requireNamespace("sm", quietly=TRUE)
+  if(!chPa) { doPlot <- FALSE
+    message(fxNa,"Cannot find package 'sm' which is needed for function, please install first from CRAN !")} 
+  if(length(x) <1) { warning(fxNa,"Input 'x' seems empty !"); doPlot <- FALSE} 
+
+  if(isTRUE(halfViolin)) halfViolin <- FALSE
+  if(!isTRUE(horizontal)) horizontal <- FALSE
+  
   fxArg <- c("x","finiteOnly","halfViolin","boxCol","hh","ylim","nameSer","horizontal","col","border","las",
     "lty","tit","lwd","rectCol","at","add","wex","drawRect",  "colMed","pchMed","silent","debug","callFrom") 
+  fxAr2 <- union(argN,fxArg[-1])
+  chX <- fxAr2 %in% "x"
+  if(any(chX)) fxAr2 <- fxAr2[-which(chX)]
   colNx <- if(length(dim(x)) >1) colnames(x) else argN[1]
-  #datas <- wrMisc::asSepList(list(x, ...), asNumeric=TRUE, fxArg=argN, callFrom=fxNa)
+  if(debug) message(fxNa, "Starting to prepare data, vv1")
   datas <- list(x=x, ...)
-  datas <- wrMisc::asSepList(datas, asNumeric=TRUE, fxArg=argN, callFrom=fxNa)
+  if(debug) {message(fxNa, "Starting to check main input, vv1b"); vv1b <- list(x=x,datas=datas,argN=argN,fxArg=fxArg)}
+  datas <- wrMisc::asSepList(datas, asNumeric=TRUE, exclElem=fxAr2, silent=silent, debug=debug, callFrom=fxNa)
   if(length(datas) >0) {
+    if(debug) message(fxNa,"vv2, ",length(datas)," additional objects found")
     datas <- lapply(datas, wrMisc::naOmit)
     chLe <- sapply(datas, length)
     if(TRUE & any(chLe <4)) {
@@ -93,42 +103,48 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     }  
   }
   if(length(datas) <1) doPlot <- FALSE
+  if(debug) {message(fxNa,"vv3, ready to pepare plotting ? ",doPlot)}
   n <- length(datas)
-  if(doPlot & length(n) >0){  
+  if(doPlot & length(n) >0) {  
     if("rainbow" %in% col) col <- grDevices::rainbow(round(n*1.08))[1:n]
     if("grayscale" %in% col) col <- grDevices::gray.colors(n)
     if("heat.colors" %in% col) col <- grDevices::heat.colors(n)
     if("topo.colors" %in% col) col <- grDevices::topo.colors(n)
-    chPaCol <- try(find.package("RColorBrewer"), silent=TRUE)
-    if("try-error" %in% class(chPaCol) & any(c("Spectral","Paired") %in% col)) stop("Cannot find package 'RColorBrewer' which is needed for your choice of argment 'col' !")   
-    if("Spectral" %in% col & !"try-error" %in% class(chPaCol)) col <- RColorBrewer::brewer.pal(min(n,11),"Spectral")
-    if("Paired" %in% col & !"try-error" %in% class(chPaCol))  col <- RColorBrewer::brewer.pal(12,"Paired")[c(5:6,1:4,7:12)][1:min(n,12)]
-    if(length(n)==1 & length(datas)==1) datas[[1]] <- as.matrix(datas[[1]])
-    if(finiteOnly) for(i in  1:n) {
+    
+    chPa <- requireNamespace("RColorBrewer", quietly=TRUE)
+    if(!chPa & any(c("Spectral","Paired") %in% col)) { col <- "rainbow"
+      warning("Cannot find package 'RColorBrewer' (install first from CRAN) which is needed for your choice of argment 'col' !") }
+    if("Spectral" %in% col & chPa) col <- RColorBrewer::brewer.pal(min(n,11),"Spectral")
+    if("Paired" %in% col & chPa)  col <- RColorBrewer::brewer.pal(12,"Paired")[c(5:6,1:4,7:12)][1:min(n,12)]
+    if(length(n) ==1 & length(datas)==1) datas[[1]] <- as.matrix(datas[[1]])
+    if(isTRUE(finiteOnly)) for(i in  1:n) {
       chFini <- is.finite(datas[[i]])
       if(any(!chFini)) datas[[i]] <- try(datas[[i]][which(chFini)], silent=TRUE) }
     if(identical(boxCol,"def")) boxCol <- grDevices::rgb(0,0,0,0.4)
     ## prepare input data
     if(length(col) <n) col <- rep(col,n)[1:n]
-    if(horizontal & n >1) {
+    if(isTRUE(horizontal) & n >1) {
       datas <- datas[n:1]                                          # return order that plot will read top -> bottom
       col <- col[length(col):1] }
     if(length(at) != n) at <- 1:n
+    if(debug) {message(fxNa,"vv4, prepare 'at' ",wrMisc::pasteC(utils::head(at)))}
     su <- if(n==1) as.matrix(summary(as.numeric(datas[[1]]))) else sapply(datas, summary)
-    fxSu <- function(y) c(lwr=min(y[1], y[2] -(y[5] -y[2])*rangeVa, na.rm=TRUE), 
+    chNum <- is.numeric(su)
+    if(!chNum) warning(fxNa," TROUBLE ahead, data from 'x' seem NOT numeric !")
+     fxSu <- function(y) c(lwr=min(y[1], y[2] -(y[5] -y[2])*rangeVa, na.rm=TRUE), 
       firQ=as.numeric(y[2]), med=as.numeric(y[3]), thiQ=as.numeric(y[5]), upr=max(y[6], y[5] +(y[5] -y[2])*rangeVa, na.rm=TRUE) ) 
     ra2 <- if(ncol(su) ==1) as.matrix(fxSu(su[,1])) else apply(su, 2, fxSu)
     smDensity <- sm::sm.density 
     smArgs <- list(display="none")
-    if(!(is.null(hh))) {smArgs[1+(1:length(hh))] <- hh; names(smArgs)[length(smArgs) +1 -(length(hh):1)]
-      if(debug) message(fxNa, "new arguments added to smArgs :",unlist(hh)) }
+    if(!(is.null(hh))) {smArgs[1 +(1:length(hh))] <- hh; names(smArgs)[length(smArgs) +1 -(length(hh):1)]
+      if(debug) message(fxNa, "New arguments added to smArgs :",unlist(hh)) }
     raYGlob <- c(min=min(su["Min.", ], na.rm=TRUE), max=max(su["Max.", ], na.rm=TRUE))     # used ?
-    if(debug) message(fxNa," raYGlob ",wrMisc::pasteC(signif(raYGlob,4)))
+    if(debug) message(fxNa,"vv5, raYGlob ",wrMisc::pasteC(signif(raYGlob,4)))
 
     smFx <- function(yy, halfViolin) {
       if(length(dim(yy)) <2) yy <- as.matrix(yy)
       suY <- if(ncol(yy)==1) summary(as.numeric(yy)) else summary(yy)
-    	raY <- c(lwr=min(suY[1],na.rm=TRUE), upr=max(suY[6],na.rm=TRUE) )         # no extension for estimation range
+    	raY <- c(lwr=min(suY[1], na.rm=TRUE), upr=max(suY[6], na.rm=TRUE) )         # no extension for estimation range
     	smRes <- do.call("smDensity", c(list(yy, xlim=raY), smArgs))
     	## do we care about the upper and lower ends of a variability band, or standard error estimate (which may not always get produced) ? 
       ## truncate to range of real values
@@ -139,7 +155,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     	## now add points to start & end from baseline=0
     	chBa <- any(smRes$estimate[c(1,length(smRes$estimate))] != 0)
     	if(chBa) { nPo <- length(smRes$estimate)
-    	  smRes$estimate <- c(0,smRes$estimate,0)
+    	  smRes$estimate <- c(0, smRes$estimate,0)
     	  smRes$eval.points <- smRes$eval.points[c(1,1:nPo,nPo)] }
     	if(!any(sapply(list("yes","pairwise",TRUE), identical, halfViolin ))) { 
         ## need to 'double' data for symmetric violin
@@ -151,7 +167,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     vioDat <- lapply(datas, smFx, halfViolin)
     xLim <- c(1 -max(vioDat[[1]]$estimate, na.rm=TRUE), n +max(vioDat[[n]]$estimate, na.rm=TRUE))  # supposed vertical display
     yLim <- if(length(ylim) !=2) range(su[c("Min.","Max."),], na.rm=TRUE) else ylim
-    if(debug) message(fxNa," init xlim=",wrMisc::pasteC(signif(xLim),4),"  ylim=",wrMisc::pasteC(signif(yLim,4)) )
+    if(debug) message(fxNa,"Init xlim=",wrMisc::pasteC(signif(xLim),4),"  ylim=",wrMisc::pasteC(signif(yLim,4)) )
     
     ## configure data/sample-names
     label <- if(is.null(nameSer)) names(datas) else nameSer
@@ -171,13 +187,13 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
         nBR[which(!chLe)] <- abs(nBR) }
       if(any(chLe)) {nBL[which(chLe)] <- abs(nBl)  # left text is smaller, need to add extra blanks
         if(any(chLe)) nBR[which(chLe)] <- 0 }
-      conMultFx <- function(y) sapply(y,function(x) paste(rep(" ",x),collapse=""))
-      label <- if(horizontal) paste(labB,labA,sep="\n\n") else paste0(conMultFx(nBL),labA, paste0(rep(" ",c(2))), conMultFx(nBR),labB)}   # try to make symmetrix by adding blanks
+      conMultFx <- function(y) sapply(y, function(x) paste(rep(" ",x),collapse=""))
+      label <- if(isTRUE(horizontal)) paste(labB,labA,sep="\n\n") else paste0(conMultFx(nBL),labA, paste0(rep(" ",c(2))), conMultFx(nBR),labB)}   # try to make symmetrix by adding blanks
       at <- at[1:ceiling(n/2)] }
     ## configure n per samples
     nDisp <- sapply(datas, function(x) sum(!is.na(x)))
-    nDisp <- if(length(unique(nDisp)) >1) paste(rep(c("n=",""), if(n >6) c(1,n-1) else c(n,0)),nDisp,sep="") else paste(if(n >1) " each","n=",nDisp[1])
-    if(!add) graphics::plot.new()
+    nDisp <- if(length(unique(nDisp)) >1) paste0(rep(c("n=",""), if(n >6) c(1,n-1) else c(n,0)),nDisp) else paste(if(n >1) " each","n=",nDisp[1])
+    if(!isTRUE(add)) graphics::plot.new()
     ## for boxplot like insert
     boxFa <- 0.06                                  # box half-width
     boxCoor <- cbind(xL=(1:n) -boxFa, yB=ra2[2,], xR=(1:n) +boxFa, yT=ra2[4,])  # basic representation
@@ -200,8 +216,8 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
     }
     for(i in 1:length(vioDat)) vioDat[[i]]$estimate <- vioDat[[i]]$estimate *wex      # change proportionally with of violins
     ## main plotting
-    if(!horizontal) {                                # plot vertical
-      if(!add) {
+    if(!isTRUE(horizontal)) {                                # plot vertical
+      if(!isTRUE(add)) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
         graphics::axis(2, las=las, cex.axis=cexAxis)        
         graphics::axis(1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data
@@ -223,7 +239,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, halfViolin=FALSE, boxCol="def", hh
       }
     } else {
       ## this is a horizontal plot ..
-      if(!add) {
+      if(!isTRUE(add)) {
         graphics::plot.window(xlim=yLim, ylim=xLim)
         graphics::axis(1, cex.axis=cexNameSer)
         graphics::axis(2, cex.axis=cexAxis, at=at, label=label,  cex=cexNameSer, las=las)

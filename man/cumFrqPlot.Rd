@@ -60,10 +60,10 @@ cumFrqPlot(
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allows easier tracking of message(s) produced}
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-plot only
+This function plots to the current garphical device
 }
 \description{
 Display data as sorted or cumulative frequency plot. This type of plot represents an alternative to plotting data as histograms.

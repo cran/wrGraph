@@ -42,10 +42,10 @@
 #' @param cexTit (numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additional messages for debugging
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' 
 #' @seealso \code{\link[graphics]{image}}, for the lattice version \code{\link[lattice]{levelplot}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from package \href{https://CRAN.R-project.org/package=gplots}{gplots}   
-#' @return graphical output only
+#' @return This function plots in image (to the current graphical device) as \code{image} does
 #' @examples
 #' imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris (head)")
 #' imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, col=c("blue","red"), 
@@ -57,10 +57,11 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
   ## improved version if image() or  levelplot()
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="imageW")
   argNa <- deparse(substitute(data))
-  if(debug) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+  if(!isTRUE(silent)) silent <- FALSE
   doPlot <- if(length(data) >0) is.numeric(data) else FALSE
-  if(length(dim(data)) <2) data <- try(matrix(as.numeric(data), ncol=1, dimnames=list(names(data), NULL)))
-  if("try-error" %in% class(data)) doPlot <- FALSE else {
+  if(length(dim(data)) <2) data <- try(matrix(as.numeric(data), ncol=1, dimnames=list(names(data), NULL)), silent=TRUE)
+  if(inherits(data, "try-error")) doPlot <- FALSE else {
     if(is.data.frame(data) & doPlot) {doPlot <- is.numeric(as.matrix(data)); data <- as.matrix(data)}}
   if(doPlot) {    
     ## checks & adjust
@@ -82,11 +83,10 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
       if(any(is.na(yLab))) yLab <- NULL
       ## colors
       if(length(col) <2) col <- c("blue","grey80","red")
-      nCol2 <- try(round(nColor[1]))
-      msg <- " argument 'nColor' should contain integer at least as high as numbers of colors defined to pass through; resetting to default=9" 
-      if("try-error" %in% class(nCol2)) nCol2 <- NULL    
-      if(nCol2 < length(col)) { if(!silent) message(fxNa,msg)
-        nCol2 <- 9 }
+      nCol2 <- try(round(nColor[1]), silent=TRUE)
+      msg <- "Note: Argument 'nColor' should contain integer at least as high as numbers of colors defined to pass through; resetting to default=9"
+      if(inherits(nCol2, "try-error")) { message(fxNa,msg); nCol2 <- 9 }
+      if(nCol2 < length(col)) { message(fxNa,msg); nCol2 <- 9 }
       miMa <- range(data, na.rm=TRUE)
       width <- (miMa[2] - miMa[1])/ nCol2
       bre <- miMa[1] + (0:nCol2) *width           # breaks
@@ -94,12 +94,14 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
       clo0br <- min(which(bre >= as.numeric(data)[clo0]))   #+ (-1:0)  # upper break/bound for center color (close/including 0)
       if(clo0br >1 & clo0br < length(bre) -1 & length(col) >2) {   # some values in lower & upper gradient
         maxLe <- max(clo0br -1, length(bre) -clo0br) -as.integer(balanceCol)  
-        negCol <- try(grDevices::colorRampPalette(col[1:2])(if(balanceCol) maxLe else length(clo0br-1)))
-        if("try-error" %in% class(negCol)) {if(!silent) message(fxNa,"invalid color-gradient for neg values")
+        negCol <- try(grDevices::colorRampPalette(col[1:2])(if(balanceCol) maxLe else length(clo0br-1)), silent=TRUE)
+        if(inherits(negCol, "try-error")) { negCol <- NULL
+          if(!silent) message(fxNa,"Invalid color-gradient for neg values")
         }
         negCol <- negCol[-length(negCol)]                              # max neg-col -> grey (wo defined grey);  remove 'grey' from last position
-        posCol <- try((grDevices::colorRampPalette(col[2:3])(if(balanceCol) maxLe else length(length(bre) -1 -clo0br))) [])  # (grey -> max pos-col)
-        if("try-error" %in% class(posCol)) { if(!silent) message(fxNa,"invalid color-gradient for pos values")
+        posCol <- try((grDevices::colorRampPalette(col[2:3])(if(balanceCol) maxLe else length(length(bre) -1 -clo0br))) [], silent=TRUE)  # (grey -> max pos-col)
+        if(inherits(posCol, "try-error")) { 
+          if(!silent) warning(fxNa,"Invalid color-gradient for pos values")
         }
         if(debug) message(fxNa, "/1 clo0br ",clo0br,"   max nCol ",nCol2,"   le negCol ",length(negCol),"   le posCol ",length(posCol))
         if(balanceCol) {

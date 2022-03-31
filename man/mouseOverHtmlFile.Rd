@@ -83,8 +83,8 @@ over the internet where urls to specific pages. With UniProt such links can easi
 ## Note, this example writes files to R's tempdir,
 ## Otherwise, if you simply work in the current directory without spcifying paths you'll 
 ##  get an html with relatove paths, which simply needs the png file in the same path 
-df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
-  link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
+df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10), mou=paste("point",letters[1:10]),
+  link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)  
 ## here we'll use R's tempdir, later you may want to choose other locations
 pngFile <- file.path(tempdir(),"test01.png")
 png(pngFile,width=800, height=600,res=72)
@@ -103,8 +103,8 @@ mouseOverHtmlFile(df1,pngFile,HtmFileNa=htmFile,pxDiam=15,
   textAtStart="Points in the figure are interactive to mouse-over ...",
   textAtEnd="and/or may contain links")
 ## We still need to make some toy links
-for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=",
-  df1[i,3],sep=""), file=df1$link[i]) 
+for(i in 1:nrow(df1)) cat(paste0("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=",
+  df1[i,3]), file=df1$link[i]) 
 ## Now we are ready to open the html file using any browser
 \dontrun{ 
 browseURL(htmFile)

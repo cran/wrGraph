@@ -30,19 +30,20 @@
 #' @param supTxtYOffs (numeric) supplemental offset for text on y axis
 #' @param useLog (character) default="", otherwise for setting axis in log-scale "x", "y" or "xy"
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allows easier tracking of message(s) produced
-#' @return plot only
+#' @param callFrom (character) allows easier tracking of messages produced
+#' @return This function plots to the current garphical device
 #' @seealso \code{\link[graphics]{layout}}, \code{\link[wrMisc]{exclExtrValues}} for decision of potential outliers; \code{\link[graphics]{hist}}, \code{\link{vioplotW}}
 #' @examples
 #' set.seed(2017); dat0 <- matrix(rnorm(500), ncol=5, dimnames=list(NULL,1:5))
 #' cumFrqPlot(dat0, tit="Sorted values")
 #' cumFrqPlot(dat0, cumSum=TRUE, tit="Sum of sorted values")
 #' @export  
-cumFrqPlot <- function(dat,cumSum=FALSE,exclCol=NULL,colNames=NULL,displColNa=TRUE,tit=NULL,xLim=NULL,yLim=NULL,
-  xLab=NULL,yLab=NULL,col=NULL,CVlimit=NULL,thisResol=NULL,supTxtAdj=0,supTxtYOffs=0,useLog="",silent=FALSE,callFrom=NULL) {
+cumFrqPlot <- function(dat, cumSum=FALSE, exclCol=NULL, colNames=NULL, displColNa=TRUE, tit=NULL, xLim=NULL, yLim=NULL,
+  xLab=NULL, yLab=NULL, col=NULL, CVlimit=NULL, thisResol=NULL, supTxtAdj=0, supTxtYOffs=0, useLog="", silent=FALSE, callFrom=NULL) {
   ## cumulative frequency plot (takes columns of 'dat' as separate series)      
   argNa <- deparse(substitute(dat))
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="cumFrqPlot")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="cumFrqPlot")
+  if(!isTRUE(silent)) silent <- FALSE
   if(length(dim(dat)) >2) {
     if(!silent) message(fxNa," ('dat' has >2 dims) Using ONLY 1st and 2nd dimension of 'dat' for plotting !")
     dat <- dat[,,1] }
@@ -50,14 +51,14 @@ cumFrqPlot <- function(dat,cumSum=FALSE,exclCol=NULL,colNames=NULL,displColNa=TR
     warning(" number of items in 'colNames' doesn't match data provided"); colNames <- NULL }
   if(length(exclCol) >0) dat <- dat[,-1*exclCol]
   if(is.null(colNames)) colNames <- colnames(dat)
-  dat <- wrMisc::.keepFiniteCol(as.matrix(dat),silent,callFrom=fxNa)
+  dat <- wrMisc::.keepFiniteCol(as.matrix(dat), silent, callFrom=fxNa)
   if(!is.matrix(dat) & !is.data.frame(dat)) dat <- as.matrix(as.numeric(dat))
   ## optional removing of extreme values (outlyers)
   if(length(CVlimit) >0 & is.numeric(CVlimit)) {
-   dat <- apply(dat,2,wrMisc::exclExtrValues,result="val",CVlim=CVlimit,maxExcl=1,goodValues=FALSE,silent=silent,callFrom=fxNa)
+   dat <- apply(dat, 2, wrMisc::exclExtrValues, result="val", CVlim=CVlimit, maxExcl=1, goodValues=FALSE, silent=silent, callFrom=fxNa)
   }       
   ## sort
-  dat <- apply(dat,2,sort,decreasing=FALSE,na.last=TRUE)   # put NAs to end
+  dat <- apply(dat, 2, sort, decreasing=FALSE,na.last=TRUE)   # put NAs to end
   repNA <- !is.finite(dat)
   nNA <- colSums(repNA)
   if(any(nNA ==nrow(dat)))  {
@@ -92,11 +93,11 @@ cumFrqPlot <- function(dat,cumSum=FALSE,exclCol=NULL,colNames=NULL,displColNa=TR
   if(length(xLim) !=2) {if(!is.null(xLim)) warning("invalid entry for 'xLim', ignoring"); xLim <- NULL }
   if(length(yLim) !=2) {if(!is.null(yLim)) warning("invalid entry for 'yLim', ignoring"); yLim <- NULL }  
   ## plot empty
-  msg1 <- paste(fxNa,": Unknow argument content ('",useLog,"') for 'useLog'; resetting to default no log",sep="")
+  msg1 <- paste0(fxNa,": Unknow argument content ('",useLog,"') for 'useLog'; resetting to default no log")
   if(length(useLog) !=1) { if(!silent) message(msg1); useLog <- ""}
   if(!(useLog %in% c("","x","y","xy"))) { warning(msg1); useLog <- ""}
-  graphics::plot(c(1,nrow(dat)),c(range(dat,na.rm=TRUE)),
-    xlim=xLim,ylim=yLim,las=1,main=tit,xlab=xLab,ylab=yLab,type="n",log=useLog)                             # plot empty frame
+  graphics::plot(c(1,nrow(dat)), c(range(dat, na.rm=TRUE)),
+    xlim=xLim, ylim=yLim, las=1, main=tit, xlab=xLab,ylab=yLab,type="n",log=useLog)                             # plot empty frame
   ## add lines and legend-text 
   for(j in 1:ncol(dat)) {
     graphics::lines(dat[,j],(1:nrow(dat))/nrow(dat), col=col[j])

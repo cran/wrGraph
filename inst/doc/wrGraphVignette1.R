@@ -27,7 +27,7 @@ library("wrGraph")
 packageVersion("wrGraph")
 
 ## ----partitionPlot1, out.width="110%", out.heigth="110%", echo=TRUE-----------
-## as the last column of the iris-data is not numeric we choose -1
+## as the last column of the Iris-data is not numeric we choose -1
 (part <- partitionPlot(ncol(iris)-1))
 layout(part)
 for(i in colnames(iris)[-5]) hist(iris[,i], main=i)
@@ -58,27 +58,27 @@ for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 
 ## ----Hist5, out.width="110%", out.heigth="150%", echo=TRUE--------------------
 layout(1)
-plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris data")
+plot(iris[,1:2], col=rgb(0.4,0.4,0.4,0.3), pch=16, main="Iris Data")
 legendHist(iris[,1], loc="br", legTit=colnames(iris)[1], cex=0.5)
 legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 
-## ----vioplot1, echo=TRUE------------------------------------------------------
-vioplotW(iris[,-5], tit="Iris-data")
+## ----vioplot1, fig.height=6, fig.width=8, echo=TRUE---------------------------
+vioplotW(iris[,-5], tit="Iris-Data Violin Plot")
 
-## ----vioplot2, echo=TRUE------------------------------------------------------
-## less sloothing
-vioplotW(iris[,-5], tit="Iris-data", hh=0.15)
+## ----vioplot2, fig.height=6, fig.width=8, echo=TRUE---------------------------
+## less smoothing
+vioplotW(iris[,-5], tit="Iris-Data Violin Plot ('nervous')", hh=0.15)
 
 ## ----cumFrqPlot1, echo=TRUE---------------------------------------------------
 cumFrqPlot(iris[,1:4])
 
 ## ----imageW, echo=TRUE--------------------------------------------------------
 par(mar=c(4, 5.5, 4, 1))  
-imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-data (head)")
+imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris-Data (head)")
 
 ## ----imageW2, fig.height=2.5, fig.width=9, fig.align="center", echo=TRUE------
 imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, transp=FALSE, col=c("blue","red"), 
-  rotXlab=45, yLab="Observation no", tit="Iris-data (head)")
+  rotXlab=45, yLab="Observation no", tit="Iris-Data (head)")
 
 ## ----imageW3, fig.height=6, fig.width=5, echo=TRUE----------------------------
 ma1 <- matrix(-7:16,nc=4,dimnames=list(letters[1:6],LETTERS[1:4]))
@@ -98,9 +98,9 @@ irisC <- sapply(thr,function(x) colSums(iris[,1:4] < x))
 irisC <- cbind(thr,t(irisC))
 
   head(irisC)
-staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-data")
-staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data")
-staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-data (log-scale)", logScale=TRUE)
+staggerdCountsPlot(irisC[,], countsCol=colnames(iris)[1:4], tit="Iris-Data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-Data")
+staggerdCountsPlot(irisC[,], varCountNa="Sepal", tit="Iris-Data (log-scale)", logScale=TRUE)
 
 ## ----plotBy2Groups1, echo=TRUE------------------------------------------------
 dat <- iris[which(iris$Species %in% c("setosa","versicolor")),]
@@ -108,7 +108,7 @@ plotBy2Groups(dat$Sepal.Length, gl(2,50,labels=c("setosa","versicolor")),
   gl(20,5), yLab="Sepal.Length")
 
 ## ----plotLinReg1, echo=TRUE---------------------------------------------------
-plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-data")
+plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-Data")
 
 ## ----PCA1, fig.height=7, fig.width=7, echo=TRUE-------------------------------
 ## the basic way
@@ -130,20 +130,20 @@ if(all(chPa)) {
 ## ----PCA4, echo=TRUE----------------------------------------------------------
 ## via wrGraph, similar to FactoMineR but with bagplots
 plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2)
+  tit="Iris Data", rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2)
 
 ## ----PCA5, fig.height=12, fig.width=9, fig.align="center", echo=TRUE----------
 ## including 3rd component and Screeplot
 plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virginica")),
-  tit="Iris data", rowTyName="types of leaves", cexTxt=2)
+  tit="Iris Data PCA", rowTyName="types of leaves", cexTxt=2)
 
 
-## ----PCA6, fig.height=12, fig.width=9, fig.align="center", echo=TRUE----------
+## ----PCA6, fig.height=7, fig.width=9, fig.align="center", echo=TRUE-----------
 ## creat copy of data and add rownames
 irisD <- as.matrix(iris[,-5])
 rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
-plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris data", 
-  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.3, rotatePC=2, pointLabelPar=list(textCex=0.45))
+plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris Data PCA", 
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.45))
 
 ## ----MA0, fig.height=6, fig.width=8, fig.align="center", echo=TRUE------------
 ## toy data

@@ -93,14 +93,14 @@ if the initial object \code{Mvalue} contains a list-element called 'annot' the s
 
 \item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, Avalue, FDRvalue, passFilt)}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
 
 \item{debug}{(logical) additional messages for debugging}
 }
 \value{
-MA-plot only
+This function plots an MA-plot (to the current graphical device); if \code{returnData=TRUE}, a data.frame with ($ID, $Mvalue, $Avalue, $FDRvalue, $passFilt) gets returned
 }
 \description{
 This type of plot for display of relative changes versus (mean) absolute abundance is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.

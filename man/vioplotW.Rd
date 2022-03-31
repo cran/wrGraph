@@ -93,10 +93,10 @@ vioplotW(
 
 \item{debug}{(logical) additional messages for debugging}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
-figure only
+This function plots a figure (to the current graphical device)
 }
 \description{
 This function allows generating \href{https://en.wikipedia.org/wiki/Violin_plot}{Violin plots}) using a variety of input formats and offers additional options for colors. 
@@ -116,11 +116,11 @@ Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better 
 \examples{
 set.seed(2013)
 dat6 <- matrix(round(rnorm(300) +3, 1), ncol=6, 
-	 dimnames=list(paste("li",1:50,sep=""), letters[19:24])) 
+	 dimnames=list(paste0("li",1:50), letters[19:24])) 
 vioplotW(dat6)
 ## variable number of elements (each n is displayed)
-dat6b <- apply(dat6,2,function(x) x[which(x <5)])
-dat6b[[4]] <- dat6b[[4]][dat6b[[4]] <4]
+dat6b <- apply(dat6, 2, function(x) x[which(x < 5)])
+dat6b[[4]] <- dat6b[[4]][dat6b[[4]] < 4]
 vioplotW(dat6b, col="Spectral")
 vioplotW(dat6b, col="Spectral" ,halfViolin="pairwise", horizontal=TRUE)
 vioplotW(dat6b, col="Spectral", halfViolin="pairwise", horizontal=FALSE)

@@ -35,10 +35,10 @@
 #' @param NaSpecTypeAsContam (logical) consider lines/proteins with \code{NA} in Mvalue$annot[,"SpecType"] as contaminants (if a 'SpecType' for contaminants already exits)
 #' @param useMar (numeric,length=4) custom margings (see also \code{\link[graphics]{par}})
 #' @param returnData (logical) optional returning data.frame with (ID, Mvalue, Avalue, FDRvalue, passFilt) 
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additional messages for debugging 
-#' @return MA-plot only
+#' @return This function plots an MA-plot (to the current graphical device); if \code{returnData=TRUE}, a data.frame with ($ID, $Mvalue, $Avalue, $FDRvalue, $passFilt) gets returned  
 #' @seealso (for PCA) \code{\link{plotPCAw}}
 #' @examples
 #' library(wrMisc)
@@ -75,7 +75,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
   multiComp <- TRUE                    # initialize  
   splNa <- annot <- ptType <- colPass <- ptBg <- grpMeans <- pcol <- FDRvalue <- FdrList <- FDRty <- NULL      # initialize
   if(length(pch) <1) pch <- 16
-  if(debug) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+  if(!isTRUE(silent)) silent <- FALSE
   if(debug) message(" length Mvalue ",length(Mvalue)," ; length Avalue ",length(Avalue)," ; useComp ",useComp)
   if(identical(col,"FDR")) {FDR4color <- TRUE; col <- NULL} else FDR4color <- FALSE
   if(length(Mvalue) <1) message(" nothing to do, 'Mvalue' seems to be empty !") else  {
@@ -291,7 +292,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     ## prepare for  plotting
     if(is.null(cexSub)) cexSub <- cexLa +0.05  
     xLab <- paste("A-value", if(!batchFig) "(average abundance)")
-    tit1 <- paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","MA-plot"),
+    tit1 <- paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","MA-Plot"),
       if(!is.null(compNa)) c(compNa[1]," vs ",compNa[2])), collapse=" ")    # but what title if batchFig=NULL & compNa=NULL -> only "MA-plot"
     if(length(FCthrs) <1) FCthrs <- 1.5 
     #needed?#if(length(FdrThrs) <1) FdrThrs <- 0.05 
@@ -346,65 +347,65 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     }
 
     ## main graphic
-    graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, las=1)
+    tmp <- try(graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, las=1), silent=TRUE)
     ## rather directly plot FDR
-    graphics::plot(merg[,"Avalue"], merg[,"Mvalue"], pch=pch, cex=useCex, main=tit1, 
-      ylab="M value (log FC)", col=useCol, xlab=xLab, cex.lab=cexLa, xlim=limM,ylim=limA, pt.bg=ptBg)    
-    
-    sTxt <- if(length(subTxt) ==1) subTxt else { if(multiComp) paste0(if(length(names(useComp)) >0) names(useComp) else paste0("useComp=",useComp),"; ",collapse="")}
-    sTxt <- paste0(sTxt,"n=",length(Mvalue),
-      if(!all(is.na(c(FCthrs)))) paste(";",sum(passAll, na.rm=TRUE),"(color) points passing", if(!is.na(FCthrs)) paste0("FCthr=", as.character(signif(FCthrs,3))) ))
-    graphics::mtext(sTxt, cex=0.75, line=0.2)    
-    
-    if(!all(is.na(FCthrs))) { 
-      if(debug) message(fxNa," n=",length(Mvalue),"  FCthrs=",as.character(FCthrs),"  filt.ini=", sum(filtFin, na.rm=TRUE),"  passAll=",sum(passAll,na.rm=TRUE),
-        " ; range Mva ",wrMisc::pasteC(signif(range(Mvalue,na.rm=TRUE),3))," ;  alph=",alph,"  useCex=",useCex,"  alph2=",alph2)
-      graphics::abline(h=c(-1,1)*(log2(FCthrs) + diff(graphics::par("usr")[1:2])/500), col=grDevices::rgb(0.87,0.72,0.72), lty=2) }
-    
-    ## add names to best points
-    if(length(namesNBest) >0) { 
-      if(any(sapply( c("passThr","pass","passFC"), identical, namesNBest))) namesNBest <- sum(passAll)
-      if(!is.integer(namesNBest)) namesNBest <- try(as.integer(namesNBest))
-      if(namesNBest >0 & any(passAll)) {      
-        useLi <- if(any(!passAll)) which(passAll) else 1:nrow(merg)
-        tmP <- as.numeric(merg[useLi,"Avalue"])
-        names(tmP) <- rownames(merg)[useLi]
-        ## look for more informative names to display
-        if(length(annot) >0) {
-          proNa <- annot[match(names(tmP), rownames(annot)), annotColumn[2]]   # normally 'Description'
-          chNa <- is.na(proNa)
-          if(!all(chNa)) names(tmP)[which(!chNa)] <- proNa[which(!chNa)]
-        }        
-        useL2 <- order(tmP, decreasing=TRUE)[1:min(namesNBest,sum(passAll))]      
-        xOffs <- signif(diff(graphics::par("usr")[1:2])/170,3)
-        yOffs <- signif(diff(graphics::par("usr")[3:4])/90,3)
-        noNa <- if(is.null(names(tmP[useL2]))) 1:length(tmP) else which(is.na(names(tmP)[useL2]))
-        if(length(noNa) >0 & all(annotColumn %in% colnames(merg))) names(tmP)[useL2[noNa]] <- merg[useLi[useL2[noNa]], wrMisc::naOmit(match(annotColumn[-1], colnames(merg)))[1]]
-        if(length(NbestCol) <1) NbestCol <- 1
-        displTx <- names(tmP[useL2])
-        chNa <- is.na(displTx)
-        if(any(chNa)) {displTx[which(chNa)] <- "unknown"; cexTxLab <- c(cexTxLab,cexTxLab*0.7)[1+chNa]}   # smaller label for 'unknown'
-        if(all(chNa)) {if(!silent) message(fxNa," no names for display of best")
-        } else graphics::text(Avalue[useLi[useL2]] +xOffs, Mvalue[useLi[useL2]] +yOffs, displTx, cex=cexTxLab, col=NbestCol, adj=0) }
-    }              
-
-    ## legend (if multiple symbols)
-    pch[which(is.na(pch))] <- -2
-    ch1 <- unique(pch)
-    if(length(ch1) >1) {
-      legInd <- which(!duplicated(merg[which(passAll), annotColumn[1]], fromLast=FALSE))
-      legPch <- pch[which(passAll)[legInd]]
-      legCol <- useCol[which(passAll)[legInd]]
-      legBg <- ptBg[which(passAll)[legInd]]
-      if(alph2 <1) {legCol <- substr(legCol,1,7); legBg <- substr(legBg,1,7)}  # reset to no transparency
-      legLab <- merg[which(passAll)[legInd], annotColumn[1]]
-      chNa <- is.na(legLab)
-      if(any(chNa)) legLab[chNa] <- "NA"
-      legOr <- if(length(legLab) >1) order(legLab) else 1   # not used so far 
-      legLoc <- checkForLegLoc(merg[which(passAll),c("Avalue","Mvalue")] , sampleGrp=legLab, showLegend=FALSE)
-      legCex <- stats::median(c(useCex,cexTxLab,1.2), na.rm=TRUE)
-      graphics::legend(legLoc$loc, legend=legLab, col=if(FDR4color) grDevices::grey(0.5) else legCol, text.col=1, pch=legPch, if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)  # as points
-    }
+    tmp <- try(graphics::plot(merg[,"Avalue"], merg[,"Mvalue"], pch=pch, cex=useCex, main=tit1, 
+      ylab="M value (log FC)", col=useCol, xlab=xLab, cex.lab=cexLa, xlim=limM,ylim=limA, pt.bg=ptBg), silent=TRUE)
+    if(inherits(tmp, "try-error")) warning(fxNa,"UNABLE to produce plot !") else {
+      sTxt <- if(length(subTxt) ==1) subTxt else { if(multiComp) paste0(if(length(names(useComp)) >0) names(useComp) else paste0("useComp=",useComp),"; ",collapse="")}
+      sTxt <- paste0(sTxt,"n=",length(Mvalue),
+        if(!all(is.na(c(FCthrs)))) paste(";",sum(passAll, na.rm=TRUE),"(color) points passing", if(!is.na(FCthrs)) paste0("FCthr=", as.character(signif(FCthrs,3))) ))
+      graphics::mtext(sTxt, cex=0.75, line=0.2)    
+      
+      if(!all(is.na(FCthrs))) { 
+        if(debug) message(fxNa," n=",length(Mvalue),"  FCthrs=",as.character(FCthrs),"  filt.ini=", sum(filtFin, na.rm=TRUE),"  passAll=",sum(passAll,na.rm=TRUE),
+          " ; range Mva ",wrMisc::pasteC(signif(range(Mvalue,na.rm=TRUE),3))," ;  alph=",alph,"  useCex=",useCex,"  alph2=",alph2)
+        graphics::abline(h=c(-1,1)*(log2(FCthrs) + diff(graphics::par("usr")[1:2])/500), col=grDevices::rgb(0.87,0.72,0.72), lty=2) }
+      
+      ## add names to best points
+      if(length(namesNBest) >0) { 
+        if(any(sapply( c("passThr","pass","passFC"), identical, namesNBest))) namesNBest <- sum(passAll)
+        if(!is.integer(namesNBest)) namesNBest <- try(as.integer(namesNBest), silent=TRUE)
+        if(namesNBest >0 & any(passAll)) {      
+          useLi <- if(any(!passAll)) which(passAll) else 1:nrow(merg)
+          tmP <- as.numeric(merg[useLi,"Avalue"])
+          names(tmP) <- rownames(merg)[useLi]
+          ## look for more informative names to display
+          if(length(annot) >0) {
+            proNa <- annot[match(names(tmP), rownames(annot)), annotColumn[2]]   # normally 'Description'
+            chNa <- is.na(proNa)
+            if(!all(chNa)) names(tmP)[which(!chNa)] <- proNa[which(!chNa)]
+          }        
+          useL2 <- order(tmP, decreasing=TRUE)[1:min(namesNBest,sum(passAll))]      
+          xOffs <- signif(diff(graphics::par("usr")[1:2])/170,3)
+          yOffs <- signif(diff(graphics::par("usr")[3:4])/90,3)
+          noNa <- if(is.null(names(tmP[useL2]))) 1:length(tmP) else which(is.na(names(tmP)[useL2]))
+          if(length(noNa) >0 & all(annotColumn %in% colnames(merg))) names(tmP)[useL2[noNa]] <- merg[useLi[useL2[noNa]], wrMisc::naOmit(match(annotColumn[-1], colnames(merg)))[1]]
+          if(length(NbestCol) <1) NbestCol <- 1
+          displTx <- names(tmP[useL2])
+          chNa <- is.na(displTx)
+          if(any(chNa)) {displTx[which(chNa)] <- "unknown"; cexTxLab <- c(cexTxLab,cexTxLab*0.7)[1+chNa]}   # smaller label for 'unknown'
+          if(all(chNa)) {if(!silent) message(fxNa," no names for display of best")
+          } else graphics::text(Avalue[useLi[useL2]] +xOffs, Mvalue[useLi[useL2]] +yOffs, displTx, cex=cexTxLab, col=NbestCol, adj=0) }
+      }              
+  
+      ## legend (if multiple symbols)
+      pch[which(is.na(pch))] <- -2
+      ch1 <- unique(pch)
+      if(length(ch1) >1) {
+        legInd <- which(!duplicated(merg[which(passAll), annotColumn[1]], fromLast=FALSE))
+        legPch <- pch[which(passAll)[legInd]]
+        legCol <- useCol[which(passAll)[legInd]]
+        legBg <- ptBg[which(passAll)[legInd]]
+        if(alph2 <1) {legCol <- substr(legCol,1,7); legBg <- substr(legBg,1,7)}  # reset to no transparency
+        legLab <- merg[which(passAll)[legInd], annotColumn[1]]
+        chNa <- is.na(legLab)
+        if(any(chNa)) legLab[chNa] <- "NA"
+        legOr <- if(length(legLab) >1) order(legLab) else 1   # not used so far 
+        legLoc <- checkForLegLoc(merg[which(passAll),c("Avalue","Mvalue")] , sampleGrp=legLab, showLegend=FALSE)
+        legCex <- stats::median(c(useCex,cexTxLab,1.2), na.rm=TRUE)
+        graphics::legend(legLoc$loc, legend=legLab, col=if(FDR4color) grDevices::grey(0.5) else legCol, text.col=1, pch=legPch, if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)  # as points
+      } }
   ## export results
   if(returnData) {
     merg <- merg[,-1*c(1,ncol(merg))]        # remove col 'ID' 'redundant' & 'pch'

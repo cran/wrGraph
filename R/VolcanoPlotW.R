@@ -1,4 +1,4 @@
-#' Volcano-plot (Statistical Test Outcome versus Relative Change)   
+#' Volcano-Plot (Statistical Test Outcome versus Relative Change)   
 #'
 #' This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/Volcano_plot_(statistics)}{Volcano-plot}.
 #' Basically, this plot allows comparing the outcome of a statistical test to the relative change (ie log fold-change, M-value).
@@ -44,9 +44,9 @@
 #' @param useMar (numeric,length=4) custom margings (see also \code{\link[graphics]{par}})
 #' @param returnData (logical) optional returning data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt) 
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' @param debug (logical) additional messages for debugging 
-#' @return MA-plot only
+#' @return This function simply plots an MA-plot (to the current graphical device), if \code{returnData=TRUE} an optional data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt) can be returned 
 #' @seealso (for PCA) \code{\link{plotPCAw}})
 #' @examples
 #' library(wrMisc)
@@ -56,7 +56,7 @@
 #' mat[3:7,4:9] <- mat[3:7,4:9] + 0.7
 #' mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 #' ## assume 2 groups with 3 samples each
-#' gr3 <- gl(3,3,labels=c("C","A","B"))
+#' gr3 <- gl(3, 3, labels=c("C","A","B"))
 #' tRes2 <- moderTest2grp(mat[,1:6], gl(2,3), addResults = c("FDR","means"))
 #' # Note: due to the small number of lines only FDR chosen to calculate 
 #' VolcanoPlotW(tRes2)
@@ -93,7 +93,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
   if(length(Mvalue) <1) message(" nothing to do, 'Mvalue' seems to be empty !") else  {
     ## data seem valid to make MAplot
     if(length(cexTxLab) <0) cexTxLab <- 0.7
-    if("MArrayLM" %in% class(Mvalue)) {
+    if(inherits(Mvalue, "MArrayLM")) {
       ## try working based on MArrayLM-object (Mvalue)
       ## initial check of  useComp
       if(length(useComp) >1) { useComp <- wrMisc::naOmit(useComp)[1]
@@ -311,7 +311,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## prepare for  plotting
     if(is.null(cexSub)) cexSub <- cexLa +0.05  
     xLab <- "M-value (log2 fold-change)"
-    tit1 <- paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","Volcano-plot"),
+    tit1 <- paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","Volcano-Plot"),
       if(!is.null(compNa)) c(compNa[1]," vs ",compNa[2])), collapse=" ")    # but what title if batchFig=NULL & compNa=NULL -> only "Volcano-plot"
     if(length(FCthrs) <1) FCthrs <- 1.5 
     if(length(FdrThrs) <1) FdrThrs <- 0.05 
@@ -385,7 +385,11 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## add names to best points
     if(length(namesNBest) >0) { 
       if(any(sapply( c("pass","passThr","passFDR","signif"), identical, namesNBest))) namesNBest <- sum(passAll)
-      if(!is.integer(namesNBest)) namesNBest <- try(as.integer(namesNBest))
+      if(!is.integer(namesNBest)) namesNBest <- try(as.integer(namesNBest), silent=TRUE)
+      if(inherits(namesNBest, "try-error")) { namesNBest <- NULL
+        message(fxNa,"Unable to understand argument 'namesNBest', must be integer or 'pass','passThr','passFDR' or 'signif' (for display of labels to points in figure)") }
+    }  
+    if(length(namesNBest) >0) { 
       if(namesNBest >0 & any(passAll)) {      
         useLi <- if(any(!passAll)) which(passAll) else 1:nrow(merg)
         tmP <- as.numeric(merg[useLi,"pValue"])
@@ -431,7 +435,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       legCex <- stats::median(c(useCex, cexTxLab, 1.2), na.rm=TRUE)
       if(length(legLab) >0) { chLeg <- try(graphics::legend(legLoc$loc, legend=legLab, col=legCol, text.col=1, pch=legPch, 
         if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5), silent=TRUE)  # as points
-        if("try-error" %in% class(chLeg)) message(fxNa,"Note: Failed to add legend .. ",if(!silent) chLeg) } 
+        if(inherits(chLeg, "try-error")) message(fxNa,"Note: Failed to add legend .. ",if(!silent) chLeg) } 
     }
     ## arrow for expected ratio
     if(identical(TRUE, expFCarrow)) {
@@ -439,9 +443,10 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         regStr <-"[[:space:]]*[[:alpha:]]+[[:punct:]]*[[:alpha:]]*"
         expM <- sub(paste0("^",regStr),"", sub(paste0(regStr,"$"), "", unlist(strsplit(names(useComp), "-"))) )   # assume '-' separator from pairwise comparison
         chN2 <- try(as.numeric(expM), silent=TRUE)
-        if(!"try-error" %in% class(chN2) & length(chN2)==2) {
-          expM <- log2(chN2[2] / chN2[1])                     # transform to ratio
-        } else expM <- NA  
+        if(inherits(chN2, "try-error")) { expM <- NA
+          message(fxNa,"Failed to extract concentration values of group-names for calculating ratios for labels to arrows") 
+        } else {
+          expM <- log2(chN2[2] / chN2[1])}                     # transform to ratio
         if(is.finite(expM)) {
           figCo <- graphics::par("usr")                         #  c(x1, x2, y1, y2)
           arr <- c(0.019,0.14)                                  # start- and end-points of arrow (as relative to entire plot)

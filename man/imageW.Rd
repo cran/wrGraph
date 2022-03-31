@@ -96,12 +96,12 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 
 \item{debug}{(logical) additional messages for debugging}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 
 \item{...}{(only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
 }
 \value{
-graphical output only
+This function plots in image (to the current graphical device) as \code{image} does
 }
 \description{
 To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.

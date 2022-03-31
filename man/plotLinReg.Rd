@@ -64,10 +64,10 @@ together with numeric 'indepVarLst' (independent variable); if list, then list-e
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allows easier tracking of message(s) produced}
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-plot and invisible list containing $data, $linRegr, $confInterval (if calculated)
+This functions simply plots (to the current graphical devce); an invisible list containing $data, $linRegr, $confInterval (if calculated) may be returned, too
 }
 \description{
 This function provides help to display a series of bivariate points given in 'dat' (multiple data formats possible), to model a linear regression and plot the results.

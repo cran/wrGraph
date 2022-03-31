@@ -27,8 +27,9 @@
 #' @param cropHist (logical) -not implemented yet- designed for cutting off bars with very low ('insignificant') values
 #' @param parDefault (logical) to automatic adjusting par(marg=,cex.axis=0.8), see also \code{\link[graphics]{par}}
 #' @param silent (logical) suppress messages
-#' @param debug (logical) additonal messagesfor debugging
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allow easier tracking of messages produced
+#' @return This function produces a histogram type graphic (to the ccurrent graphical device)
 #' @seealso \code{\link[graphics]{hist}}
 #' @examples
 #' set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
@@ -60,7 +61,7 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
   if(debug) silent <- FALSE
   if(length(output) <1) output <- "screen" else if(length(output) >1) output <- output[1]
   if(any(output %in% c("png","tiff","tif","jpg","jpeg"))) if(file.access(fileName,mode=0) ==0) {
-    if(file.access(fileName,mode=2) <0) stop("File exists ",msg1,fileName) }
+    if(file.access(fileName, mode=2) <0) stop("File exists ",msg1,fileName) }
   if(length(dat) <1) stop( " 'dat must be vector of numeric values")
   if(is.null(tit)) tit <- paste("Signal Histogram of",argN)
   if(is.null(xLab)) xLab <- "" 
@@ -91,15 +92,15 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
   if(output %in% c("jpg","jpeg")) {tmp <- try(grDevices::jpeg(file=fileName, width=imgSize[1], height=imgSize[2],res=140), silent=TRUE); pl2fi <- TRUE}
   if(output %in% c("tif","tiff")) {tmp <- try(grDevices::tiff(file=fileName, width=imgSize[1], height=imgSize[2],res=140), silent=TRUE); pl2fi <- TRUE}
   ## create plot
-  if(class(tmp) == "try-error") {
-    warning(fxNa," cannot create file '",output,"' (or other selected format) !")
+  if(inherits(tmp, "try-error")) {
+    warning(fxNa,"Cannot create file '",output,"' (or other selected format) !")
   } else  {
     nBars <- length(mainHist$breaks)
     ## try to adopt number of x-axis labels displayed to space available
     ch1 <- if(pl2fi) imgSize[1]/150 else graphics::par("pin")[1]            # bring px-size & screen-width to similar measure ..
     nCharLab <- min(max(nchar(c(utils::head(mainHist$breaks), utils::tail(mainHist$breaks)))),5)   # max no of character used in legend (but no more than 5)
     ## how many axis labels can one reasonably display ?
-    if(debug) message(" init ch1 ",signif(ch1,3),"   nCharLab ",nCharLab,"   nBars ",nBars)
+    if(debug) message("Initial ch1 ",signif(ch1,3),"   nCharLab ",nCharLab,"   nBars ",nBars)
     ch1 <- max(2+ ch1 *5 / (1 +nCharLab*xcex), 3)
     if(length(maxNoXLabels)==1 & is.finite(maxNoXLabels)) if(nBars >maxNoXLabels) ch1 <- max(nBars %/% maxNoXLabels, ch1)
     ch2 <- round(nBars/ch1)
@@ -111,20 +112,20 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
       
     if(parDefault) graphics::par(mar=c(0.8 +txtLas, 5, 2.6, 0.8), cex.axis=xcex)                    # mar(bot,le,top,ri)
     cexSubTi <- if(!is.numeric(cexSubTi) | length(cexSubTi) !=1) graphics::par("font.sub")*0.7
-    txt2 <- c("initial values range from  ","  to  ")
-    graphics::plot(mainHist, xlab=xLab, ylab=yLab, col=useCol,border=useBord,main=tit,xaxt="n",las=1)
+    txt2 <- c("Initial values range from  ","  to  ")
+    graphics::plot(mainHist, xlab=xLab, ylab=yLab, col=useCol, border=useBord, main=tit, xaxt="n", las=1)
     graphics::segments(hist.ini$breaks[showBorder], 0,hist.ini$breaks[showBorder],  -1*signif(max(hist.ini$counts,na.rm=TRUE)/110,3) ) # x-axis ticks
     ## look for alternatve of making plot, rather as contour-lines for overlay ?
     if(isLog) {
       tx <- signif(c(2^min(dat), 2^hist.ini$breaks[-1*c(1,length(hist.ini$breaks))], 2^max(dat)),2)[showBorder]
       if(length(tx) > length(unique(tx))) tx <- signif(c(2^min(dat), 2^hist.ini$breaks[-1*c(1,length(hist.ini$breaks))], 2^max(dat)),3)[showBorder]
-      graphics::mtext(tx, at=hist.ini$breaks[showBorder], col=1,side=1,li=-0.2,cex=0.75,xlab=xLab,las=txtLas)
-      txt2 <- paste(txt2[1], signif(2^min(dat,na.rm=TRUE),4), txt2[2],signif(2^max(dat,na.rm=TRUE),5))      # 'initial values range form ..to..'
+      graphics::mtext(tx, at=hist.ini$breaks[showBorder], col=1, side=1, li=-0.2,cex=0.75, xlab=xLab, las=txtLas)
+      txt2 <- paste(txt2[1], signif(2^min(dat,na.rm=TRUE),4), txt2[2], signif(2^max(dat,na.rm=TRUE),5))      # 'initial values range form ..to..'
     } else {
       tx <- signif(hist.ini$breaks[-1*length(hist.ini$breaks)],2)[showBorder]
       if(length(tx) > length(unique(tx))) tx <- signif(c(min(dat), hist.ini$breaks[-1*c(1,length(hist.ini$breaks))], max(dat)),3)[showBorder]
-      graphics::mtext(tx,at=hist.ini$breaks[showBorder],col=1,side=1,li=-0.2,cex=0.75,xlab=xLab,las=1)
-      txt2 <- paste(txt2[1],signif(min(dat,na.rm=TRUE),4),txt2[2],signif(max(dat,na.rm=TRUE),5)) }
+      graphics::mtext(tx, at=hist.ini$breaks[showBorder], col=1, side=1, li=-0.2, cex=0.75,xlab=xLab,las=1)
+      txt2 <- paste(txt2[1], signif(min(dat,na.rm=TRUE),4), txt2[2], signif(max(dat,na.rm=TRUE),5)) }
     if(!identical(subTi,FALSE)) graphics::mtext(if(is.null(subTi)) txt2 else subTi,li=-0.4,cex=cexSubTi)
   }
   if(output %in% c("png","tif","tiff","jpg","jpeg")) grDevices::dev.off() }

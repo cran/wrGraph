@@ -22,8 +22,8 @@
 #' @param col (integer or character) custom color for points (choose \code{NULL} for not plotting the actual data)
 #' @param pch (integer or character) type of symbol for points (see also \code{\link[graphics]{par}})
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allows easier tracking of message(s) produced
-#' @return plot and invisible list containing $data, $linRegr, $confInterval (if calculated)
+#' @param callFrom (character) allows easier tracking of messages produced
+#' @return This functions simply plots (to the current graphical devce); an invisible list containing $data, $linRegr, $confInterval (if calculated) may be returned, too
 #' @seealso \code{\link[wrMisc]{exclExtrValues}} for decision of potential outliers; \code{\link[graphics]{hist}}, \code{\link{vioplotW}}
 #' @examples
 #' set.seed(2020); dat1 <- rep(1:6,each=2) +runif(12,0,1)
@@ -32,12 +32,12 @@
 #' li2 <- list(aa=gl(5,2), bb=dat1[1:10])
 #' plotLinReg(li2, indepVarLst="aa", dependVar="bb")
 #' @export  
-plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1,regrLwd=1,regrCol=1,confInt=0.95,
-  confCol=NULL,xLab=NULL,yLab=NULL,xLim=NULL,yLim=NULL,tit=NULL,nSignif=3,col=1,pch=1,silent=FALSE,callFrom=NULL) {
+plotLinReg <- function(dat, indepVarLst=NULL, dependVar=NULL, cusTxt=NULL, regrLty=1, regrLwd=1, regrCol=1, confInt=0.95,
+  confCol=NULL, xLab=NULL, yLab=NULL, xLim=NULL, yLim=NULL, tit=NULL, nSignif=3, col=1, pch=1, silent=FALSE, callFrom=NULL) {
   ## plot linear regression for single gene/protein based on list containing data & annotation for multiple proteins/genes/elements
   ##
-  argNa <- c(deparse(substitute(dat)),deparse(substitute(indepVarLst)),deparse(substitute(dependVar)))
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="plotLinReg")
+  argNa <- c(deparse(substitute(dat)), deparse(substitute(indepVarLst)), deparse(substitute(dependVar)))
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="plotLinReg")
   opar <- graphics::par(no.readonly=TRUE)
   asNumDf <- function(x, colNa=c("x","y")) {   
     ## check matrix or data.frame with 2 columns if numeric, try to convert to data.frame of 2 numeric
@@ -45,14 +45,14 @@ plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1
     if(length(colNa) !=2) stop(" argument 'colNa' must be of length=2")
     chNum <- c(is.numeric(x[,1]), is.numeric(x[,2]))     # check for factors
     if(any(!chNum)) for(i in which(!chNum)) {
-      num <- try(wrMisc::convToNum(x[,i], spaceRemove=TRUE, remove=NULL,silent=silent,callFrom=fxNa))
+      num <- try(wrMisc::convToNum(x[,i], spaceRemove=TRUE, remove=NULL, silent=silent,callFrom=fxNa), silent=TRUE)
       if("character" %in% class(num)) {
         num <- as.numeric(as.character(as.factor(x[,i])))
         warning(" Trouble converting column no ",i," to numeric (",wrMisc::pasteC(utils::head(x[,i])),",  interpreted as ",wrMisc::pasteC(utils::head(num)),")") } 
       x[,i] <- num }
     colnames(x) <- colNa  
     x }
-  extrFromList <- function(x,yy,zz,colNa=c("x","y")) {
+  extrFromList <- function(x, yy, zz, colNa=c("x","y")) {
     ## look for list-elements names 'yy' & 'zz', use their content ('yy' as 'x' and 'zz' as 'y')
     if(all(is.integer(c(yy[1],zz[1])))) {
       if(any(c(yy[1],zz[1]) <1) | length(x) < max(c(yy[1],zz[1]))) stop(" index values for list-elements of 'x' out of range")
@@ -60,7 +60,7 @@ plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1
       ## thus yy& zz are considered/tested as names of x
       msg <- "both arguments 'yy' and 'zz' must correspond to list-elements of 'x'"
       if(length(yy) <1) stop(msg)
-      if(length(zz) <1) {  # if 'zz' NULL, try to extract 1st & 2nd col of x$yy
+      if(length(zz) <1) {    # if 'zz' NULL, try to extract 1st & 2nd col of x$yy
         isBad <- TRUE
         if(length(dim(x[[yy]])) >1) if(ncol(x[[yy]]) >1) { isBad <- FALSE
           x <- as.data.frame(x[[yy]][,1:2],stringsAsFactors=FALSE) } 
@@ -72,7 +72,7 @@ plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1
     }    
     colnames(x) <- colNa
     x }    
-  extrFromMatr <- function(x,yy,zz,name1=c("y","ordinate","dat","measure","pred","depend"),name2=c("x","abscissa","grp","grp2","dat2","obs","indep"),
+  extrFromMatr <- function(x, yy, zz, name1=c("y","ordinate","dat","measure","pred","depend"), name2=c("x","abscissa","grp","grp2","dat2","obs","indep"),
     colNa=c("x","y"),silent=silent,fxNa=fxNa) {
     ## extract column specified in 'zz' or look among names in 'name1'
     ## if no name found for 'yy' just avoid using using the column found for 'zz'
@@ -91,7 +91,7 @@ plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1
     if(all(!is.list(dat), length(dat) >2,length(indepVarLst) >2, length(dim(dat)) <1, length(dim(indepVarLst)) <1 )) {
       ## simplest case: both x & y as separate numeric vector (of same length)
       if(length(dat)!=length(indepVarLst)) stop("length of 'dat' and 'indepVarLst' don't match !")
-      df0 <- data.frame(x=indepVarLst,y=dat,stringsAsFactors=FALSE) 
+      df0 <- data.frame(x=indepVarLst, y=dat, stringsAsFactors=FALSE) 
       argNa[4:5] <- argNa[2:1]
     } else {
       ## if S3 (from limma) or (other) list, need to locate-list-elements
@@ -118,18 +118,19 @@ plotLinReg <- function(dat,indepVarLst=NULL,dependVar=NULL,cusTxt=NULL,regrLty=1
   argNa[4:5] <- gsub("\"","",argNa[4:5])                   # remove protected 'double' quotes
   if(is.null(xLab)) xLab <- if(argNa[4]=="NULL") "x" else argNa[4]                 # explanatory variable
   if(is.null(yLab)) yLab <- if(argNa[5]=="NULL" | argNa[5]==xLab) "y" else argNa[5]  
-  graphics::plot(y ~ x, data=df0, las=1, xlab=xLab, ylab=yLab, pch=pch,col=col, main=tit)
-  graphics::abline(lm0, lty=regrLty, lwd=regrLwd, col=regrCol)
-  suplTx <- paste(c("; ",if(length(cusTxt) <1) paste("p.slope =",signif(stats::coef(summary(lm0))[2,"Pr(>|t|)"],2)) else cusTxt), collapse=" ")
-  graphics::mtext(paste("regression (rounded): y =",signif(stats::coef(lm0)[2],nSignif)," x +",signif(stats::coef(lm0)[1],nSignif),suplTx,
-    ",  r2=",signif(stats::cor(df0$y,df0$x)^2,nSignif)),cex=0.75,line=0.15)
-  if(length(confInt) >0) { ra <- c(range(df0$x,na.rm=TRUE), abs(mean(df0$x,na.rm=TRUE)))
-    newx <- seq(ra[1]-0.05*ra[3],ra[2]+0.05*ra[3],length.out=200)
-    if(length(confCol) <1) confCol <- grDevices::rgb(0.3,0.3,0.3,0.07)           # (background) color for confidence-interval
-    confInterval <- stats::predict(lm0, newdata=data.frame(x=newx), interval="confidence", level=confInt)   # can do single conf interv at a time ..
-    graphics::polygon(cbind(x=c(newx,rev(newx)),y=c(confInterval[,"lwr"],confInterval[length(newx):1,"upr"])),col=confCol,border=NA)
-    graphics::points(y ~ x, df0, col=col)
-    graphics::mtext(paste("  confidence interval at ",100*confInt,"% shown"), line=-1.05,cex=0.65,adj=0,col=wrMisc::convColorToTransp(confCol,alph=240))  }
+  tmp <- try(graphics::plot(y ~ x, data=df0, las=1, xlab=xLab, ylab=yLab, pch=pch,col=col, main=tit), silent=TRUE)
+  if(inherits(tmp, "try-error"))  warning(fxNa," Plot cannot be produced") else {
+    graphics::abline(lm0, lty=regrLty, lwd=regrLwd, col=regrCol)
+    suplTx <- paste(c("; ",if(length(cusTxt) <1) paste("p.slope =",signif(stats::coef(summary(lm0))[2,"Pr(>|t|)"],2)) else cusTxt), collapse=" ")
+    graphics::mtext(paste("regression (rounded): y =",signif(stats::coef(lm0)[2],nSignif)," x +",signif(stats::coef(lm0)[1],nSignif),suplTx,
+      ",  r2=",signif(stats::cor(df0$y,df0$x)^2,nSignif)),cex=0.75,line=0.15)
+    if(length(confInt) >0) { ra <- c(range(df0$x,na.rm=TRUE), abs(mean(df0$x,na.rm=TRUE)))
+      newx <- seq(ra[1]-0.05*ra[3],ra[2]+0.05*ra[3],length.out=200)
+      if(length(confCol) <1) confCol <- grDevices::rgb(0.3,0.3,0.3,0.07)           # (background) color for confidence-interval
+      confInterval <- stats::predict(lm0, newdata=data.frame(x=newx), interval="confidence", level=confInt)   # can do single conf interv at a time ..
+      graphics::polygon(cbind(x=c(newx,rev(newx)),y=c(confInterval[,"lwr"],confInterval[length(newx):1,"upr"])),col=confCol,border=NA)
+      graphics::points(y ~ x, df0, col=col)
+      graphics::mtext(paste("  confidence interval at ",100*confInt,"% shown"), line=-1.05,cex=0.65,adj=0,col=wrMisc::convColorToTransp(confCol,alph=240))  } }
   }
   invisible(list(data=df0,linRegr=lm0,if(length(confInt) >0) confInterval=confInterval)) }
   

@@ -40,8 +40,8 @@
 #' ## Note, this example writes files to R's tempdir,
 #' ## Otherwise, if you simply work in the current directory without spcifying paths you'll 
 #' ##  get an html with relatove paths, which simply needs the png file in the same path 
-#' df1 <- data.frame(id=letters[1:10],x=1:10,y=rep(5,10),mou=paste("point",letters[1:10]),
-#'   link=file.path(tempdir(),paste(LETTERS[1:10],".html",sep="")),stringsAsFactors=FALSE)  
+#' df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10), mou=paste("point",letters[1:10]),
+#'   link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)  
 #' ## here we'll use R's tempdir, later you may want to choose other locations
 #' pngFile <- file.path(tempdir(),"test01.png")
 #' png(pngFile,width=800, height=600,res=72)
@@ -60,8 +60,8 @@
 #'   textAtStart="Points in the figure are interactive to mouse-over ...",
 #'   textAtEnd="and/or may contain links")
 #' ## We still need to make some toy links
-#' for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=",
-#'   df1[i,3],sep=""), file=df1$link[i]) 
+#' for(i in 1:nrow(df1)) cat(paste0("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=",
+#'   df1[i,3]), file=df1$link[i]) 
 #' ## Now we are ready to open the html file using any browser
 #' \dontrun{ 
 #' browseURL(htmFile)
@@ -87,8 +87,8 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
     if(length(grep("ming.32",R.Version()$platform)) >0) {
       x <- gsub("\\\\", "/", x)     # (for some editors) "
       if(asHtml & length(grep("[[:upper:]]:", substr(x,1,2))) >0) {
-        x <- paste("file:///",x,sep="") }
-    } else if(asHtml & length(grep("^/",x)) >0) x <- paste("file:///",x,sep="")
+        x <- paste0("file:///",x) }
+    } else if(asHtml & length(grep("^/",x)) >0) x <- paste0("file:///",x)
     x }      
   ## check colNa
   colN2 <- rep(NA,5)  
@@ -118,12 +118,12 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   if(is.na(colN2[1])) {
     myCoor$ID <- if(is.null(rownames(myCoor))) 1:nrow(myCoor) else rownames(myCoor)
     colN2[1] <- "ID"
-    if(!silent) message(fxNa," using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
+    if(!silent) message(fxNa,"Using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
   }
   if(!identical(mouseOverTxt,FALSE)) if(is.null(mouseOverTxt)) {
     if(is.na(colN2[4])) {
       myCoor$mouseOver <- myCoor[,colN2[1]]                                             # nothing specified, use names as default
-      if(!silent) message(fxNa," using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
+      if(!silent) message(fxNa,"Using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
       colN2[4] <- "mouseOver" }
   } else { if(length(mouseOverTxt) ==nrow(myCoor) & length(unique(mouseOverTxt)) > 1) {
     myCoor$mouseOver <- mouseOverTxt } else {
@@ -137,11 +137,11 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
    if(length(addLinks) >0) {if(length(addLinks) ==nrow(myCoor) & length(unique(addLinks)) > 1 & max(nchar(addLinks),na.rm=TRUE) >0) {
      myCoor$link <- addLinks
      colN2[5] <- "addLinks" } else {
-     if(!silent) message(fxNa," invalid entry for 'addLinks' (expecting length ",nrow(myCoor)," but found ",length(addLinks),")")}}}   # no default
+     if(!silent) message(fxNa,"Invalid entry for 'addLinks' (expecting length ",nrow(myCoor)," but found ",length(addLinks),")")}}}   # no default
   ## check extensions of specified links (ie myCoor$link) : if 'linkExt' specified (& longer than 0 char) add to this ending if not present
   if(length(linkExt) >0) if(nchar(linkExt) >0) {
-    chExt <- grep(paste(linkExt,"$",sep=""), myCoor$link)
-    if(length(chExt) < nrow(myCoor) & length(chExt) >0) myCoor$link[chExt] <- paste(myCoor$link[chExt],linkExt,sep="")
+    chExt <- grep(paste0(linkExt,"$"), myCoor$link)
+    if(length(chExt) < nrow(myCoor) & length(chExt) >0) myCoor$link[chExt] <- paste0(myCoor$link[chExt],linkExt)
   }
   ## prepare for making html file
   if(!file.exists(pngFileNa)) stop("Cannot find file which should be used for embedding image into html !")
@@ -151,7 +151,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   baseFiNa <- sub(".PNG$","",sub(".png$","",sub(".htm$","",sub(".html$","",HtmFileNa))))
   if(nchar(HtmFileNa)== nchar(baseFiNa)) {
     htmlExt <- if(length(htmlExt) <0) "" else htmlExt[1]                     # allow file wo extesion if empty argument 'htmlExt'
-    if(!silent) message(fxNa," setting file-name + extension to : ",baseFiNa,".",htmlExt)
+    if(!silent) message(fxNa,"Setting file-name + extension to : ",baseFiNa,".",htmlExt)
   } else {
     htmlExt <- substr(HtmFileNa, unlist(regexec("\\.htm",HtmFileNa)), nchar(HtmFileNa))}
   HtmFileNa <- wrMisc::.checkFileNameExtensions(baseFiNa, htmlExt)       # check file extensions for HtmFileNa & pngFileNa
@@ -160,13 +160,13 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
     nLi <- length(txt)
     apply(matrix(c(rep("<p>",nLi), txt,rep("</p>",nLi)), nrow=nLi), 1, paste, collapse="") }
   ## main, ie html creation
-  htmVec <- c('<!DOCTYPE html>','<html lang="en">','<head>','<meta charset="utf-8">')
+  htmVec <- c('<!DOCTYPE html>', '<html lang="en">', '<head>', '<meta charset="utf-8">')
   htmTit <- paste(c('<title>',myHtmTit,'</title>'),collapse="")
-  htmVec <- c(htmVec,htmTit,"</head>","<body>")
+  htmVec <- c(htmVec, htmTit,"</head>","<body>")
   htmCom <- paste(c("<!-- ",myComment,"-->"),collapse="")
   htmGraTit <- if(is.null(tit)) NULL else paste(c("<h2>",tit,"</h2>"),collapse="")           # graphic title
   htmVec <- c(htmVec,htmCom,htmGraTit)
-  if(!is.null(textAtStart)) htmVec <- c(htmVec,.convTxtToHtmPar(textAtStart))
+  if(!is.null(textAtStart)) htmVec <- c(htmVec, .convTxtToHtmPar(textAtStart))
   htmImg <- paste(c('<img src="',.corPath(pngFileNa),'" alt="wrGraph_imageForMouseOver" usemap="#colormap" style="width:',
     displSi[1],'px;height:',displSi[2],'px">'),collapse="")
   htmVec <- c(htmVec,htmImg,'<map name="colormap">')
@@ -174,18 +174,18 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   ar3 <- 'shape="circle" coords="'
   ar5 <- ' alt="'
   ar7 <- '"'
-  htmCor <- data.frame(ar1,na1=myCoor[,colN2[4]],'" ',ar3,corX=myCoor[,colN2[2]],
-    ',',corY=myCoor[,colN2[3]],',',diam=pxDiam,naZ='"',stringsAsFactors=FALSE)
-  if(!is.na(colN2[5])) htmCor <- data.frame(htmCor[,-1*ncol(htmCor)],na2='" href="',na3=.corPath(myCoor$link),'"',stringsAsFactors=FALSE)
-  htmCor <- cbind(htmCor,last=" >")
-  htmCor <- as.character(apply(htmCor,1,paste,collapse=""))
-  htmVec <- c(htmVec,htmCor,"</map>")
-  if(!is.null(textAtEnd)) htmVec <- c(htmVec,.convTxtToHtmPar(textAtEnd))
+  htmCor <- data.frame(ar1, na1=myCoor[,colN2[4]],'" ', ar3,corX=myCoor[,colN2[2]],
+    ',', corY=myCoor[,colN2[3]], ',', diam=pxDiam, naZ='"',stringsAsFactors=FALSE)
+  if(!is.na(colN2[5])) htmCor <- data.frame(htmCor[,-1*ncol(htmCor)], na2='" href="', na3=.corPath(myCoor$link),'"',stringsAsFactors=FALSE)
+  htmCor <- cbind(htmCor, last=" >")
+  htmCor <- as.character(apply(htmCor, 1, paste, collapse=""))
+  htmVec <- c(htmVec, htmCor, "</map>")
+  if(!is.null(textAtEnd)) htmVec <- c(htmVec, .convTxtToHtmPar(textAtEnd))
   htmVec <- c(htmVec,"</body>","</html>")
-  if(is.null(HtmFileNa)) HtmFileNa <- paste(sub(".png$","",pngFileNa),".html",sep="")
+  if(is.null(HtmFileNa)) HtmFileNa <- paste0(sub(".png$","",pngFileNa),".html")
   if(file.exists(HtmFileNa) & !silent) message(fxNa," BEWARE, file '",HtmFileNa,"' will be overwritten !")
-  tryWrite <- try(cat(paste(htmVec,collpse="\n"),file=HtmFileNa))
-  if(class(tryWrite) =="try-error") warning(fxNa," PROBLEM : couldn't write Html file '",
+  tryWrite <- try(cat(paste(htmVec, collpse="\n"), file=HtmFileNa))
+  if(inherits(tryWrite, "try-error")) warning(fxNa," PROBLEM : couldn't write Html file '",
     HtmFileNa,"' ! (file open ?  check path,rights etc)")
 }        
 
@@ -196,12 +196,12 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   fxNa <- wrMisc::.composeCallName(callFrom, newNa=".serachColName")
   x <- if(length(dim(x)) >1)  colnames(x) else as.character(x)
   if(length(x) <1) return(NULL) else {
-  errMsg <- "argument 'searchColNa' is emty or all NA !"
+  errMsg <- "Argument 'searchColNa' is emty or all NA !"
   if(length(searchColNa) <1) stop(errMsg)
   chNa <- is.na(searchColNa)
   if(any(chNa)) {if(all(chNa)) stop(errMsg) else searchColNa <- searchColNa[which(!chNa)]}
   if(plusLowerCaps) searchColNa <-  wrMisc::.plusLowerCaps(searchColNa)
-  out <- wrMisc::naOmit(match(searchColNa,x))
-  if(length(out) <1) stop("none of the terms found")
-  if(returnList) list(foundNa=x[out[1]],remainNa=x[-out]) else out[1] }}
+  out <- wrMisc::naOmit(match(searchColNa, x))
+  if(length(out) <1) stop("None of the terms found")
+  if(returnList) list(foundNa=x[out[1]], remainNa=x[-out]) else out[1] }}
   

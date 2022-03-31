@@ -1,5 +1,5 @@
 Package: wrGraph
-Version: 1.3.0
+Version: 1.3.1
 Title: Graphics in the Context of Analyzing High-Throughput Data
 Authors@R: person("Wolfgang", "Raffelsberger", email = "w.raffelsberger@gmail.com", role = c("aut", "cre"))
 Author: Wolfgang Raffelsberger [aut, cre]
@@ -18,9 +18,9 @@ Imports: graphics, grDevices, grid, lattice, RColorBrewer, stats,
 Suggests: dplyr, factoextra, FactoMineR, knitr, limma, rmarkdown, sm
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-09-01 09:13:48 UTC; wraff
+Packaged: 2022-03-31 14:48:23 UTC; wraff
 Repository: CRAN
-Date/Publication: 2021-09-02 16:00:02 UTC
+Date/Publication: 2022-03-31 15:10:02 UTC

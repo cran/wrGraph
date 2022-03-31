@@ -2,7 +2,7 @@
 % Please edit documentation in R/VolcanoPlotW.R
 \name{VolcanoPlotW}
 \alias{VolcanoPlotW}
-\title{Volcano-plot (Statistical Test Outcome versus Relative Change)}
+\title{Volcano-Plot (Statistical Test Outcome versus Relative Change)}
 \usage{
 VolcanoPlotW(
   Mvalue,
@@ -110,14 +110,14 @@ if the initial object \code{Mvalue} contains a list-element called 'annot' the s
 
 \item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt)}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
 
 \item{debug}{(logical) additional messages for debugging}
 }
 \value{
-MA-plot only
+This function simply plots an MA-plot (to the current graphical device), if \code{returnData=TRUE} an optional data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt) can be returned
 }
 \description{
 This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/Volcano_plot_(statistics)}{Volcano-plot}.
@@ -136,7 +136,7 @@ mat[1:50,4:6] <- mat[1:50,4:6] + rep(c(-1,1)*0.1,25)
 mat[3:7,4:9] <- mat[3:7,4:9] + 0.7
 mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 ## assume 2 groups with 3 samples each
-gr3 <- gl(3,3,labels=c("C","A","B"))
+gr3 <- gl(3, 3, labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3), addResults = c("FDR","means"))
 # Note: due to the small number of lines only FDR chosen to calculate 
 VolcanoPlotW(tRes2)

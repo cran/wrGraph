@@ -67,9 +67,12 @@ histW(
 
 \item{silent}{(logical) suppress messages}
 
-\item{debug}{(logical) additonal messagesfor debugging}
+\item{debug}{(logical) additonal messages for debugging}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
+}
+\value{
+This function produces a histogram type graphic (to the ccurrent graphical device)
 }
 \description{
 This function proposes a few special tweaks to the general \code{\link[graphics]{hist}} function :
