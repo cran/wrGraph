@@ -9,20 +9,24 @@
 #' @param horiz (logical) will priviledge horizontal layout if \code{TRUE}
 #' @param figNcol (integer) optional number of columns
 #' @param byrow (logical) toggle if output is in order of rows or columns (equivament to \code{\link[base]{matrix}} 
+#' @param silent (logical) suppress messages
+#' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
 #' @return matrix for use with \code{layout} or (if \code{returnMatr=FALSE} numeric vector with number of segements in x- an y-axis) 
 #' @seealso \code{\link[graphics]{layout}}
 #' @examples
 #' partitionPlot(5); partitionPlot(14,horiz=TRUE)
 #' @export  
-partitionPlot <- function(nFig,returnMatr=TRUE,horiz=TRUE,figNcol=NULL,byrow=TRUE,callFrom=NULL) {
+partitionPlot <- function(nFig, returnMatr=TRUE, horiz=TRUE, figNcol=NULL, byrow=TRUE, silent=TRUE, debug=FALSE, callFrom=NULL) {
   ## function to create layout-matrix for multiple separate plots
   ## to do : test more non-square layouts for (near-)perfect fit to 'nFig'
-  fxNa <- wrMisc::.composeCallName(callFrom,newNa="partitionPlot")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="partitionPlot")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
   if(is.null(figNcol)) figNcol <- ceiling(sqrt(nFig))
   figNrow <- ceiling(nFig/figNcol)
-  figDim <- c(ceiling(nFig/figNcol),figNcol)
+  figDim <- c(ceiling(nFig/figNcol), figNcol)
   if(figDim[2] < figDim[1] & horiz | figDim[2] > figDim[1] & !horiz) figDim <- figDim[2:1]
-  out <- if(returnMatr) matrix(1:(figDim[2]*figDim[1]),ncol=figDim[2],byrow=byrow) else figDim
+  out <- if(returnMatr) matrix(1:(figDim[2]*figDim[1]), ncol=figDim[2], byrow=byrow) else figDim
   out }
-    
+      

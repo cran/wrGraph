@@ -24,8 +24,7 @@ VolcanoPlotW(
   cexLa = 1.1,
   limM = NULL,
   limp = NULL,
-  annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species",
-    "Contam"),
+  annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species", "Contam"),
   annColor = NULL,
   expFCarrow = FALSE,
   cexPt = NULL,
@@ -43,8 +42,9 @@ VolcanoPlotW(
 )
 }
 \arguments{
-\item{Mvalue}{(numeric or matrix) data to plot; M-values are typically calculated as difference of log2-abundance values and 'pValue' the mean of log2-abundance values;
-M-values and p-values may be given as 2 columsn of a matrix, in this case the argument \code{pValue} should remain NULL}
+\item{Mvalue}{(MArrayLM-object, numeric or matrix) data to plot; M-values are typically calculated as difference of log2-abundance values and 'pValue' the mean of log2-abundance values;
+ M-values and p-values may be given as 2 columsn of a matrix, in this case the argument \code{pValue} should remain NULL.
+One may also furnish MArrayLM-objects created bpackage wrProteo or limma.}
 
 \item{pValue}{(numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the p-values to be used}
 
@@ -89,7 +89,7 @@ The first entry (typically 'SpecType') is used for different symbols in figure, 
 \item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
 
 \item{expFCarrow}{(logical or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
-if \code{numeric} an arrow will be drawn at this M-value}
+if \code{numeric} an arrow will be drawn at this M-value (1st position in vector) with the color of 2nd position of vector}
 
 \item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
@@ -97,7 +97,7 @@ if \code{numeric} an arrow will be drawn at this M-value}
 
 \item{cexTxLab}{(numeric) size of text-labels for points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
-\item{namesNBest}{(integer or character) for display of labels to points in figure: if 'pass','passThr' or 'signif' all points passing thresholds; if numeric (length=1) this number of best points will get labels 
+\item{namesNBest}{(integer or character) for display of labels to points in figure: if 'pass','passThr' or 'signif' all points passing thresholds; if numeric (length=1) this number of best points will get labels
 if the initial object \code{Mvalue} contains a list-element called 'annot' the second of the column specified in argument \code{annotColumn} will be used as text}
 
 \item{NbestCol}{(character or integer) colors for text-labels of best points}
@@ -138,18 +138,18 @@ mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 ## assume 2 groups with 3 samples each
 gr3 <- gl(3, 3, labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3), addResults = c("FDR","means"))
-# Note: due to the small number of lines only FDR chosen to calculate 
+# Note: due to the small number of lines only FDR chosen to calculate
 VolcanoPlotW(tRes2)
 ## Add names of points passing custom filters
 VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="passThr")
 
 ## assume 3 groups with 3 samples each
 tRes <- moderTestXgrp(mat, gr3, addResults = c("FDR","means"))
-# Note: due to the small number of lines only FDR chosen to calculate 
+# Note: due to the small number of lines only FDR chosen to calculate
 VolcanoPlotW(tRes)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
- 
+
 }
 \seealso{
 (for PCA) \code{\link{plotPCAw}})

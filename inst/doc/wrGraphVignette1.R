@@ -179,7 +179,9 @@ gr3 <- gl(3,3,labels=c("C","A","B"))
 tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
 
 VolcanoPlotW(tRes2)
-VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass")
+
+# now with thresholds, labels and arrow for expected ratio
+VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass", expFCarrow=c(0.75,2))
 
 ## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
 ## assume 3 groups with 3 samples each

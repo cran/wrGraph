@@ -10,6 +10,8 @@ partitionPlot(
   horiz = TRUE,
   figNcol = NULL,
   byrow = TRUE,
+  silent = TRUE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -23,6 +25,10 @@ partitionPlot(
 \item{figNcol}{(integer) optional number of columns}
 
 \item{byrow}{(logical) toggle if output is in order of rows or columns (equivament to \code{\link[base]{matrix}}}
+
+\item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) additonal messages for debugging}
 
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }

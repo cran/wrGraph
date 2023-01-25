@@ -22,6 +22,7 @@ cumFrqPlot(
   supTxtYOffs = 0,
   useLog = "",
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -59,6 +60,8 @@ cumFrqPlot(
 \item{useLog}{(character) default="", otherwise for setting axis in log-scale "x", "y" or "xy"}
 
 \item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) additonal messages for debugging}
 
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }

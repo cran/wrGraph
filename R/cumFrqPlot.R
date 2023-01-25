@@ -30,6 +30,7 @@
 #' @param supTxtYOffs (numeric) supplemental offset for text on y axis
 #' @param useLog (character) default="", otherwise for setting axis in log-scale "x", "y" or "xy"
 #' @param silent (logical) suppress messages
+#' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
 #' @return This function plots to the current garphical device
 #' @seealso \code{\link[graphics]{layout}}, \code{\link[wrMisc]{exclExtrValues}} for decision of potential outliers; \code{\link[graphics]{hist}}, \code{\link{vioplotW}}
@@ -39,12 +40,13 @@
 #' cumFrqPlot(dat0, cumSum=TRUE, tit="Sum of sorted values")
 #' @export  
 cumFrqPlot <- function(dat, cumSum=FALSE, exclCol=NULL, colNames=NULL, displColNa=TRUE, tit=NULL, xLim=NULL, yLim=NULL,
-  xLab=NULL, yLab=NULL, col=NULL, CVlimit=NULL, thisResol=NULL, supTxtAdj=0, supTxtYOffs=0, useLog="", silent=FALSE, callFrom=NULL) {
+  xLab=NULL, yLab=NULL, col=NULL, CVlimit=NULL, thisResol=NULL, supTxtAdj=0, supTxtYOffs=0, useLog="", silent=FALSE, debug=FALSE, callFrom=NULL) {
   ## cumulative frequency plot (takes columns of 'dat' as separate series)      
   argNa <- deparse(substitute(dat))
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="cumFrqPlot")
   if(!isTRUE(silent)) silent <- FALSE
-  if(length(dim(dat)) >2) {
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+if(length(dim(dat)) >2) {
     if(!silent) message(fxNa," ('dat' has >2 dims) Using ONLY 1st and 2nd dimension of 'dat' for plotting !")
     dat <- dat[,,1] }
   if(!is.null(colNames)) if(length(colNames) != ncol(as.matrix(dat))) {

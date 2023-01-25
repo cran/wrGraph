@@ -23,8 +23,9 @@ addBagPlot(
   ctrCex = NULL,
   addSubTi = TRUE,
   returnOutL = FALSE,
+  silent = TRUE,
   callFrom = NULL,
-  silent = TRUE
+  debug = FALSE
 )
 }
 \arguments{
@@ -64,9 +65,11 @@ addBagPlot(
 
 \item{returnOutL}{(logical) decide if rownames of (potential) outlyer values should be returned when running the function}
 
+\item{silent}{(logical) suppress messages}
+
 \item{callFrom}{(character) allow easier tracking of messages produced}
 
-\item{silent}{(logical) suppress messages}
+\item{debug}{(logical) display additional messages for debugging}
 }
 \value{
 plot, optional return of matrix with outlyers
@@ -79,9 +82,13 @@ If a group of data consists only of 2 data-points, they will be conected using a
 It is recommended using transparent colors to highlight the core part of a group (if only 2 points are available, they will be conected using a straight line),
 in addition, one could use the option to re-plot all (non-outlyer) points (arguments \code{reCol}, \code{rePch} and \code{reCex} must be used).
 }
+\details{
+The outlyer detection works similar to the one used in \code{boxplot}: The distance of a given point is compared to the median distance of all points to their respective group-center plus
+the 25 - 75 quantile-distance (of all points) times the multiplicative factor of argument \code{outCoef}.
+}
 \examples{
 set.seed(2020); dat1 <- matrix(round(rnorm(2000),3),ncol=2); rownames(dat1) <- 1:nrow(dat1)
-dat1 <- dat1+ 5*matrix(rep(c(0,1,1,0,0,0,1,1),nrow(dat1)/4), byrow=TRUE, ncol=2)
+dat1 <- dat1 + 5*matrix(rep(c(0,1,1,0,0,0,1,1),nrow(dat1)/4), byrow=TRUE, ncol=2)
 col1 <- rgb(red=c(153,90,203,255), green=c(143,195,211,125), blue=c(204,186,78,115),
   alpha=90, maxColorValue=255)
 ## suppose we know the repartition into 4 subgroups which we would like to highlight them

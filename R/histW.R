@@ -53,12 +53,13 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
   ## 'parDefault' .. to automatic adjusting par(marg=,cex.axis=0.8)
   argN <- deparse(substitute(dat))
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="histW")
-  opar <- graphics::par(no.readonly = TRUE) 
-  on.exit(graphics::par(opar$mar))           # restore only parameters susceptible of changes lateron (to allow successive plotting after layout() )
-  on.exit(graphics::par(opar$font.sub))      # restore only parameters susceptible of changes lateron (to allow successive plotting after layout() )
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+  opar <- graphics::par(no.readonly=TRUE)
+  opar2 <- opar[-which(names(opar) %in% c("fig","fin","font","mfcol","mfg","mfrow","oma","omd","omi"))]    #
+  on.exit(graphics::par(opar2))     # progression ok
   maxNoXLabels <- NA           # max number of border-values to display
   msg1 <- " NOT sufficent rights to write : "
-  if(debug) silent <- FALSE
   if(length(output) <1) output <- "screen" else if(length(output) >1) output <- output[1]
   if(any(output %in% c("png","tiff","tif","jpg","jpeg"))) if(file.access(fileName,mode=0) ==0) {
     if(file.access(fileName, mode=2) <0) stop("File exists ",msg1,fileName) }
@@ -128,5 +129,7 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
       txt2 <- paste(txt2[1], signif(min(dat,na.rm=TRUE),4), txt2[2], signif(max(dat,na.rm=TRUE),5)) }
     if(!identical(subTi,FALSE)) graphics::mtext(if(is.null(subTi)) txt2 else subTi,li=-0.4,cex=cexSubTi)
   }
-  if(output %in% c("png","tif","tiff","jpg","jpeg")) grDevices::dev.off() }
+  if(output %in% c("png","tif","tiff","jpg","jpeg")) grDevices::dev.off() 
+  tmp <- try(graphics::par(mar=opar$mar, cex.main=opar$font.sub), silent=TRUE)
+}
     

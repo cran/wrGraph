@@ -64,10 +64,9 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
   ## optional arguments for explicit title in batch-mode
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="MAplotW")
   opar <- graphics::par(no.readonly=TRUE) 
-  on.exit(graphics::par(opar$mar)) 
-  on.exit(graphics::par(opar$cex.main)) 
-  on.exit(graphics::par(opar$cex.lab)) 
-  on.exit(graphics::par(opar$las)) 
+  opar2 <- opar[-which(names(opar) %in% c("fig","fin","font","mfcol","mfg","mfrow","oma","omd","omi"))]    #
+  on.exit(graphics::par(opar2))     # progression ok
+  ## during function changes in  $mar,$cex.main,$cex.lab,$las 
   plotByFdr <- TRUE  #
   namesIn <- c(deparse(substitute(Mvalue)), deparse(substitute(Avalue)), deparse(substitute(filtFin)))
   basRGB <- c(0.3,0.3,0.3)           # grey
@@ -406,6 +405,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         legCex <- stats::median(c(useCex,cexTxLab,1.2), na.rm=TRUE)
         graphics::legend(legLoc$loc, legend=legLab, col=if(FDR4color) grDevices::grey(0.5) else legCol, text.col=1, pch=legPch, if(length(ptBg) >0) pt.bg=ptBg, cex=legCex, pt.cex=1.2*legCex, xjust=0.5, yjust=0.5)  # as points
       } }
+  tmp <- try(graphics::par(mar=opar$mar, cex.main=opar$cex.main, las=opar$las), silent=TRUE)
+      
   ## export results
   if(returnData) {
     merg <- merg[,-1*c(1,ncol(merg))]        # remove col 'ID' 'redundant' & 'pch'

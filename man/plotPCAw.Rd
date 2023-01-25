@@ -14,6 +14,7 @@ plotPCAw(
   colBase = NULL,
   useSymb2 = NULL,
   displBagPl = TRUE,
+  outCoef = 2,
   getOutL = FALSE,
   cexTxt = 1,
   cexSub = 0.6,
@@ -49,61 +50,66 @@ Alternatively, a vector of length equal the number of columns of x can be suppli
 
 \item{displBagPl}{(logical) if \code{TRUE}, show bagPlot (group-center) if >3 points per group otherwise the average-confidence-interval}
 
+\item{outCoef}{(numeric) parameter for defining outliers, see  \code{\link{addBagPlot}} (equivalent to \code{range} in \code{\link[graphics]{boxplot}})}
+
 \item{getOutL}{(logical) return outlyer samples/values}
 
 \item{cexTxt}{(integer) expansion factor for text (see also \code{\link[graphics]{par}})}
 
 \item{cexSub}{(integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}})}
 
-\item{showLegend}{(logical or character) toggle to display legend , if character it designes the location within the plot to display the legend ('bottomleft','topright', etc..)}
+\item{showLegend}{(logical or character) toggle to display legend, if character it designes the location within the plot to display the legend ('bottomleft','topright', etc..)}
 
 \item{nGrpForMedian}{(integer) decide if group center should be displayed via its average or median value: If group has less than 'nGrpForMedian' values, the average will be used, otherwise the median; if \code{NULL} no group centers will be displayed}
 
-\item{pointLabelPar}{(character) define formatting for optional labels next to points in main figure (ie PC1 vs PC2); may be \code{TRUE} or list containing elments 'textLabel','textCol','textCex',
-'textOffSet','textAdj' for fine-tuning}
+\item{pointLabelPar}{(character) define formatting for optional labels next to points in main figure (ie PC1 vs PC2); may be \code{TRUE} or list containing elments 'textLabel', 'textCol', 'textCex',
+'textOffSet', 'textAdj' for fine-tuning}
 
 \item{rowTyName}{(character) for subtitle : specify nature of rows (genes, proteins, probesets,...)}
 
-\item{rotatePC}{(integer) optional rotation (by -1) for figure of the principal components specified by index}
+\item{rotatePC}{(integer) optional rotation (by -1) for fig&ure of the principal components specified by index}
 
 \item{suplFig}{(logical) to include plots vs 3rd principal component (PC) and Screeplot}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
 
 \item{debug}{(logical) display additional messages for debugging}
 }
 \value{
-plot and optional matrix of outlyer-data
+This function make a plot and may retiurn an optional matrix of outlyer-data (depending on argument \code{getOutL})
 }
 \description{
-This function allows to plot \href{https://en.wikipedia.org/wiki/Principal_component_analysis}{principal components analysis (PCA)}, 
+This function allows to plot \href{https://en.wikipedia.org/wiki/Principal_component_analysis}{principal components analysis (PCA)},
 with options to show center and potential outliers for each of the groups (columns of data).
-The main points of this implementation consist in offering bagplots to highlight groups of columns/samples and support to (object-oriented) 
+The main points of this implementation consist in offering bagplots to highlight groups of columns/samples and support to (object-oriented)
  output from \href{https://bioconductor.org/packages/release/bioc/html/limma.html}{limma} and \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}.
 }
 \details{
-One of the motivations for this implementation comes from integrating the idea of bag-plots to better visualize different groups of points 
+One motivation for this implementation of plotting PCA was to provide a convenient way for doing so with of MArrayLM-objects or lists
+as created by \href{https://bioconductor.org/packages/release/bioc/html/limma.html}{limma} and \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}.
+
+Another motivation for this implementation come from integrating the idea of bag-plots to better visualize different groups of points
 (if they can be organized so beforehand as distinct groups) :
 The main body of data is shown as 'bag-plots' (a bivariate boxplot, see \href{https://en.wikipedia.org/wiki/Bagplot}{Bagplot})
 with different transparent colors to highlight the core part of different groups (if they contain more than 2 values per group).
 Furthermore, group centers are shown as average or median (see 'nGrpForMedian') with stars & index-number (if <25 groups).
+
 Layout is automatically set to 2 or 4 subplots (if plotting more than 2 principal components makes sense).
 
-The other motivation for this implementation came from plotting PCA based on MArrayLM-objects (or lists) 
-created by \href{https://bioconductor.org/packages/release/bioc/html/limma.html}{limma} and \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} in a convenient way.
+Note : This function uses \code{\link[stats]{prcomp}} for calculating Eigenvectors and principal components, with default \code{center=TRUE} and \code{scale.=FALSE} (different to \code{princomp()}. which standardizes by default).
+This way the user has to option to intervene on arguments \code{center} and \code{scale.}. However, this should be done with care.
 
-Note : This function uses for calulating PCA \code{\link[stats]{prcomp}} with default \code{center=TRUE} and \code{scale.=FALSE}, (different to princomp() which standardizes by default).
-
-Note: \code{NA}-values cannot (by definition) be processed by PCA - all lines with any non-finite values/content (eg \code{NA}) will be omitted !
+Note: \code{NA}-values cannot (by definition) be processed by (any) PCA - all lines with any non-finite values/content (eg \code{NA}) will be omitted !
 
 Note : Package RColorBrewer may be used if available.
 
- a very wide spectrum of possibiities, in particular for combined numeric and categorical data.
+For more options with PCA (and related methods) you may also see also the package  \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR}
+which provides a very wide spectrum of possibiities, in particular for combined numeric and categorical data.
 }
 \examples{
-set.seed(2019); dat1 <- matrix(round(c(rnorm(1000), runif(1000,-0.9,0.9)),2), 
+set.seed(2019); dat1 <- matrix(round(c(rnorm(1000), runif(1000,-0.9,0.9)),2),
   ncol=20, byrow=TRUE) + matrix(rep(rep(1:5,6:2), each=100), ncol=20)
 biplot(prcomp(dat1))        # traditional plot
 (grp = factor(rep(LETTERS[5:1],6:2)))
