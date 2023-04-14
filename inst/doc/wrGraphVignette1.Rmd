@@ -477,7 +477,7 @@ VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.rstudio.com/). 
 In this case the original idea was simply to provide help to identify points in a plot and display via mouse-over labels to display and by providing clickable links. 
 To do so, very simple html documents are created which display a separately saved image and have a section indicating at which location of the figure which information should be displayed as mouse-over and providing the clickable links. 
-In high-throughput biology many times researchers want quickly know which protein or gene a given point in a graphic corresponds and being able to get further information on this protein or gene via links to [UniProt](https://www.uniprot.org/) or [GenBank](https://www.ncbi.nlm.nih.gov/genbank/).
+In high-throughput biology many times researchers want quickly know which protein or gene a given point in a graphic corresponds and being able to get further information on this protein or gene via links to [UniProt](https://www.uniprot.org) or [GenBank](https://www.ncbi.nlm.nih.gov/genbank).
 
 As this functionality was made for separate html documents it's output cannot be easily integrated into a vignette like this one.
 To generate such a simple mouse-over interactive html document, the user is invited to run the code 
@@ -524,9 +524,10 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 #from within R# browseURL(htmFile) 
 ```
 
+
 ## Acknowledgements
 
-The author wants to acknowledge the support by the [IGBMC](https://www.igbmc.fr/) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](https://www.cnrs.fr/), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr/) and of course all collegues from the [IGBMC proteomics platform](https://proteomics.igbmc.fr/).
+The author wants to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](https://www.cnrs.fr/en), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr) and of course all collegues from the [IGBMC proteomics platform](https://proteomics.igbmc.fr).
 The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.

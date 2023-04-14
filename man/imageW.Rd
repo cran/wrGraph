@@ -25,6 +25,7 @@ imageW(
   panel.background.col = "white",
   rotXlab = 0,
   rotYlab = 0,
+  ...,
   cexXlab = 0.7,
   cexAxs = NULL,
   cexYlab = 0.9,
@@ -33,8 +34,7 @@ imageW(
   cexTit = 1.6,
   silent = FALSE,
   debug = FALSE,
-  callFrom = NULL,
-  ...
+  callFrom = NULL
 )
 }
 \arguments{
@@ -80,6 +80,8 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 
 \item{rotYlab}{(numeric, 0 - 360, lattice version only) control rotation of y-axis labels}
 
+\item{...}{(only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
+
 \item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
 
 \item{cexAxs}{(numeric) cex-like expansion factor for x- and y-axis text/labels (see also \code{\link[graphics]{par}})}
@@ -97,8 +99,6 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 \item{debug}{(logical) additional messages for debugging}
 
 \item{callFrom}{(character) allow easier tracking of messages produced}
-
-\item{...}{(only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
 }
 \value{
 This function plots in image (to the current graphical device) as \code{image} does

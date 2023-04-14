@@ -21,7 +21,8 @@ mouseOverHtmlFile(
   linkExt = NULL,
   htmlExt = "htm",
   callFrom = NULL,
-  silent = FALSE
+  silent = FALSE,
+  debug = FALSE
 )
 }
 \arguments{
@@ -58,9 +59,11 @@ or 3) \code{TRUE} to check presence of 4th name specified in 'colNa' to be useed
 
 \item{htmlExt}{(character, length=1) extension used when making html files}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allow easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) additional messages for debugging}
 }
 \value{
 plot

@@ -72,7 +72,7 @@ addBagPlot(
 \item{debug}{(logical) display additional messages for debugging}
 }
 \value{
-plot, optional return of matrix with outlyers
+This function returns primarily a plot, optionally it may return of matrix with outlyers (if argument \code{returnOutL=TRUE})
 }
 \description{
 This function adds a bagplot on an existing (scatter-)plot allowing to highlight the central area of the data.

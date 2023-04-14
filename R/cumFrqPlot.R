@@ -46,33 +46,35 @@ cumFrqPlot <- function(dat, cumSum=FALSE, exclCol=NULL, colNames=NULL, displColN
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="cumFrqPlot")
   if(!isTRUE(silent)) silent <- FALSE
   if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
-if(length(dim(dat)) >2) {
+  if(length(dim(dat)) >2) {
     if(!silent) message(fxNa," ('dat' has >2 dims) Using ONLY 1st and 2nd dimension of 'dat' for plotting !")
     dat <- dat[,,1] }
   if(!is.null(colNames)) if(length(colNames) != ncol(as.matrix(dat))) {
-    warning(" number of items in 'colNames' doesn't match data provided"); colNames <- NULL }
+    warning("Number of items in 'colNames' doesn't match data provided"); colNames <- NULL }
   if(length(exclCol) >0) dat <- dat[,-1*exclCol]
   if(is.null(colNames)) colNames <- colnames(dat)
   dat <- wrMisc::.keepFiniteCol(as.matrix(dat), silent, callFrom=fxNa)
-  if(!is.matrix(dat) & !is.data.frame(dat)) dat <- as.matrix(as.numeric(dat))
+  if(!is.matrix(dat) && !is.data.frame(dat)) dat <- as.matrix(as.numeric(dat))
   ## optional removing of extreme values (outlyers)
-  if(length(CVlimit) >0 & is.numeric(CVlimit)) {
+  if(length(CVlimit) >0 && is.numeric(CVlimit)) {
    dat <- apply(dat, 2, wrMisc::exclExtrValues, result="val", CVlim=CVlimit, maxExcl=1, goodValues=FALSE, silent=silent, callFrom=fxNa)
-  }       
+  } 
+  if(debug) message(fxNa,"cFP1")
+      
   ## sort
   dat <- apply(dat, 2, sort, decreasing=FALSE,na.last=TRUE)   # put NAs to end
   repNA <- !is.finite(dat)
   nNA <- colSums(repNA)
   if(any(nNA ==nrow(dat)))  {
-    if(!silent) message(fxNa," problem with columns ",wrMisc::pasteC(colnames(dat)[which(nNA ==nrow(dat))],quote="'")," , removing")
+    if(!silent) message(fxNa,"Problem with columns ",wrMisc::pasteC(colnames(dat)[which(nNA ==nrow(dat))],quote="'")," , removing")
     dat <- dat[,which(nNA <nrow(dat))]}    
   ## median for display
-  datMed <- apply(dat,2,stats::median,na.rm=TRUE)
+  datMed <- apply(dat, 2, stats::median,na.rm=TRUE)
   ## take slices if thisResol
   ##  taking slices before cumSum should go much faster on very big data, but some loss in precision since need to mulitply results for cumSum
-  if(length(thisResol) >0 & is.numeric(thisResol)) {
+  if(length(thisResol) >0 && is.numeric(thisResol)) {
     if(thisResol[1] > nrow(dat)/1.5) {                  # can't go better than full resolution ! Or, if < 50% stay full res
-      if(!silent) message(fxNa," reducing resolution to '",thisResol,"' brings not sufficient/major again, remain at full resolution")
+      if(!silent) message(fxNa,"Reducing resolution to '",thisResol,"' brings not sufficient/major again, remain at full resolution")
       thisResol <- NULL }}   
   if(length(thisResol) >0) if(is.numeric(thisResol)) {
     xx <- round(nrow(dat)/thisResol)
@@ -88,23 +90,23 @@ if(length(dim(dat)) >2) {
   }  
   ##prepare figure
   if(length(col) <1) col <- 1:ncol(dat)
-  if(is.null(xLab)) xLab <- paste("value of ", if(cumSum) "cumulated" else "sorted"," per column")
+  if(is.null(xLab)) xLab <- paste("Value of ", if(cumSum) "cumulated" else "sorted"," per column")
   if(is.null(yLab)) yLab <- "fraction of data"
   if(is.null(xLim)) xLim <- range(dat,na.rm=TRUE,finite=TRUE)
   if(is.null(yLim)) yLim <- c(0,1)  #c(1,nrow(dat))/nrow(dat)  
-  if(length(xLim) !=2) {if(!is.null(xLim)) warning("invalid entry for 'xLim', ignoring"); xLim <- NULL }
-  if(length(yLim) !=2) {if(!is.null(yLim)) warning("invalid entry for 'yLim', ignoring"); yLim <- NULL }  
+  if(length(xLim) !=2) {if(!is.null(xLim)) warning("Invalid entry for 'xLim', ignoring"); xLim <- NULL }
+  if(length(yLim) !=2) {if(!is.null(yLim)) warning("Invalid entry for 'yLim', ignoring"); yLim <- NULL }  
   ## plot empty
   msg1 <- paste0(fxNa,": Unknow argument content ('",useLog,"') for 'useLog'; resetting to default no log")
   if(length(useLog) !=1) { if(!silent) message(msg1); useLog <- ""}
   if(!(useLog %in% c("","x","y","xy"))) { warning(msg1); useLog <- ""}
   graphics::plot(c(1,nrow(dat)), c(range(dat, na.rm=TRUE)),
-    xlim=xLim, ylim=yLim, las=1, main=tit, xlab=xLab,ylab=yLab,type="n",log=useLog)                             # plot empty frame
+    xlim=xLim, ylim=yLim, las=1, main=tit, xlab=xLab, ylab=yLab, type="n", log=useLog)                             # plot empty frame
   ## add lines and legend-text 
   for(j in 1:ncol(dat)) {
     graphics::lines(dat[,j],(1:nrow(dat))/nrow(dat), col=col[j])
     graphics::mtext(paste("  med ",if(displColNa) colNames[j],"=",signif(datMed[j],3)),
-      line=-2*j/3+supTxtYOffs,cex=0.7,col=col[j],adj=supTxtAdj)
+      line=-2*j/3 +supTxtYOffs, cex=0.7, col=col[j], adj=supTxtAdj)
   }
 }
   

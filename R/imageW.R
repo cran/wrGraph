@@ -53,7 +53,7 @@
 #' @export
 imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowNa=NULL, colNa=NULL, tit=NULL, xLab=NA, yLab=NA, las=2, 
   col=NULL, nColor=9, balanceCol=TRUE, gridCol="grey75", gridLty=1, centColShift=0, cexDispl=NULL, panel.background.col="white", 
-  rotXlab=0, rotYlab=0, cexXlab=0.7, cexAxs=NULL, cexYlab=0.9, Xtck=0, Ytck=0, cexTit=1.6, silent=FALSE, debug=FALSE, callFrom=NULL, ...) { 
+  rotXlab=0, rotYlab=0, ..., cexXlab=0.7, cexAxs=NULL, cexYlab=0.9, Xtck=0, Ytck=0, cexTit=1.6, silent=FALSE, debug=FALSE, callFrom=NULL) { 
   ## improved version if image() or  levelplot()
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="imageW")
   argNa <- deparse(substitute(data))
@@ -62,7 +62,7 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
   doPlot <- if(length(data) >0) is.numeric(data) else FALSE
   if(length(dim(data)) <2) data <- try(matrix(as.numeric(data), ncol=1, dimnames=list(names(data), NULL)), silent=TRUE)
   if(inherits(data, "try-error")) doPlot <- FALSE else {
-    if(is.data.frame(data) & doPlot) {doPlot <- is.numeric(as.matrix(data)); data <- as.matrix(data)}}
+    if(is.data.frame(data) && doPlot) {doPlot <- is.numeric(as.matrix(data)); data <- as.matrix(data)}}
   if(doPlot) {    
     ## checks & adjust
     if(length(rowNa) <nrow(data)) rowNa <- rownames(data) 
@@ -74,8 +74,8 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
     if(latticeVersion) {
       ## reformat input
       if(!transp) data <- t(data)                 #  was initially written for transp=T, re-transform if not chosen
-      if(length(rotXlab)==0 & any(las %in% c(2,3))) rotXlab <- 0
-      if(length(rotYlab)==0 & any(las %in% c(0,3))) rotYlab <- 0
+      if(length(rotXlab)==0 && any(las %in% c(2,3))) rotXlab <- 0
+      if(length(rotYlab)==0 && any(las %in% c(0,3))) rotYlab <- 0
       ma2 <- expand.grid(1:ncol(data), 1:nrow(data))
       ma2 <- cbind(ma2, as.numeric(t(data[nrow(data):1,])))
       colnames(ma2) <- c("x","y","z")
@@ -92,29 +92,29 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
       bre <- miMa[1] + (0:nCol2) *width           # breaks
       clo0 <- which.min(abs(as.numeric(data)))    # (first) value closest to 0, try to include in grey segm
       clo0br <- min(which(bre >= as.numeric(data)[clo0]))   #+ (-1:0)  # upper break/bound for center color (close/including 0)
-      if(clo0br >1 & clo0br < length(bre) -1 & length(col) >2) {   # some values in lower & upper gradient
+      if(clo0br >1 && clo0br < length(bre) -1 && length(col) >2) {   # some values in lower & upper gradient
         maxLe <- max(clo0br -1, length(bre) -clo0br) -as.integer(balanceCol)  
-        negCol <- try(grDevices::colorRampPalette(col[1:2])(if(balanceCol) maxLe else length(clo0br-1)), silent=TRUE)
+        negCol <- try(grDevices::colorRampPalette(col[1:2])(if(balanceCol) maxLe else length(clo0br -1)), silent=TRUE)
         if(inherits(negCol, "try-error")) { negCol <- NULL
           if(!silent) message(fxNa,"Invalid color-gradient for neg values")
         }
         negCol <- negCol[-length(negCol)]                              # max neg-col -> grey (wo defined grey);  remove 'grey' from last position
-        posCol <- try((grDevices::colorRampPalette(col[2:3])(if(balanceCol) maxLe else length(length(bre) -1 -clo0br))) [], silent=TRUE)  # (grey -> max pos-col)
+        posCol <- try((grDevices::colorRampPalette(col[2:3])(if(balanceCol) maxLe else length(length(bre) -1 -clo0br))), silent=TRUE)  # (grey -> max pos-col)
         if(inherits(posCol, "try-error")) { 
           if(!silent) warning(fxNa,"Invalid color-gradient for pos values")
         }
         if(debug) message(fxNa, "/1 clo0br ",clo0br,"   max nCol ",nCol2,"   le negCol ",length(negCol),"   le posCol ",length(posCol))
         if(balanceCol) {
-          centColShift <- if(length(centColShift) <1 | !is.numeric(centColShift)) 0 else as.integer(centColShift)
+          centColShift <- if(length(centColShift) <1 || !is.numeric(centColShift)) 0 else as.integer(centColShift)
           .keepLastN <- function(x,lastN) x[(length(x) -lastN +1):length(x)]
           if(length(negCol) != clo0br -2 +centColShift) {
-            if(debug) message(fxNa," correct negCol (prev=",length(negCol),") centColShift=",centColShift," to : ",clo0br -2 +centColShift)
+            if(debug) message(fxNa,"Correct negCol (prev=",length(negCol),") centColShift=",centColShift," to : ",clo0br -2 +centColShift)
             if(length(negCol) > clo0br -2 +centColShift) negCol <- .keepLastN(negCol, clo0br -2 +centColShift)
             if(length(negCol) < clo0br -2 +centColShift) {negCol <- grDevices::colorRampPalette(col[1:2])(clo0br -1 +centColShift)
               negCol <- negCol[-length(negCol)] }
           }
           if(length(posCol) != length(bre) -length(negCol) -1) {
-            if(debug) message(fxNa," corr posCol (prev ",length(posCol),") to ",maxLe + centColShift," to ",length(bre) -length(negCol) -1)
+            if(debug) message(fxNa,"Corr posCol (prev ",length(posCol),") to ",maxLe + centColShift," to ",length(bre) -length(negCol) -1)
             if(length(posCol) > length(bre) -length(negCol) -1) posCol <- posCol[1:(length(bre) -clo0br)]
             if(length(posCol) < length(bre) -length(negCol) -1) {
               posCol <- grDevices::colorRampPalette(col[2:3])(length(bre) -length(negCol) -1) }
@@ -132,10 +132,10 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
         grid::grid.rect(gp=grid::gpar(col=NA, fill=NAcol))       # fill NA
         lattice::panel.levelplot(...)
         argXYZ <- list(...)
-        if(length(cexDispl)==1 & is.numeric(cexDispl)) lattice::panel.text(argXYZ$x, argXYZ$y, signif(argXYZ$z,2), cex=cexDispl)      # add rounded numeric value
+        if(length(cexDispl)==1 && is.numeric(cexDispl)) lattice::panel.text(argXYZ$x, argXYZ$y, signif(argXYZ$z,2), cex=cexDispl)      # add rounded numeric value
         if(any(is.na(gridCol))) gridCol <- NULL
         chGri <- (1:6) %in% gridLty
-        if(length(gridCol) >0 & any(chGri)) {                # add grid-lines
+        if(length(gridCol) >0 && any(chGri)) {                # add grid-lines
           lattice::panel.abline(h=0.5 +1:(nrow(data) -1), col=gridCol, lty=gridLty)     # vertical 
           lattice::panel.abline(v=0.5 +1:(ncol(data) -1), col=gridCol, lty=gridLty) }   # hor            
       }  
@@ -151,17 +151,17 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
       ## (until v1.2.5) standard graphics version
       if(transp) data <- t(data)
       if(ncol(data) >1) data <- data[,ncol(data):1]                         # reverse for intuitive display left -> right
-      if(identical(col,"heat.colors") | identical(col,"heatColors")) col <- rev(grDevices::heat.colors(sort(c(15, prod(dim(data)) +2))[2] ))
+      if(identical(col,"heat.colors") || identical(col,"heatColors")) col <- rev(grDevices::heat.colors(sort(c(15, prod(dim(data)) +2))[2] ))
       chRCo <- requireNamespace("RColorBrewer", quietly=TRUE) 
-      msgRCo <- c(fxNa,": package 'RColorBrewer' not installed",", ignore argument 'col'")
+      msgRCo <- c(fxNa,"Package 'RColorBrewer' not installed",", ignore argument 'col'")
       if(identical(col,"YlOrRd"))  {if(chRCo) col <- RColorBrewer::brewer.pal(9,"YlOrRd") else { col <- NULL; if(!silent) message(msgRCo) }}
       if(identical(col,"RdYlGn"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"RdYlGn") else { col <- NULL; if(!silent) message(msgRCo) }}
       if(identical(col,"Spectral"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"Spectral") else { col <- NULL; if(!silent) message(msgRCo) }}
       if(identical(col,"RdBu"))  {if(chRCo) col <- RColorBrewer::brewer.pal(11,"RdBu") else { col <- NULL; if(!silent) message(msgRCo) }}  
-      if(length(col) <1) { if(!chRCo) message(msgRCo[1:2]," using rainbow colors instead of 'RdYlBu'") 
+      if(length(col) <1) { if(!chRCo) message(msgRCo[1:2],"Using rainbow colors instead of 'RdYlBu'") 
         col <- if(chRCo) grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(n=7, name="RdYlBu")))(60) else grDevices::rainbow(60)}  
       chNa <- is.na(data)  
-      if(any(chNa) & length(NAcol) >0) { if(!is.matrix(data)) data <- as.matrix(data)
+      if(any(chNa) && length(NAcol) >0) { if(!is.matrix(data)) data <- as.matrix(data)
         mi <- min(data, na.rm=TRUE)
         ## mark NAs
         if(any(chNa)) data[which(chNa)] <- min(data, na.rm=TRUE) -diff(range(data, na.rm=TRUE))*1.1/(length(col))
@@ -173,5 +173,6 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", rowN
         graphics::mtext(at=(0:(length(colNa)-1))/(length(colNa)-1), colNa, side=if(transp) 1 else 2, line=0.3, las=las, cex=cexYlab)   # on bottom 
         graphics::mtext(at=if(transp) rev(yAt) else yAt, rowNa, side=if(transp) 2 else 1, line=0.3, las=las, cex=cexXlab)   # on bottom  , cex=cexAxs
         graphics::box(col=grDevices::grey(0.8)) }}
-    } else if(!silent) message(fxNa,": argument 'data' invalid, please furnish matrix or data.frame with min 2 lines & min 1 col") 
+    } else if(!silent) message(fxNa,"Argument 'data' invalid, please furnish matrix or data.frame with min 2 lines & min 1 col") 
 }  
+  

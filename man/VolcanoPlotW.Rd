@@ -88,8 +88,8 @@ The first entry (typically 'SpecType') is used for different symbols in figure, 
 
 \item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
 
-\item{expFCarrow}{(logical or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
-if \code{numeric} an arrow will be drawn at this M-value (1st position in vector) with the color of 2nd position of vector}
+\item{expFCarrow}{(logical, character or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
+if \code{numeric} an arrow will be drawn (M-value as 1st position, color of 2nd position of vector).}
 
 \item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
@@ -100,7 +100,7 @@ if \code{numeric} an arrow will be drawn at this M-value (1st position in vector
 \item{namesNBest}{(integer or character) for display of labels to points in figure: if 'pass','passThr' or 'signif' all points passing thresholds; if numeric (length=1) this number of best points will get labels
 if the initial object \code{Mvalue} contains a list-element called 'annot' the second of the column specified in argument \code{annotColumn} will be used as text}
 
-\item{NbestCol}{(character or integer) colors for text-labels of best points}
+\item{NbestCol}{(character or integer) colors for text-labels of best points, also used for arrow}
 
 \item{sortLeg}{(character) sorting of 'SpecType' annotation either ascending ('ascend') or descending ('descend'), no sorting if \code{NULL}}
 

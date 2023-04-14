@@ -14,6 +14,7 @@ legendHist(
   offS = NULL,
   border = TRUE,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -30,19 +31,21 @@ legendHist(
 
 \item{srt}{(numeric) angle for histogram text labels (90 will give vertical label) (see also \code{\link[graphics]{par}})}
 
-\item{offS}{(\code{NULL} or numeric, length=5) fine-tuning of where histogram-insert will be placed and how elements therein are ditributed 
-(default c(xOff=0.2,yOff=0.25,leftOffS=0.05, upperBarEnd=1.05,txtOff=0.02),  
-1st and 2nd determine proportio of insert relative to entire plotting region, 3rd defines space left on bottom for text, 
+\item{offS}{(\code{NULL} or numeric, length=5) fine-tuning of where histogram-insert will be placed and how elements therein are ditributed
+(default c(xOff=0.2,yOff=0.25,leftOffS=0.05, upperBarEnd=1.05,txtOff=0.02),
+1st and 2nd determine proportio of insert relative to entire plotting region, 3rd defines space left on bottom for text,
 4th if bars hit ceiling of insert or proportion to leave, 5th for shifting text towards top when turned other than 90 degrees )}
 
 \item{border}{(logical) decide of draw gray rectangle or not around legend}
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) display additional messages for debugging}
+
+\item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
-figure
+This function produces a histogram on the current plottig device
 }
 \description{
 Add histogram at pleace of legend using colors from 'colorRamp'.

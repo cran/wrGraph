@@ -18,6 +18,7 @@ plotBy2Groups(
   cexLab = NULL,
   sepLines = FALSE,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -48,7 +49,9 @@ plotBy2Groups(
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additional messages for debugging}
+
+\item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
 list with \code{$annot}, \code{$abund} for initial/raw abundance values and \code{$quant} with final normalized quantitations, or returns data.frame with annot and quant if \code{separateAnnot=FALSE}
@@ -58,7 +61,7 @@ Plot series of data as membership of 2 different grouping vectors (eg by grp=pat
 }
 \examples{
 set.seed(2020); rand1 <- round(runif(12),2) +rep(1:3,each=4)
-plotBy2Groups(rand1,gl(2,6,labels=LETTERS[5:6]),gl(4,3,labels=letters[1:4]))
+plotBy2Groups(rand1, gl(2,6,labels=LETTERS[5:6]), gl(4,3,labels=letters[1:4]))
  
 }
 \seealso{

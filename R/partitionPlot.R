@@ -26,7 +26,8 @@ partitionPlot <- function(nFig, returnMatr=TRUE, horiz=TRUE, figNcol=NULL, byrow
   if(is.null(figNcol)) figNcol <- ceiling(sqrt(nFig))
   figNrow <- ceiling(nFig/figNcol)
   figDim <- c(ceiling(nFig/figNcol), figNcol)
-  if(figDim[2] < figDim[1] & horiz | figDim[2] > figDim[1] & !horiz) figDim <- figDim[2:1]
+  if(figDim[2] < figDim[1] && horiz || figDim[2] > figDim[1] && !horiz) figDim <- figDim[2:1]
   out <- if(returnMatr) matrix(1:(figDim[2]*figDim[1]), ncol=figDim[2], byrow=byrow) else figDim
+  if(debug) message(fxNa,"Figure as ",wrMisc::pasteC(if(returnMatr) dim(out) else figDim))
   out }
       

@@ -23,6 +23,7 @@ plotLinReg(
   col = 1,
   pch = 1,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -64,7 +65,9 @@ together with numeric 'indepVarLst' (independent variable); if list, then list-e
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allows easier tracking of messages produced}
+\item{debug}{(logical) additional messages for debugging}
+
+\item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
 This functions simply plots (to the current graphical devce); an invisible list containing $data, $linRegr, $confInterval (if calculated) may be returned, too
@@ -76,7 +79,7 @@ Furthermore, a confidence interval to the regression may be added to the plot, r
 \examples{
 set.seed(2020); dat1 <- rep(1:6,each=2) +runif(12,0,1)
 plotLinReg(dat1, gl(6,2))
-# extract elements out of list :
+## extract elements out of list :
 li2 <- list(aa=gl(5,2), bb=dat1[1:10])
 plotLinReg(li2, indepVarLst="aa", dependVar="bb")
 }

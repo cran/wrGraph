@@ -9,8 +9,9 @@
 #' @param showLegend (logical or character) decide if \code{matr} should be checked for best location; if \code{showLegend} contains any of the standard legend-location designations (eg 'topleft') it will be used in the output
 #' @param suplSpace (numeric) allows to consider extra room taken in legend by symbol and surrounding space, interpreted as n additional characters
 #' @param testCorner (integer) which corners should be considered (1=left-top, 2=right-top, right-bottom, left-bottom) 
-#' @param callFrom (character) allow easier tracking of message(s) produced
 #' @param silent (logical) suppress messages
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allows easier tracking of messages produced
 #' @return list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts
 #' @seealso \code{\link[graphics]{legend}}
 #' @examples
@@ -20,17 +21,20 @@
 #' plot(dat1, cex=3)
 #' legend(legLoc$loc, legend=grp, text.col=2:3, pch=1, cex=0.8)
 #' @export
-checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testCorner=1:4,silent=TRUE,callFrom=NULL){
+checkForLegLoc <- function(matr, sampleGrp=NULL, showLegend=TRUE, suplSpace=4, testCorner=1:4, silent=TRUE, debug=FALSE, callFrom=NULL){
   ## check 'showLegend' if specified location or logical term (if TRUE, then estimate best location using .bestLegendLoc())
   ## 'matr' .. matrix of data for display, optimal legend location will get determined for these data (if not specifically given)
   ## 'sampleGrp' .. legend-names to be displayed
   ## 'testCorner' specifies places(corners) to be tested: c("topleft","topright","bottomright","bottomleft")
   ## return list with $showL as logical depending if legend should be drawn, and  $loc as location
   fxNa <- wrMisc::.composeCallName(callFrom,newNa="checkForLegLoc")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+
   txt <- "'matr' must be matrix or data.frame with at least 1 row and at least 2 columns"
   if(length(dim(matr)) <2) stop(txt)
   if(any(dim(matr)[1:2] < 1:2)) stop(txt)
-  .longTxt <- function(x,nLim=8) {    # return longest or almost longest of text-entries in 'x': if more than 'nLim' text-entries look for 87%quantile
+  .longTxt <- function(x, nLim=8) {    # return longest or almost longest of text-entries in 'x': if more than 'nLim' text-entries look for 87%quantile
     out <- NULL                       # initialize
     if(any(nchar(x) >0)) {
       y <- graphics::strwidth(as.character(x), units="figure")
@@ -41,10 +45,10 @@ checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testC
   displLeg <- list(showL=FALSE, loc=NA)
   if(length(showLegend) <1) showLegend <- FALSE
   chLeg <- try(is.logical(showLegend), silent=TRUE)
-  if("try-error" %in% class(chLeg)) {            # non-logical entry, check if precise location
+  if(inherits(chLeg, "try-error")) {            # non-logical entry, check if precise location
     chLoc <- showLegend[1] %in% c("topleft","topright", "top","bottomright", "bottomleft",
       "bottom", "left","right","center")
-    if(silent) message(fxNa," argument 'showLegend' was called as TRUE but with  '",showLegend,"', (",if(chLoc) "valid" else "INVALID"," location)")  
+    if(silent) message(fxNa,"Argument 'showLegend' was called as TRUE but with  '",showLegend,"', (",if(chLoc) "valid" else "INVALID"," location)")  
     displLeg <- list(showL=chLoc, loc=if(chLoc) showLegend[1] else NA, nConflicts=NA)
   } else {                                                                  # is logical
     if(chLeg) {                                                             # chLeg is TRUE
@@ -53,7 +57,7 @@ checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testC
       txLe <- graphics::strwidth(txLe,units="figure") +suplSpace*graphics::strwidth("z", units="figure") 
       nLi <- if(length(sampleGrp) >0) length(unique(sampleGrp)) else 4      # presume 4 groups (if no names given)
       txHi <- (nLi+2.2)*graphics::strheight("1",units="figure")             # need to adjust for extra space towards edge/box of legend
-      locCount <- .bestLegendLoc(matr[,1:2],txtLen=txLe,txtHi=txHi,silent=silent,callFrom=callFrom) 
+      locCount <- .bestLegendLoc(matr[,1:2], txtLen=txLe, txtHi=txHi, silent=silent, debug=debug, callFrom=callFrom) 
       ## prefer legend on left, add small penalty to right locations to favour lactions at left side (in case of egality)
       if(length(displLeg) >3) locCount[2:3] <- locCount[2:3] +0.1
       best <- which.min(locCount[testCorner])
@@ -62,17 +66,41 @@ checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testC
     } else displLeg <- list(showL=FALSE, loc=NA, nConflicts=NA)
   }
   displLeg }
-  
+
+
+#' Search best corner of plot for placing for legend 
+#'	 
+#' This function aims to find best corner for plotting a legend.	 
+#'	 
+#' @param dat (matrix, list or data.frame) main data of plot
+#' @param txtLen (numeric, length=1)  text width from graphics::strwidth()
+#' @param txtHi (numeric, length=1) text height from graphics::strheight() (including inter-line)
+#' @param txtLen (numeric, length=1) 
+#' @param displayPlotSearch (logical) decide if lines to mark area where data is searched for legend should be drawn
+#' @param silent (logical) suppress messages
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allows easier tracking of messages produced
+#' @return numeric vector with counts of umber of points expected to enter legend-location for each corner (ie legend-localization)
+#' @seealso \code{\link{checkForLegLoc}},  \code{\link[graphics]{legend}}
+#' @examples
+#' dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
+#' (legLoc <- .bestLegendLoc(dat1, txtLen=0.4, txtHi=28))
 #' @export
-.bestLegendLoc <- function(dat,txtLen=NULL,txtHi=NULL,silent=TRUE,callFrom=NULL) {
+.bestLegendLoc <- function(dat, txtLen, txtHi, displayPlotSearch=FALSE, silent=TRUE, debug=FALSE, callFrom=NULL) {
   ## try to find best corner for legend ; 'dat': matrix or df (use 1st & 2nd column, ie x & y coord for points)
   ## 'txtLen' .. text width from graphics::strwidth()
   ## 'txtHi' .. text height from graphics::strheight() (including inter-line)
-  if(!(is.matrix(dat) | is.data.frame(dat))) stop(" 'dat' must be matrix or data.frame (with at least 2 columns)")
+  ## 'displayPlotSearch' .. draw lines to mark area where data is searched for legend
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa=".bestLegendLoc")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+
+  if(!(is.matrix(dat) || is.data.frame(dat))) stop(" 'dat' must be matrix or data.frame (with at least 2 columns)")
   if(ncol(dat) <2) stop("'dat' should have at least 2 columns")
-  if(!is.numeric(txtHi)) stop("argument 'txtHi' should be numeric (of length 1) !")
-  if(length(txtLen) >1 | length(txtHi) >1) {txtLen <- txtLen[1]; txtHi <- txtHi[1]; warning("truncating 'txtLen' and 'txtHi' to length 1 !")}
-  if(is.na(txtLen) | is.na(txtHi) |  min(c(txtLen,txtHi)) < 0)  stop("arguments 'txtLen' and 'txtHi' should not be NA or negative !")
+  if(!is.numeric(txtHi)) stop("Argument 'txtHi' should be numeric (of length 1) !")
+  if(length(txtLen) >1 || length(txtHi) >1) {txtLen <- txtLen[1]; txtHi <- txtHi[1]; warning("Truncating 'txtLen' and 'txtHi' to length 1 !")}
+  if(is.na(txtLen) | is.na(txtHi) |  min(c(txtLen,txtHi)) < 0)  stop("Arguments 'txtLen' and 'txtHi' should not be NA or negative !")
+  if(debug) message(fxNa,"bLL1")
   raX <- range(dat[,1], na.rm=TRUE)
   raY <- range(dat[,2], na.rm=TRUE)
   raX <- c(raX, abs(raX[2] -raX[1]))
@@ -84,9 +112,10 @@ checkForLegLoc <- function(matr,sampleGrp=NULL,showLegend=TRUE,suplSpace=4,testC
     topright   =sum(dat[,1] > raX[2] - ocX*raX[3] & dat[,2] > raY[2] - ocY*raY[3], na.rm=TRUE) ,
     bottomright=sum(dat[,1] > raX[2] - ocX*raX[3] & dat[,2] < raY[1] + ocY*raY[3], na.rm=TRUE) ,
     bottomleft =sum(dat[,1] < raX[1] + ocX*raX[3] & dat[,2] < raY[1] + ocY*raY[3], na.rm=TRUE) )
-  if(!silent) { message(callFrom,"  txtLen ",signif(txtLen,3))
+  if(debug) message(callFrom," txtLen: ",signif(txtLen,3))  
+  if(isTRUE(displayPlotSearch)) { 
     graphics::abline(v=c(raX[1] + ocX*raX[3], raX[2] - ocX*raX[3]), lty=2)
-    graphics::abline(h=c(raY[2] - ocY*raY[3], raY[1] + ocY*raY[3]), lty=2)
-    message("  locCount: ", paste(locCount,collapse="  ")) }
+    graphics::abline(h=c(raY[2] - ocY*raY[3], raY[1] + ocY*raY[3]), lty=2) }
+  if(debug) message(fxNa," locCount: ", paste(locCount,collapse="  "))    
   locCount }  
      

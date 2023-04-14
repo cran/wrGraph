@@ -8,6 +8,7 @@ vioplotW(
   x,
   ...,
   finiteOnly = TRUE,
+  removeEmpty = FALSE,
   halfViolin = FALSE,
   boxCol = "def",
   hh = NULL,
@@ -43,6 +44,8 @@ vioplotW(
 \item{...}{(numeric) additional sets of data to plot}
 
 \item{finiteOnly}{(logical) eliminate non-finite elements to avoid potential errors (eg when encountering \code{NA})}
+
+\item{removeEmpty}{(logical) omit empty series (or less than 4 finite numeric entries) of data from plot}
 
 \item{halfViolin}{(logical or character) decide with \code{TRUE} or \code{FALSE} if full or only half of violins should be plotted, if "pairwise" always 2 data-sets will be plotted back-to-back}
 

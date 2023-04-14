@@ -59,10 +59,12 @@
 MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, FCthrs=NULL, subTxt=NULL,
   grayIncrem=TRUE, col=NULL, pch=16, compNa=NULL, batchFig=FALSE, cexMa=1.8, cexLa=1.1, limM=NULL, limA=NULL,
   annotColumn=c("SpecType","GeneName","EntryName","Accession","Species","Contam"), annColor=NULL, cexPt=NULL, cexSub=NULL, cexTxLab=0.7, 
-  namesNBest=NULL, NbestCol=1, NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE,debug=FALSE) {
+  namesNBest=NULL, NbestCol=1, NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE, debug=FALSE) {
   ## MA plot
   ## optional arguments for explicit title in batch-mode
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="MAplotW")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
   opar <- graphics::par(no.readonly=TRUE) 
   opar2 <- opar[-which(names(opar) %in% c("fig","fin","font","mfcol","mfg","mfrow","oma","omd","omi"))]    #
   on.exit(graphics::par(opar2))     # progression ok
@@ -76,39 +78,39 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
   if(length(pch) <1) pch <- 16
   if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
   if(!isTRUE(silent)) silent <- FALSE
-  if(debug) message(" length Mvalue ",length(Mvalue)," ; length Avalue ",length(Avalue)," ; useComp ",useComp)
+  if(debug) message("Length Mvalue ",length(Mvalue)," ; length Avalue ",length(Avalue)," ; useComp ",useComp)
   if(identical(col,"FDR")) {FDR4color <- TRUE; col <- NULL} else FDR4color <- FALSE
-  if(length(Mvalue) <1) message(" nothing to do, 'Mvalue' seems to be empty !") else  {
+  if(length(Mvalue) <1) message("Nothing to do, 'Mvalue' seems to be empty !") else  {
     ## data seem valid to make MAplot
     if(length(cexTxLab) <0) cexTxLab <- 0.7
-    if("MArrayLM" %in% class(Mvalue) | "list" %in% class(Mvalue)) {
+    if("MArrayLM" %in% class(Mvalue) || "list" %in% class(Mvalue)) {
       ## try working based on MArrayLM-object (Mvalue)
       if(debug) message("'",namesIn[1],"' is list or MArrayLM-object ")
       ## initial check of useComp
       if(length(useComp) >1) { useComp <- wrMisc::naOmit(useComp)[1]
-        if(!silent) message(fxNa," argument 'useComp' should be integer of length=1; using only 1st entry") }
+        if(!silent) message(fxNa,"Argument 'useComp' should be integer of length=1; using only 1st entry") }
       if(length(useComp) <1) { useComp <- 1
-        if(!silent) message(fxNa," argument 'useComp' invalid, setting to 1") }
+        if(!silent) message(fxNa,"Argument 'useComp' invalid, setting to 1") }
       ## address multiple questions (via useComp): need to check 'useComp', thus need to locate FDRvalues or pValues for group-names ..
       pcol <- wrMisc::naOmit(match(c("p.value","pvalue","pval","p"), tolower(names(Mvalue))))          
       FDRcol <- wrMisc::naOmit(match(c("fdr","bh","lfdr","by","bonferroni"), tolower(names(Mvalue))))
       ## extract FDR-values (or p-values if no FDR available)
       if(length(FDRcol) >0) FDRvalue <- Mvalue[[FDRcol[1]]] else if(length(pcol) >0) FDRvalue <- Mvalue[[pcol[1]]] 
-      if(FDR4color | useComp >1) {
+      if(FDR4color || useComp >1) {
         if(debug) message(" FDR4color=",FDR4color,"  need to extract FDR or p-values")
         if(length(dim(FDRvalue)) >0) {    # FDRvalues are present as multi-column
-          if(colnames(FDRvalue)[1]=="(Intercept)" & ncol(FDRvalue) >1) {
+          if(colnames(FDRvalue)[1]=="(Intercept)" && ncol(FDRvalue) >1) {
             ## extract 2nd col if result from wrMisc::moderTest2grp()
-            if(debug) message(" extract 2nd col if result from wrMisc::moderTest2grp()")
+            if(debug) message("Extract 2nd col if result from wrMisc::moderTest2grp()")
             pNa <- rownames(FDRvalue)
             FDRvalue <- as.numeric(FDRvalue[,2])
             names(FDRvalue) <- pNa
             multiComp <- FALSE 
           } else {
             ## select corresponding of multiple comparisons
-            if(debug) message(" select corresponding FDR of multiple comparisons")
+            if(debug) message("Select corresponding FDR of multiple comparisons")
             if(useComp > ncol(FDRvalue)) { useComp <- 1
-              if(!silent) message(fxNa," argument 'useComp' for FDR-Values invalid or too high; reset to 1") }
+              if(!silent) message(fxNa,"Argument 'useComp' for FDR-Values invalid or too high; reset to 1") }
             names(useComp) <- colnames(FDRvalue)[useComp]
             pNa <- rownames(FDRvalue)
             FDRvalue <- as.numeric(FDRvalue[,useComp])
@@ -120,7 +122,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       } else {     # no need to use useComp 
         plotByFdr <- FALSE
         if(useComp >1) { useComp <- 1 
-          if(!silent) message(fxNa," ignoring value of argument 'useComp' since no p-Values or FDR-values found")}
+          if(!silent) message(fxNa,"Ignoring value of argument 'useComp' since no p-Values or FDR-values found")}
       }
       ## look for M-values (need to create if not available - using useComp checked)
       Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","m"), tolower(names(Mvalue))))      # which list-element
@@ -128,7 +130,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       ## look for group-means & identify column association to current question/pairwise comparison
       if("means" %in% names(Mvalue)) {
         ## identify sample-groups to comparsison(s) - needed lateron
-        if(debug) message(" identify sample-groups to comparsison(s)")
+        if(debug) message("Identify sample-groups to comparsison(s)")
         pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=names(Mvalue)[FDRcol[1]], callFrom=fxNa,silent=silent) 
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])  
         ## are all group-means needed (for exporting) ??
@@ -143,7 +145,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       } else {                               # need to construct M-values based on means
         if("means" %in% names(Mvalue)) {
           ## construct Mvalue based on means (only one/current pairwise comparison needed)
-          if(debug) message(" construct Mvalue based on means")
+          if(debug) message("Construct Mvalue based on means")
           Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]                           
           Melem <- which(names(Mvalue)=="Mval")                # update
         } else stop("Can't construct M-values since suitable field '$means' missing in '",namesIn[1],"' !")    
@@ -155,7 +157,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       if(length(Avalue) != length(Mvalue$Mval)) Avalue <- Mvalue$Aval <- rowMeans(grpMeans[,1:2], na.rm=TRUE)    # define fresh A-values 
 
       ## recuperate filtering - if present, but only when no custom filtering provided
-      if(length(filtFin) <1 | identical(filtFin, FALSE)) {
+      if(length(filtFin) <1 || identical(filtFin, FALSE)) {
         Filcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"), tolower(names(Mvalue))))
         filtFin <- if(length(Filcol) >0) Mvalue[[Filcol[1]]] else rep(TRUE,length(Avalue))
         if(length(dim(filtFin)) >1) filtFin <- filtFin[,useComp]
@@ -173,8 +175,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
             chConta <- tolower(ptType) %in% c("contaminant","contam","conta","cont")
             if(any(chConta)) ptType[which(is.na(ptType))] <- unique(ptType[which(chConta)])[1]}          
           if(any(is.na(ptType))) ptType[which(chNA)] <- "NA" 
-          if(length(pch) < length(Avalue) & length(unique(wrMisc::naOmit(ptType))) >1) {
-            if(length(pch) >1 & !silent) message(fxNa," (invalid pch) using default 'pch' oriented by $annot and starting from 15")
+          if(length(pch) < length(Avalue) && length(unique(wrMisc::naOmit(ptType))) >1) {
+            if(length(pch) >1 && !silent) message(fxNa," (invalid pch) using default 'pch' oriented by $annot and starting from 15")
             pch <- 14 + as.integer(as.factor(ptType))            
           } 
           useAnnCol <- wrMisc::naOmit(useAnnCol) }
@@ -193,14 +195,14 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         if(length(MNa) >0) names(Mvalue) <- MNa }
       ## additional check for length 
       chpM <- length(Mvalue)==length(Avalue)  
-      if(!chpM & !silent) message(fxNa,"trouble ahead ? p- and M- values have different length !!  (M=",length(Mvalue)," vs A=",length(Avalue),")")
+      if(!chpM && !silent) message(fxNa,"Trouble ahead ? p- and M- values have different length !!  (M=",length(Mvalue)," vs A=",length(Avalue),")")
 
       ## done with extracting MArrayLM-object    
       if(!silent) message(fxNa,"Successfully extracted  ",length(Mvalue)," Mvalues and  ",length(Avalue)," Avalues", if(length(annot) >0) c(" plus annotation"))      
     } else {
       ## thus argument 'Mvalue' is not 'MArrayLM'-object
       ## ... case of explicit Avalue argument
-      if(length(Avalue) <1) stop(" argument 'Avalue' is required (if 'Mvalue' not 'MArrayLM'-type object) !")
+      if(length(Avalue) <1) stop("Argument 'Avalue' is required (if 'Mvalue' not 'MArrayLM'-type object) !")
       multiComp <- FALSE
       if(length(dim(Avalue)) >1) if(ncol(Avalue) >1) {
         if(!silent) message(fxNa," Note, ",namesIn[2]," has ",ncol(Avalue)," columns, using last column")
@@ -210,13 +212,13 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     }
     
     chNA <- is.na(Avalue)
-    if(all(chNA)) stop(fxNa," All A-values are NA, nothing to draw !")
+    if(all(chNA)) stop(fxNa,"All A-values are NA, nothing to draw !")
 
     ## check for (same) order, adjust Mvalue & Avalue according to names
     chNa <- list(MNa=if(length(dim(Mvalue)) >1) rownames(Mvalue) else names(Mvalue),
       ANa=if(length(dim(Avalue)) >1) rownames(Avalue) else names(Avalue))
     nIni <- c(M=length(Mvalue), A=length(Avalue))
-    if(length(chNa$MNa) >0 & length(chNa$ANa) >0) {        # ie both have names, so one can match names
+    if(length(chNa$MNa) >0 && length(chNa$ANa) >0) {        # ie both have names, so one can match names
       if(!identical(chNa$MNa,chNa$ANa)) {
         matchNa <- wrMisc::naOmit(match(chNa$MNa,chNa$ANa))
         if(length(matchNa) <1) stop("Both 'Mvalue' and 'Avalue' have names, but none of them match !!")
@@ -226,8 +228,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         if(length(Mvalue) != length(Avalue)) stop("A- and M- values have different length, but no names to match !!  (M=",length(Mvalue)," vs A=",length(Avalue),")")
       }
     if(length(grpMeans) <1) grpMeans <- matrix(rep(NA,2*length(Mvalue)), ncol=2, dimnames=list(names(Mvalue),c("mean1","mean2")))
-    if(length(pch)==1 & length(Mvalue) >1) pch <- rep(pch, length(Mvalue))
-    if(length(pch) != length(Mvalue) & (length(pch) >1)) { if(!silent) message(fxNa," bizzare entry for 'pch'")
+    if(length(pch)==1 && length(Mvalue) >1) pch <- rep(pch, length(Mvalue))
+    if(length(pch) != length(Mvalue) && (length(pch) >1)) { if(!silent) message(fxNa," bizzare entry for 'pch'")
       pch <- rep(pch, length(Mvalue))[1:length(Mvalue)]}
     ## start creating merged data for plot (& export)
     merg <- if(length(annot) >0) data.frame(ID=NA, grpMeans, Mvalue=Mvalue, Avalue=Avalue, FDR=if(length(FDRvalue) >0) FDRvalue else rep(NA,length(Mvalue)), 
@@ -243,10 +245,10 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
 
     ## adjust col (color) & pch
     if(!any(c(1,length(Mvalue)) %in% length(pch))) {
-      if(!silent) message(fxNa,"argument 'pch' should be either length=1 or correspond to length of data, reset to default=16")
+      if(!silent) message(fxNa,"Argument 'pch' should be either length=1 or correspond to length of data, reset to default=16")
       pch <- 16 }
-    if(length(col) >1 & length(col) <length(Mvalue)) {
-      if(!silent) message(fxNa,"argument 'col' should be either length=1 or correspond to length of data, reset to default=NULL")
+    if(length(col) >1 && length(col) <length(Mvalue)) {
+      if(!silent) message(fxNa,"Argument 'col' should be either length=1 or correspond to length of data, reset to default=NULL")
       col <- NULL }
 
     ## prepare/integrate FILTERING
@@ -262,13 +264,13 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
 
     ## apply filtering
     msg <- " data provided in 'Mvalue' and 'Avalue' "
-    if(!silent & nrow(merg) < round(length(Mvalue)/10)) message(" .. note : less than 10% of",msg," were matched") else {
-      if(!silent & nrow(merg) < length(Mvalue)/2) message(" .. NOTE : less than 50% of",msg," were matched !!")}
+    if(!silent && nrow(merg) < round(length(Mvalue)/10)) message(" .. note : less than 10% of",msg," were matched") else {
+      if(!silent && nrow(merg) < length(Mvalue)/2) message(" .. NOTE : less than 50% of",msg," were matched !!")}
     if(debug) message(msg," were matched to ",nrow(merg)," common entries")    
 
     ## apply filtering (keep all lines where at least one condition passes)
-    if(length(filtFin) >0 & !identical(filtFin, FALSE)) {                         #  use filtering provided
-      if(sum(filtFin) >0 & sum(filtFin) < nrow(merg)) { 
+    if(length(filtFin) >0 && !identical(filtFin, FALSE)) {                         #  use filtering provided
+      if(sum(filtFin) >0 && sum(filtFin) < nrow(merg)) { 
         whFilt <- which(merg$filtFin)
         if(length(pch) >1) pch <- pch[whFilt]
         if(length(col) >1) col <- col[whFilt]
@@ -297,7 +299,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     #needed?#if(length(FdrThrs) <1) FdrThrs <- 0.05 
 
     ## count no of passing
-    passAll <- passFC <- if(length(FCthrs) ==1 & !any(is.na(FCthrs))) abs(merg[,"Mvalue"]) >= log2(FCthrs) else merg[,"filtFin"]      ## convert FCthrs to log2
+    passAll <- passFC <- if(length(FCthrs) ==1 && !any(is.na(FCthrs))) abs(merg[,"Mvalue"]) >= log2(FCthrs) else merg[,"filtFin"]      ## convert FCthrs to log2
     passAll <- merg[,"filtFin"] & passFC    
 
     chNA <- is.na(passAll)                              # passFdr may contain NAs
@@ -305,7 +307,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     if(debug) message(fxNa,"  ",sum(passFC,na.rm=TRUE)," passing FCthrs ")
     ## color for points passing filter
     if(length(col) >0) if(length(col) != nrow(merg)) { col <- NULL
-      if(!silent) message(fxNa," invalid entry for 'col', should be of length=",nrow(merg),", resetting to default")}
+      if(!silent) message(fxNa,"Invalid entry for 'col', should be of length=",nrow(merg),", resetting to default")}
 
     if(length(col) <1) {
       alph <- sort(c(0.14, round(0.6/log10(length(Mvalue)),2), 0.8))[2]       # alph <- round(12/sqrt(nrow(eBayesLst$pValue)),2)
@@ -365,7 +367,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       if(length(namesNBest) >0) { 
         if(any(sapply( c("passThr","pass","passFC"), identical, namesNBest))) namesNBest <- sum(passAll)
         if(!is.integer(namesNBest)) namesNBest <- try(as.integer(namesNBest), silent=TRUE)
-        if(namesNBest >0 & any(passAll)) {      
+        if(namesNBest >0 && any(passAll)) {      
           useLi <- if(any(!passAll)) which(passAll) else 1:nrow(merg)
           tmP <- as.numeric(merg[useLi,"Avalue"])
           names(tmP) <- rownames(merg)[useLi]
@@ -379,7 +381,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
           xOffs <- signif(diff(graphics::par("usr")[1:2])/170,3)
           yOffs <- signif(diff(graphics::par("usr")[3:4])/90,3)
           noNa <- if(is.null(names(tmP[useL2]))) 1:length(tmP) else which(is.na(names(tmP)[useL2]))
-          if(length(noNa) >0 & all(annotColumn %in% colnames(merg))) names(tmP)[useL2[noNa]] <- merg[useLi[useL2[noNa]], wrMisc::naOmit(match(annotColumn[-1], colnames(merg)))[1]]
+          if(length(noNa) >0 && all(annotColumn %in% colnames(merg))) names(tmP)[useL2[noNa]] <- merg[useLi[useL2[noNa]], wrMisc::naOmit(match(annotColumn[-1], colnames(merg)))[1]]
           if(length(NbestCol) <1) NbestCol <- 1
           displTx <- names(tmP[useL2])
           chNa <- is.na(displTx)
@@ -413,4 +415,4 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
     annCo <- wrMisc::naOmit(match(annotColumn, colnames(merg)))
     if(length(annCo) >0) cbind(merg[,annCo],  merg[,-annCo]) else merg }
   } }
-     
+       

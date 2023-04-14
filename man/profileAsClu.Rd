@@ -2,7 +2,7 @@
 % Please edit documentation in R/profileAsClu.R
 \name{profileAsClu}
 \alias{profileAsClu}
-\title{Plot profile(s) according to CLustering}
+\title{Plot profiles according to CLustering}
 \usage{
 profileAsClu(
   dat,
@@ -18,6 +18,7 @@ profileAsClu(
   meLwd = 1,
   legLoc = "bottomleft",
   silent = TRUE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -46,12 +47,14 @@ profileAsClu(
 
 \item{legLoc}{(character) legend location}
 
-\item{silent}{(logical) suppress (less important) messages}
+\item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additonal messages for debugging}
+
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-plot only
+This functin returns a plot only
 }
 \description{
 This function was made for visualuzing the result of clustering of a numeric vector or clustering along multiple columns of a matrix.
@@ -65,5 +68,4 @@ dat1Cl <- stats::kmeans(dat1, 3)$cluster
 dat1Cl <- 5- dat1Cl              # bring cluster-numbers in ascending form
 dat1Cl[which(dat1Cl >3)] <- 1    # bring cluster-numbers in ascending form
 profileAsClu(dat1, clu=dat1Cl)
-
 }

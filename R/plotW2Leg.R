@@ -21,7 +21,8 @@
 #' @param histLoc (character) location of histomgram-legend (of 3rd column of \code{useCol}) 
 #' @param legHiTi (character) optional title for histomgram-legend
 #' @param silent (logical) suppress messages
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allows easier tracking of messages produced
 #' @seealso (standard plots) \code{plot} from the package \code{base}   
 #' @return graphical output only
 #' @examples
@@ -29,17 +30,21 @@
 #' plotW2Leg(x1,useCol=c("x","y","y","grade"))
 #' @export
 plotW2Leg <- function(dat,useCol=c("logp","slope","medAbund","startFr"), tit=NULL, subTi=NULL, subCex=0.9, pch=21:25, xlim=NULL, ylim=NULL,
-  xlab=NULL, ylab=NULL, ablines=NULL, legendloc="topright", txtLegend=NULL, histLoc="bottomleft", legHiTi=NULL, silent=TRUE, callFrom=NULL) {
+  xlab=NULL, ylab=NULL, ablines=NULL, legendloc="topright", txtLegend=NULL, histLoc="bottomleft", legHiTi=NULL, silent=TRUE, debug=FALSE, callFrom=NULL) {
   ## plot with 2 extra legends
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="plotW2Leg")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+
   if(is.null(tit)) tit <- "log p-value vs slope"
   msg <- "Invalid entries for 'useCol' (should be column-names or integer as index)"
-  if(length(useCol) <4) useCol <- c(useCol, rep(NA,4 -length(useCol)))
+  if(length(useCol) <4) useCol <- c(useCol, rep(NA, 4 -length(useCol)))
   if(!is.integer(useCol)) {chCol <- match(useCol, colnames(dat))
     if(all(is.na(chCol))) stop(msg)
-    if(any(is.na(chCol)) & !silent) message(fxNa,"Trouble ahead ! Can't find columns ",wrMisc::pasteC(useCol[is.na(chCol)],quoteC="'"))
+    if(any(is.na(chCol)) && !silent) message(fxNa,"Trouble ahead ! Can't find columns ",wrMisc::pasteC(useCol[is.na(chCol)],quoteC="'"))
     useCol <- chCol 
   } else if(any(useCol <1 | useCol >ncol(dat))) stop(msg)
+  if(debug) message(fxNa,"pW2L1")
   useColor <- if(!is.na(useCol[3])) wrMisc::colorAccording2(dat[,useCol[3]], gradTy="rainbow", revCol=TRUE, nEndOmit=14) else grDevices::gray(0.6)
   stRa <- if(!is.na(useCol[4])) range(dat[,useCol[4]], na.rm=TRUE) else NA
   graphics::plot(dat[,useCol[1:2]], type="n", main=tit, xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim, las=1) 
@@ -49,12 +54,12 @@ plotW2Leg <- function(dat,useCol=c("logp","slope","medAbund","startFr"), tit=NUL
     if("v" %in% names(ablines)) graphics::abline(v=ablines$v, lty=2, col="grey") 
     if("v" %in% names(ablines)) graphics::abline(h=ablines$v, lty=2, col="grey") }
   ## legend for symbols
-  if(!is.na(useCol[4]) & length(legendloc)==1) graphics::legend(legendloc, paste(                                                                  
+  if(!is.na(useCol[4]) && length(legendloc)==1) graphics::legend(legendloc, paste(                                                                  
     if(length(txtLegend) <1) paste(colnames(dat)[useCol[4]],"=") else txtLegend,
     stRa[1]:stRa[2]), text.col=1, pch=21:25, col=1, pt.bg="white", cex=0.9, xjust=0.5, yjust=0.5)
   if(length(subTi) >0) graphics::mtext(subTi,cex=0.9)
   ## histigram legend 
-  if(!is.na(useCol[3]) & length(histLoc)==1) {
+  if(!is.na(useCol[3]) && length(histLoc)==1) {
     if(length(legHiTi) <1) legHiTi <- colnames(dat)[useCol[3]]
     hi1 <- graphics::hist(dat[,useCol[3]], plot=FALSE)
     legendHist(sort(dat[,useCol[3]]), colRamp=useColor[order(dat[,useCol[3]])][cumsum(hi1$counts)], location=histLoc, legTit=legHiTi) }

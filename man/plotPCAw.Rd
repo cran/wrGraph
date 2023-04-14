@@ -13,11 +13,11 @@ plotPCAw(
   scale. = TRUE,
   colBase = NULL,
   useSymb2 = NULL,
+  cexTxt = 1,
+  cexSub = 0.6,
   displBagPl = TRUE,
   outCoef = 2,
   getOutL = FALSE,
-  cexTxt = 1,
-  cexSub = 0.6,
   showLegend = TRUE,
   nGrpForMedian = 6,
   pointLabelPar = NULL,
@@ -48,15 +48,15 @@ Alternatively, a vector of length equal the number of columns of x can be suppli
 
 \item{useSymb2}{(integer) symbol to mark group-center (no mark of group-center if default NULL) (equivalent to \code{pch}, see also \code{\link[graphics]{par}})}
 
+\item{cexTxt}{(integer) expansion factor for text (see also \code{\link[graphics]{par}})}
+
+\item{cexSub}{(integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}})}
+
 \item{displBagPl}{(logical) if \code{TRUE}, show bagPlot (group-center) if >3 points per group otherwise the average-confidence-interval}
 
 \item{outCoef}{(numeric) parameter for defining outliers, see  \code{\link{addBagPlot}} (equivalent to \code{range} in \code{\link[graphics]{boxplot}})}
 
 \item{getOutL}{(logical) return outlyer samples/values}
-
-\item{cexTxt}{(integer) expansion factor for text (see also \code{\link[graphics]{par}})}
-
-\item{cexSub}{(integer) expansion factor for subtitle line text (see also \code{\link[graphics]{par}})}
 
 \item{showLegend}{(logical or character) toggle to display legend, if character it designes the location within the plot to display the legend ('bottomleft','topright', etc..)}
 

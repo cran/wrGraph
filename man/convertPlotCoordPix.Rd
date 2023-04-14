@@ -12,7 +12,8 @@ convertPlotCoordPix(
   plotRes = 100,
   fromTop = TRUE,
   callFrom = NULL,
-  silent = FALSE
+  silent = FALSE,
+  debug = FALSE
 )
 }
 \arguments{
@@ -28,22 +29,24 @@ convertPlotCoordPix(
 
 \item{fromTop}{(logical) toggle if poordinates should start from top}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{callFrom}{(character) allows easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
+
+\item{debug}{(logical) additonal messages for debugging}
 }
 \value{
 matrix with x- and y-coordinates in pixels
 }
 \description{
-This function allows conversion the plotting positions ('x' and 'y' coordiantes) of points in a given plot into coordiantes in pixels (of the entire plotting region).
+This function allows conversion the plotting positions ('x' and 'y' coordinates) of points in a given plot into coordinates in pixels (of the entire plotting region).
 It was designed to be used as coordinates in an html file for mouse-over interactivity (display of names of points and links).
 Of course, the size of the plotting region is crucial and may not be changed afterwards (if the plot is not written to file using \code{png} etc).
-In turn the function \code{\link{mouseOverHtmlFile}} will use the pixel-coordiantes, allowing to annotate given points of a plot for mouse-over interactive html.
+In turn the function \code{\link{mouseOverHtmlFile}} will use the pixel-coordinates, allowing to annotate given points of a plot for mouse-over interactive html.
 }
 \examples{
 df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10),mou=paste("point",letters[1:10]),
-  link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)  
+  link=file.path(tempdir(),paste0(LETTERS[1:10],".html")), stringsAsFactors=FALSE)
 ## Typically one wants to get pixel-coordinates for plots written to file.
 ## Here we'll use R's tempdir, later you may want to choose other locations
 pngFile <- file.path(tempdir(),"test01.png")
@@ -57,7 +60,7 @@ df1$mou <- htmlSpecCharConv(df1$mou)
 ## Let's add the x- and y-coordiates of the points in pixels to the data.frame
 df1 <- cbind(df1,convertPlotCoordPix(x=df1[,2], y=df1[,3], plotD=c(800,600),plotRes=72))
 head(df1)
-## using mouseOverHtmlFile() one could now make an html document with interactive 
+## using mouseOverHtmlFile() one could now make an html document with interactive
 ## display of names and clockable links to the coordinates we determined here ...
 }
 \seealso{

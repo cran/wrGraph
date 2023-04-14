@@ -15,6 +15,7 @@ foldChangeArrow(
   addText = c(line = -0.9, cex = 0.7, txt = "expected", loc = "toright"),
   returnRatio = FALSE,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -40,10 +41,12 @@ or any combination of 'loc','line','cex','side','adj','col','text' (or 'txt') fo
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additonal messages for debugging}
+
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-plots arrow only (and explicative text), if \code{returnRatio=TRUE} also returns numeric value for extracted ratio
+This function plots only an arrow onto current plotting device (and some explicative text), if \code{returnRatio=TRUE} also returns numeric value for extracted ratio
 }
 \description{
 This function allows adding an arrow indicating a fold-change to MA- or Volcano-plots. 
@@ -53,11 +56,11 @@ for extracting a numeric content (supposed as concentrations in sample-names) wh
 Optionally the ratio used for plotting can be returned as numeric value.
 }
 \details{
-The argument \code{addText} also allows specifying a fixed position when using \code{addText=c(loc="bottomleft")}, also bottomright, topleft, topright, toleft and toright may be used.
+#' @details The argument \code{addText} also allows specifying a fixed position when using \code{addText=c(loc="bottomleft")}, also bottomright, topleft, topright, toleft and toright may be used.
   In this case the elemts \code{side} and \code{adjust} will be redefined to accomodate the text in the corner specified.
 }
 \examples{
-plot(rnorm(20,1.5,0.1),1:20)
+plot(rnorm(20,1.5,0.1), 1:20)
 foldChangeArrow(FC=1.5) 
 
 }

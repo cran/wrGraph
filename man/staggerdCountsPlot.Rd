@@ -18,6 +18,7 @@ staggerdCountsPlot(
   las.alph = 2,
   displMaxSpec = TRUE,
   silent = FALSE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -50,7 +51,9 @@ In proteomics benchmark studies this would typically be the species-abbreciation
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additonal messages for debugging}
+
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
 plot only

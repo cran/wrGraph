@@ -11,6 +11,7 @@ checkForLegLoc(
   suplSpace = 4,
   testCorner = 1:4,
   silent = TRUE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -27,7 +28,9 @@ checkForLegLoc(
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additonal messages for debugging}
+
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
 list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts

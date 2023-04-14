@@ -6,6 +6,9 @@
 #' for extracting a numeric content (supposed as concentrations in sample-names) which will be used to determine the expected ratio used for plotting. 
 #' Optionally the ratio used for plotting can be returned as numeric value. 
 #' 
+#' #' @details The argument \code{addText} also allows specifying a fixed position when using \code{addText=c(loc="bottomleft")}, also bottomright, topleft, topright, toleft and toright may be used.
+#'   In this case the elemts \code{side} and \code{adjust} will be redefined to accomodate the text in the corner specified. 
+#'
 #' @param FC (numeric, list or MArrayLM-object) main information for drawing arrow : either numeric value for fold-change/log2-ratio of object to search for colnames of statistical testing for extracting numeric part
 #' @param useComp (integer) only used in case FC is list or MArrayLM-object an has multiple pairwise-comparisons  
 #' @param isLin (logical) inidicate if \code{FC} is log2 or not
@@ -16,39 +19,38 @@
 #' @param addText (logical or named vector) indicate if text explaining arrow should be displayed, use \code{TRUE} for default (on top right of plot), 
 #'    or any combination of 'loc','line','cex','side','adj','col','text' (or 'txt') for customizing specific elements
 #' @param returnRatio (logical) return ratio
-#' @param callFrom (character) allow easier tracking of message(s) produced
 #' @param silent (logical) suppress messages
-#' @return plots arrow only (and explicative text), if \code{returnRatio=TRUE} also returns numeric value for extracted ratio
-#'
-#' @details The argument \code{addText} also allows specifying a fixed position when using \code{addText=c(loc="bottomleft")}, also bottomright, topleft, topright, toleft and toright may be used.
-#'   In this case the elemts \code{side} and \code{adjust} will be redefined to accomodate the text in the corner specified. 
-#'
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allows easier tracking of messages produced
+#' @return This function plots only an arrow onto current plotting device (and some explicative text), if \code{returnRatio=TRUE} also returns numeric value for extracted ratio
 #'
 #' @seealso \code{\link[wrGraph]{MAplotW}}, \code{\link[wrGraph]{VolcanoPlotW}}
 #' @examples
-#' plot(rnorm(20,1.5,0.1),1:20)
+#' plot(rnorm(20,1.5,0.1), 1:20)
 #' foldChangeArrow(FC=1.5) 
 #' 
 #' @export
 foldChangeArrow <- function(FC, useComp=1, isLin=TRUE, asX=TRUE, col=2, arr=c(0.005,0.15), lwd=NULL, 
-  addText=c(line=-0.9,cex=0.7,txt="expected",loc="toright"), returnRatio=FALSE,silent=FALSE, callFrom=NULL){
+  addText=c(line=-0.9,cex=0.7,txt="expected",loc="toright"), returnRatio=FALSE, silent=FALSE, debug=FALSE, callFrom=NULL){
   ##
-  fxNa <- wrMisc::.composeCallName(callFrom, newNa="foldChangeArrow2")
+  fxNa <- wrMisc::.composeCallName(callFrom, newNa="foldChangeArrow")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
   figCo <- graphics::par("usr")                         #  c(x1, x2, y1, y2)
-  if(all(length(FC) >1, any(c("MArrayLM","list") %in% class(FC)) )) {
+  if(length(FC) >1 && any(c("MArrayLM","list") %in% class(FC)) ) {
     ## try working based on MArrayLM-object or list
     ##  look for names of pairwise comparisons to extract numeric parts for calculating expected ratio ... 
     chNa <- names(FC) %in% c("t","BH","FDR","p.value")
     if(any(chNa)) {
       if(all(length(useComp)==1, length(dim(FC[[which(chNa)[1]]])) ==2, dim(FC[[which(chNa)[1]]]) > 0:1)) {
         colNa <- colnames(FC[[which(chNa)[1]]])
-        ch2 <- colNa[1]=="(Intercept)" & length(colNa)==2        
+        ch2 <- colNa[1]=="(Intercept)" && length(colNa)==2        
       } else ch2 <- TRUE 
       if(!ch2) {
         regStr <-"[[:space:]]*[[:alpha:]]+[[:punct:]]*[[:alpha:]]*"
         colNa <- sub(paste0("^",regStr),"", sub(paste0(regStr,"$"), "", unlist(strsplit(colNa[useComp], "-"))) )
         chN2 <- try(as.numeric(colNa), silent=TRUE)
-        if(!"try-error" %in% class(chN2) & length(colNa)==2) {
+        if(inherits(chN2, "try-error") && length(colNa)==2) {
           FC <- chN2[2] / chN2[1]
         } else ch2 <- TRUE
         ## note: wrMisc::numPairDeColNames() sorts numeric values, can't use here
@@ -77,9 +79,9 @@ foldChangeArrow <- function(FC, useComp=1, isLin=TRUE, asX=TRUE, col=2, arr=c(0.
         chLe <- grep("left$", as.character(addText["loc"]))
         chCe <- grep("center$", as.character(addText["loc"]))
         if(length(chLe) >0) { mAdj <- 0; mTxt <- paste0(" ",mTxt)                          # this is left.xxx
-          if(arr[1] < 0.15 & FC < figCo[1] +diff(figCo[1:2])/3) arr[1] <- 0.015            # raise min starting hight to avoid crossing text
+          if(arr[1] < 0.15 && FC < figCo[1] +diff(figCo[1:2])/3) arr[1] <- 0.015            # raise min starting hight to avoid crossing text
         } else { if(length(chRi) >0) {mAdj <- 1; mTxt <- paste0(mTxt," ")                  # this is right.xxx
-          if(arr[1] < 0.15 & FC > figCo[2] -diff(figCo[1:2])/3) arr[1] <- 0.015            # raise min starting hight to avoid crossing text
+          if(arr[1] < 0.15 && FC > figCo[2] -diff(figCo[1:2])/3) arr[1] <- 0.015            # raise min starting hight to avoid crossing text
           } else {
             if(length(chCe) >0) mAdj <- 0.5; if(arr[1] < 0.15) arr[1] <- 0.015 }} 
         ## check for top/bottom
@@ -94,10 +96,10 @@ foldChangeArrow <- function(FC, useComp=1, isLin=TRUE, asX=TRUE, col=2, arr=c(0.
     chArr <- (arr[2] -arr[1]) > 0.05
     if(!chArr) arr[2] <- arr[1] +0.04
     ## draw arrow
-    if(asX) graphics::arrows(FC, figCo[3] + arr[1]*(figCo[4]-figCo[3]), FC, figCo[3] + arr[2]*(figCo[4]-figCo[3]), 
-      col=col,lwd=lwd,length=0.1) else { graphics::arrows(figCo[3] + arr[1]*(figCo[4] -figCo[3]), FC, 
-      figCo[3] + arr[2]*(figCo[4]-figCo[3]), FC, col=col, lwd=lwd,length=0.1) }
+    if(asX) graphics::arrows(FC, figCo[3] + arr[1]*(figCo[4] -figCo[3]), FC, figCo[3] + arr[2]*(figCo[4] -figCo[3]), 
+      col=col, lwd=lwd, length=0.1) else { graphics::arrows(figCo[3] + arr[1]*(figCo[4] -figCo[3]), FC, 
+      figCo[3] + arr[2]*(figCo[4] -figCo[3]), FC, col=col, lwd=lwd, length=0.1) }
     if(returnRatio) return(FC)
-  } else if(!silent) message("unable to extract usable values for drawing arrow")
+  } else if(!silent) message("Unable to extract usable values for drawing arrow")
 }
   

@@ -32,8 +32,9 @@
 #'  or 3) \code{TRUE} to check presence of 4th name specified in 'colNa' to be useed as columname from 'myCoor'   dominates over eventual presence of 4th name in 'colNa' 
 #' @param linkExt (character) if specified : links will get specified ending, define as \code{NULL} or "" for taking 'addLinks' asIs  
 #' @param htmlExt (character, length=1) extension used when making html files  
-#' @param callFrom (character) allow easier tracking of message(s) produced
+#' @param callFrom (character) allow easier tracking of messages produced
 #' @param silent (logical) suppress messages
+#' @param debug (logical) additional messages for debugging 
 #' @return plot
 #' @seealso \code{\link{convertPlotCoordPix}}; use \code{\link[wrMisc]{htmlSpecCharConv}} to convert special characters for proper html display 
 #' @examples
@@ -69,7 +70,7 @@
 #' @export
 mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NULL, displSi=c(800,600),
 	colNa=NULL, tit="", myHtmTit="", myComment=NULL, textAtStart=NULL, textAtEnd=NULL, pxDiam=5,
-    addLinks=NULL, linkExt=NULL, htmlExt="htm", callFrom=NULL, silent=FALSE){
+    addLinks=NULL, linkExt=NULL, htmlExt="htm", callFrom=NULL, silent=FALSE, debug=FALSE){
   ## make html file/output where (www-)links & supplemental information is accessible at mouse-over on image/plot (eg IDs/names in plot)
   ##  assume, that initial png is already made and coordinates are already converted to pixel level of png-image
   ##  'displSi'  size of image ('pngFileNa') at display in html (width,height)
@@ -78,6 +79,9 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   ##   dominates over eventual presence of 4th name in 'colNa'
   myCoorTy <- NULL
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="mouseOverHtmlFile")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+
   if(length(dim(myCoor)) !=2) stop(" Expecting matrix or data.frame")
   if(nrow(myCoor) <1) stop(" 'myCoor' seems to be empty !")
   if(!is.data.frame(myCoor)) myCoor <- as.data.frame(myCoor, stringsAsFactors=FALSE)
@@ -86,7 +90,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
     ## correct mixed slash and backslash in file path
     if(length(grep("ming.32",R.Version()$platform)) >0) {
       x <- gsub("\\\\", "/", x)     # (for some editors) "
-      if(asHtml & length(grep("[[:upper:]]:", substr(x,1,2))) >0) {
+      if(asHtml && length(grep("[[:upper:]]:", substr(x,1,2))) >0) {
         x <- paste0("file:///",x) }
     } else if(asHtml & length(grep("^/",x)) >0) x <- paste0("file:///",x)
     x }      
@@ -98,7 +102,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   potYname <- wrMisc::.plusLowerCaps(c("yPix","yPred","coorY","htmlY","yCoor","dataY","Y"))
   potMouseOvname <- wrMisc::.plusLowerCaps(c("mouseOver","mouseInfo","Mouse","Mou","Hint","Name","fullName","FullName","Combined","CustName","custName","Info"))
   potLinkname <- wrMisc::.plusLowerCaps(c("LINK","Link","Li","Http","WWW","AddLink","addLink"))
-  ## determine column nmaes to be extracted
+  ## determine column names to be extracted
   if(length(colNa) ==2) colN2[2:3] <- colNa else if(length(colNa) >2) colN2[1:length(colNa)] <- colNa
   if(length(colNa) <1) {
     if(ncol(myCoor)==2) colN2[2:3] <- colnames(myCoor) else {
@@ -120,33 +124,33 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
     colN2[1] <- "ID"
     if(!silent) message(fxNa,"Using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
   }
-  if(!identical(mouseOverTxt,FALSE)) if(is.null(mouseOverTxt)) {
+  if(!isFALSE(mouseOverTxt)) if(is.null(mouseOverTxt)) {
     if(is.na(colN2[4])) {
       myCoor$mouseOver <- myCoor[,colN2[1]]                                             # nothing specified, use names as default
       if(!silent) message(fxNa,"Using column '",colnames(myCoor[colN2[1]]),"' for mouse-over")
       colN2[4] <- "mouseOver" }
-  } else { if(length(mouseOverTxt) ==nrow(myCoor) & length(unique(mouseOverTxt)) > 1) {
+  } else { if(length(mouseOverTxt) ==nrow(myCoor) && length(unique(mouseOverTxt)) > 1) {
     myCoor$mouseOver <- mouseOverTxt } else {
       if(!silent) message(fxNa,"Ignoring invalid entry for 'mouseOverTxt' (expecting length ",nrow(myCoor)," but found ",length(mouseOverTxt),")")
       myCoor$mouseOver <- myCoor[,"ID"]
     } }
   ##
-  if(identical(addLinks,TRUE)) {            # colNa has priority over IDs
+  if(isTRUE(addLinks)) {            # colNa has priority over IDs
     myCoor$link <- myCoor[,if(is.na(colN2[5])) colN2[1] else colN2[5]]
     colN2[5] <- "addLinks" } else {
-   if(length(addLinks) >0) {if(length(addLinks) ==nrow(myCoor) & length(unique(addLinks)) > 1 & max(nchar(addLinks),na.rm=TRUE) >0) {
+   if(length(addLinks) >0) {if(length(addLinks) ==nrow(myCoor) && length(unique(addLinks)) > 1 && max(nchar(addLinks),na.rm=TRUE) >0) {
      myCoor$link <- addLinks
      colN2[5] <- "addLinks" } else {
      if(!silent) message(fxNa,"Invalid entry for 'addLinks' (expecting length ",nrow(myCoor)," but found ",length(addLinks),")")}}}   # no default
   ## check extensions of specified links (ie myCoor$link) : if 'linkExt' specified (& longer than 0 char) add to this ending if not present
   if(length(linkExt) >0) if(nchar(linkExt) >0) {
     chExt <- grep(paste0(linkExt,"$"), myCoor$link)
-    if(length(chExt) < nrow(myCoor) & length(chExt) >0) myCoor$link[chExt] <- paste0(myCoor$link[chExt],linkExt)
+    if(length(chExt) < nrow(myCoor) && length(chExt) >0) myCoor$link[chExt] <- paste0(myCoor$link[chExt],linkExt)
   }
   ## prepare for making html file
   if(!file.exists(pngFileNa)) stop("Cannot find file which should be used for embedding image into html !")
   msg <- " 'displSi' : Expecting numeric vector of lengt 2 (for display size in px in html)  !"
-  if(!is.numeric(displSi) | length(displSi) <2) stop(msg)
+  if(!is.numeric(displSi) || length(displSi) <2) stop(msg)
   if(length(HtmFileNa) !=1) HtmFileNa <- pngFileNa
   baseFiNa <- sub(".PNG$","",sub(".png$","",sub(".htm$","",sub(".html$","",HtmFileNa))))
   if(nchar(HtmFileNa)== nchar(baseFiNa)) {
@@ -155,7 +159,7 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   } else {
     htmlExt <- substr(HtmFileNa, unlist(regexec("\\.htm",HtmFileNa)), nchar(HtmFileNa))}
   HtmFileNa <- wrMisc::.checkFileNameExtensions(baseFiNa, htmlExt)       # check file extensions for HtmFileNa & pngFileNa
-  .convTxtToHtmPar <- function(txt){    # convert character vector to paragraphs  <p>My paragraph.</p>
+  .convTxtToHtmPar <- function(txt) {    # convert character vector to paragraphs  <p>My paragraph.</p>
     txt <- as.character(txt)
     nLi <- length(txt)
     apply(matrix(c(rep("<p>",nLi), txt,rep("</p>",nLi)), nrow=nLi), 1, paste, collapse="") }
@@ -183,14 +187,31 @@ mouseOverHtmlFile <- function(myCoor, pngFileNa, HtmFileNa=NULL, mouseOverTxt=NU
   if(!is.null(textAtEnd)) htmVec <- c(htmVec, .convTxtToHtmPar(textAtEnd))
   htmVec <- c(htmVec,"</body>","</html>")
   if(is.null(HtmFileNa)) HtmFileNa <- paste0(sub(".png$","",pngFileNa),".html")
-  if(file.exists(HtmFileNa) & !silent) message(fxNa," BEWARE, file '",HtmFileNa,"' will be overwritten !")
+  if(file.exists(HtmFileNa) && !silent) message(fxNa," BEWARE, file '",HtmFileNa,"' will be overwritten !")
   tryWrite <- try(cat(paste(htmVec, collpse="\n"), file=HtmFileNa))
   if(inherits(tryWrite, "try-error")) warning(fxNa," PROBLEM : couldn't write Html file '",
     HtmFileNa,"' ! (file open ?  check path,rights etc)")
 }        
 
+
+#' Search Column Name	 
+#'	 
+#' This function provides help when seraching column names	 
+#'	 
+#' @param x (matrix or data.frame) main input
+#' @param searchColNa (character)
+#' @param plusLowerCaps (logical) add lower caps to search
+#' @param returnList (logical) 
+#' @param callFrom (character) allow easier tracking of messages produced
+#' @param silent (logical) suppress messages
+#' @param debug (logical) additional messages for debugging 
+#' @return integer vector with index of colnames found or list with $foundNa and $remainNa
+#' @seealso \code{\link{convertPlotCoordPix}}; use \code{\link[wrMisc]{htmlSpecCharConv}} to convert special characters for proper html display 
+#' @examples
+#' mat1 <- matrix(1:6, ncol=3, dimnames=list(NULL, LETTERS[1:3]))
+#' .serachColName(mat1, c("C","F","A"))
 #' @export
-.serachColName <- function(x,searchColNa, plusLowerCaps=TRUE,returnList=TRUE,callFrom=NULL) {
+.serachColName <- function(x, searchColNa, plusLowerCaps=TRUE, returnList=TRUE, silent=FALSE, debug=FALSE, callFrom=NULL) {
   ## 'x' character vector of column-names to inspect, or matrix/data.frame where colnames will be extracted/inspected
   ## 'searchColNa' (character) 
   fxNa <- wrMisc::.composeCallName(callFrom, newNa=".serachColName")

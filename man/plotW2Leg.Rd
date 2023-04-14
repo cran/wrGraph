@@ -21,6 +21,7 @@ plotW2Leg(
   histLoc = "bottomleft",
   legHiTi = NULL,
   silent = TRUE,
+  debug = FALSE,
   callFrom = NULL
 )
 }
@@ -57,7 +58,9 @@ plotW2Leg(
 
 \item{silent}{(logical) suppress messages}
 
-\item{callFrom}{(character) allow easier tracking of message(s) produced}
+\item{debug}{(logical) additonal messages for debugging}
+
+\item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
 graphical output only

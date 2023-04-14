@@ -1,4 +1,4 @@
-#' Plot profile(s) according to CLustering
+#' Plot profiles according to CLustering
 #'
 #' This function was made for visualuzing the result of clustering of a numeric vector or clustering along multiple columns of a matrix.
 #' The data will be plotted like a reglar scatter-plot, but some extra space is added to separate clusters and dashed lines highlight cluster-borders.
@@ -17,20 +17,23 @@
 #' @param meLty (integer) line-type line of mean/representative values (see also \code{lty} in \code{\link[graphics]{par}})
 #' @param meLwd (numeric) line-width line of mean/representative values (see also \code{lwd} in \code{\link[graphics]{par}})
 #' @param legLoc (character) legend location
-#' @param silent (logical) suppress (less important) messages
-#' @param callFrom (character) allow easier tracking of message(s) produced
-#' @return plot only
+#' @param silent (logical) suppress messages
+#' @param debug (logical) additonal messages for debugging
+#' @param callFrom (character) allows easier tracking of messages produced
+#' @return This functin returns a plot only
 #' @examples
 #' set.seed(2020); dat1 <- runif(12)/2 + rep(6:8, each=4)
 #' dat1Cl <- stats::kmeans(dat1, 3)$cluster
 #' dat1Cl <- 5- dat1Cl              # bring cluster-numbers in ascending form
 #' dat1Cl[which(dat1Cl >3)] <- 1    # bring cluster-numbers in ascending form
 #' profileAsClu(dat1, clu=dat1Cl)
-#' 
-#' @export
-profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xlab=NULL, ylab=NULL, meCol="grey", meLty=1, meLwd=1, legLoc="bottomleft", silent=TRUE, callFrom=NULL) {
+#' @export 
+profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xlab=NULL, ylab=NULL, meCol="grey", meLty=1, meLwd=1, legLoc="bottomleft", silent=TRUE, debug=FALSE, callFrom=NULL) {
   ##
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="profileAsClu")
+  if(!isTRUE(silent)) silent <- FALSE
+  if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
+
   argNames <- c(deparse(substitute(dat)), deparse(substitute(clu)), deparse(substitute(z)))
   msg <- "Invalid argument 'dat'; must be matrix or data.frame with min 2 lines"
   if(length(dat) <1) stop(msg)
@@ -40,7 +43,8 @@ profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xla
     clu <- dat[,cluC]; dat <- dat[,-cluC] }
   if(length(clu) != nrow(dat)) stop("Length of 'clu' does not match number of lines from 'dat')")  
   chClu <- clu[-1] - clu[-length(clu)]
-  if(any(any(chClu <0) & any(chClu >0), any(chClu < -1), any(chClu >1))) stop("Invalid 'clu'; cluster numbers must be sorted") 
+  if(any(any(chClu <0) && any(chClu >0), any(chClu < -1), any(chClu >1))) stop("Invalid 'clu'; cluster numbers must be sorted") 
+  if(debug) message(fxNa,"pAC1")
   ## main
   nClu <- length(unique(clu))
   ## geometrix mean
@@ -49,12 +53,13 @@ profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xla
       message(fxNa,"Can't find column '",meanD,"'")
       meanD <- NULL} }
   if(length(dim(dat)) <2) dat <- as.matrix(dat)
-  if(is.null(meanD) & ncol(dat) >1) meanD <- apply(dat, 1, prod)^(1/ncol(dat))
+  if(is.null(meanD) && ncol(dat) >1) meanD <- apply(dat, 1, prod)^(1/ncol(dat))
   cluLoc <- table(clu)[rank(unique(clu))]
   cluBord <- cumsum(cluLoc[-nClu]) +0.5
   cluLoc <- cumsum(cluLoc) - cluLoc/2 +0.5
   meanLi <- matrix(NA, nrow=nrow(dat) +nClu, ncol=2)
   inc <- 0
+  if(debug) message(fxNa,"pAC2")
   for(i in unique(clu)) { li <- which(clu==i); meanLi[inc+li,] <- cbind(li, meanD[li]); inc <- inc +1}
   meanLi[which(is.na(meanLi[,1])),1] <- c(cluBord,NA)
   if(is.null(col)) col <- 1:ncol(dat)

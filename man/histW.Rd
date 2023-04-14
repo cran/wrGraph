@@ -86,12 +86,12 @@ Note that the argument for (costom) title \code{main} is now called \code{tit}.
 \examples{
 set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
 dat1 <- dat1[which(dat1 <50 & dat1 > 0.2)]
-histW(dat1,br="FD",isLog=FALSE)
-histW(log2(dat1),br="FD",isLog=TRUE)
+histW(dat1, br="FD", isLog=FALSE)
+histW(log2(dat1), br="FD", isLog=TRUE)
 
 ## quick overview of distributions  
 layout(partitionPlot(4))
-for(i in 1:4) histW(iris[,i],isLog=FALSE,tit=colnames(iris)[i])
+for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 }
 \seealso{
 \code{\link[graphics]{hist}}
