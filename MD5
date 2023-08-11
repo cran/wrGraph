@@ -1,4 +1,4 @@
-824c0371c724b1c3a5c5e194e6db8326 *DESCRIPTION
+275c856588d13ff0e58b28959f187c7d *DESCRIPTION
 2dce2a9b2a5d3730b77779a2b14e273a *NAMESPACE
 1c2fb4e66ad648ec74d8032a28159abd *R/MAplotW.R
 2d975f9f9bafd3c66bdf072c15c8f2e3 *R/VolcanoPlotW.R
@@ -16,13 +16,13 @@ bc75f1c442ff9c0a1e3d001c921b46b1 *R/plotBy2Groups.R
 2dc11e7b6160fa8d46a65d18d30aed49 *R/plotLinReg.R
 c1ddf7f3fb13412d6a0df17bd329a9e8 *R/plotPCAw.R
 42fb5eba00ec209e54907802f8ea8359 *R/plotW2Leg.R
-f296ff5b1abd13ca6de304792b0e7fe9 *R/profileAsClu.R
+8c1983aa4a23bec5a6d32a49a59ed096 *R/profileAsClu.R
 6497fd9ea9e5cb0c6dd7c145845fcc0a *R/staggerdCountsPlot.R
-f610702ab60448ee6c62e0c7806e2ded *R/vioplotW.R
-072e88c2aab48e428d6abb89282ac945 *build/vignette.rds
+0732002440abcbe73283469c0cf0d175 *R/vioplotW.R
+4645ff4aecbb017b753c491beb9226ea *build/vignette.rds
 0f48608df1968cf80798875252608391 *inst/doc/wrGraphVignette1.R
-d1b3082bc287eda720434c96e51b69a4 *inst/doc/wrGraphVignette1.Rmd
-ee26969d083dc1a2e1f79916577ffbfb *inst/doc/wrGraphVignette1.html
+23cb7d5fb7bc4ae0be0a75610ffa665f *inst/doc/wrGraphVignette1.Rmd
+4214c6f31b1ba46f9d60a66b8c85bd53 *inst/doc/wrGraphVignette1.html
 be6288e6981c69fbbb312c17abfeb42f *man/MAplotW.Rd
 ffa9f638aee8442760b85fb0d3b5a1b4 *man/VolcanoPlotW.Rd
 5a9aa4c419ab6cf8879714ec1969ff8d *man/addBagPlot.Rd
@@ -47,7 +47,7 @@ c15fee114ac71489d282cf18edc468a6 *man/mouseOverHtmlFile.Rd
 2cc7506122ad8bf2553e95e88f134314 *man/plotLinReg.Rd
 64a346cf1e5a631340d677b53a55b849 *man/plotPCAw.Rd
 62af970ec70fe410ad1dcf4cb2739376 *man/plotW2Leg.Rd
-7d9a4443bddcfda6e793f7832ccf9ea9 *man/profileAsClu.Rd
+84d9338a3de55fb1d95177bcb426754d *man/profileAsClu.Rd
 0d0fbdd82a0d630ed98299df32435f9d *man/staggerdCountsPlot.Rd
-122762ff8f5ea43a3be9ae426a826c6b *man/vioplotW.Rd
-d1b3082bc287eda720434c96e51b69a4 *vignettes/wrGraphVignette1.Rmd
+e55ccceabac2c273a434a826daa5c98a *man/vioplotW.Rd
+23cb7d5fb7bc4ae0be0a75610ffa665f *vignettes/wrGraphVignette1.Rmd

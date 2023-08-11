@@ -13,6 +13,9 @@
 #' @param pch (integer) custom plotting symbols (see also \code{\link[graphics]{par}})
 #' @param xlab (character) custom x-axis label
 #' @param ylab (character) custom y-axis label
+#' @param cex (numeric) cex-like expansion factor  (see also \code{\link[graphics]{par}})
+#' @param cexTit (numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})
+
 #' @param meCol (character) color for (dashed) line of mean/representative values
 #' @param meLty (integer) line-type line of mean/representative values (see also \code{lty} in \code{\link[graphics]{par}})
 #' @param meLwd (numeric) line-width line of mean/representative values (see also \code{lwd} in \code{\link[graphics]{par}})
@@ -28,7 +31,7 @@
 #' dat1Cl[which(dat1Cl >3)] <- 1    # bring cluster-numbers in ascending form
 #' profileAsClu(dat1, clu=dat1Cl)
 #' @export 
-profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xlab=NULL, ylab=NULL, meCol="grey", meLty=1, meLwd=1, legLoc="bottomleft", silent=TRUE, debug=FALSE, callFrom=NULL) {
+profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xlab=NULL, ylab=NULL, meCol="grey", meLty=1, meLwd=1, cex=NULL, cexTit=NULL, legLoc="bottomleft", silent=TRUE, debug=FALSE, callFrom=NULL) {
   ##
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="profileAsClu")
   if(!isTRUE(silent)) silent <- FALSE
@@ -65,12 +68,14 @@ profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xla
   if(is.null(col)) col <- 1:ncol(dat)
   if(is.null(pch)) pch <- unique(clu)
   if(is.null(ylab)) ylab <- argNames[1]
-  graphics::plot(c(range(dat,na.rm=TRUE), rep(NA,nrow(dat)-2)), type="n", las=1, ylab=ylab, main=tit, xlab=xlab)
-  graphics::mtext(paste("clu", unique(clu)), side=3, at=cluLoc)                    # cluster names
-  if(ncol(dat) >1) graphics::lines(meanLi, col=meCol, lty=meLty, lwd=meLwd)        # geom mean line
-  graphics::abline(v=cluBord, lty=4, col=grDevices::grey(0.8))                     # clu borders
-  for(i in 1:ncol(dat)) graphics::points(1:nrow(dat), dat[,i], pch=pch[clu], col=col[i])
-  if(ncol(dat) >1) graphics::legend(legLoc,c(colnames(dat),"geomMean"), text.col=c(1:3,1), pch=c(rep(1,ncol(dat)), NA),
-    lty=c(rep(NA,ncol(dat)),meLty), lwd=c(rep(NA,ncol(dat)),meLwd), col=c(col[1:ncol(dat)], meCol), cex=0.85, xjust=0.5, yjust=0.5)
+  ch1 <- try(graphics::plot(c(range(dat,na.rm=TRUE), rep(NA,nrow(dat)-2)), type="n", las=1, ylab=ylab, main=tit, cex=cex, cex.main=cexTit, xlab=xlab), silent=TRUE)
+  if(inherits(ch1, "try-error")) warning(fxNa,"UNABLE TO PRODUCE PLOT !  \n  initial message : ",ch1) else {
+    graphics::mtext(paste("clu", unique(clu)), side=3, at=cluLoc)                    # cluster names
+    if(ncol(dat) >1) graphics::lines(meanLi, col=meCol, lty=meLty, lwd=meLwd)        # geom mean line
+    graphics::abline(v=cluBord, lty=4, col=grDevices::grey(0.8))                     # clu borders
+    for(i in 1:ncol(dat)) graphics::points(1:nrow(dat), dat[,i], pch=pch[clu], col=col[i])
+    if(ncol(dat) >1) ch1 <- try(graphics::legend(legLoc,c(colnames(dat),"geomMean"), text.col=c(col,1), pch=c(rep(1,ncol(dat)), NA),
+      lty=c(rep(NA,ncol(dat)),meLty), lwd=c(rep(NA,ncol(dat)),meLwd), col=c(col[1:ncol(dat)], meCol), cex=0.85, xjust=0.5, yjust=0.5), silent=TRUE)
+	 if(inherits(ch1, "try-error")) message(fxNa,"Unable to plot legend")  }
 }
    

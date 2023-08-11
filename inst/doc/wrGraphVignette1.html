@@ -12,7 +12,7 @@
 
 <meta name="author" content="Wolfgang Raffelsberger" />
 
-<meta name="date" content="2023-04-14" />
+<meta name="date" content="2023-08-10" />
 
 <title>Getting started with wrGraph</title>
 
@@ -378,7 +378,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Getting started with wrGraph</h1>
 <h4 class="author">Wolfgang Raffelsberger</h4>
-<h4 class="date">2023-04-14</h4>
+<h4 class="date">2023-08-10</h4>
 
 
 <div id="TOC">
@@ -440,7 +440,7 @@ package)</a>.</p>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;wrGraph&quot;</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This is version no:</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;wrGraph&quot;</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.3.3&#39;</span></span></code></pre></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.3.4&#39;</span></span></code></pre></div>
 <p>     </p>
 </div>
 <div id="prepare-layout-for-accomodating-multiple-smaller-plots" class="section level2">
@@ -887,8 +887,8 @@ estimation of lfdr is not optimal.</p>
 <h2>Standalone html Page with Plot and Mouse-Over Interactive
 Features</h2>
 <p>The idea of this function dates before somehow similar applications
-were made possible using <a href="https://shiny.rstudio.com/">Shiny</a>.
-In this case the original idea was simply to provide help to identify
+were made possible using <a href="https://shiny.posit.co/">Shiny</a>. In
+this case the original idea was simply to provide help to identify
 points in a plot and display via mouse-over labels to display and by
 providing clickable links. To do so, very simple html documents are
 created which display a separately saved image and have a section
@@ -935,12 +935,12 @@ cannot access the image any more.</p>
 <span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; convertPlotCoordPix : Supl params : mar=6.2,4,4,2  dim=800x600   res=72</span></span>
 <span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df1)</span>
 <span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   id x y     mou                                                      link xPix</span></span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  a 1 5 point a C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/A.html   81</span></span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  b 2 5 point b C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/B.html  155</span></span>
-<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  c 3 5 point c C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/C.html  229</span></span>
-<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  d 4 5 point d C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/D.html  303</span></span>
-<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  e 5 5 point e C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/E.html  377</span></span>
-<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  f 6 5 point f C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpW8syIe/F.html  451</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  a 1 5 point a C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/A.html   81</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  b 2 5 point b C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/B.html  155</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  c 3 5 point c C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/C.html  229</span></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  d 4 5 point d C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/D.html  303</span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  e 5 5 point e C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/E.html  377</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  f 6 5 point f C:\\Users\\wraff\\AppData\\Local\\Temp\\RtmpMxPxYr/F.html  451</span></span>
 <span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   yPix</span></span>
 <span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  284</span></span>
 <span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  284</span></span>
@@ -973,51 +973,56 @@ version.</p>
 </div>
 <div id="appendix-session-info" class="section level2">
 <h2>Appendix: Session-Info</h2>
-<pre><code>#&gt; R version 4.2.3 (2023-03-15 ucrt)
+<pre><code>#&gt; R version 4.3.0 (2023-04-21 ucrt)
 #&gt; Platform: x86_64-w64-mingw32/x64 (64-bit)
-#&gt; Running under: Windows 10 x64 (build 19042)
+#&gt; Running under: Windows 10 x64 (build 19045)
 #&gt; 
 #&gt; Matrix products: default
+#&gt; 
 #&gt; 
 #&gt; locale:
 #&gt; [1] LC_COLLATE=C                   LC_CTYPE=French_France.utf8   
 #&gt; [3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
 #&gt; [5] LC_TIME=French_France.utf8    
 #&gt; 
+#&gt; time zone: Europe/Paris
+#&gt; tzcode source: internal
+#&gt; 
 #&gt; attached base packages:
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] dplyr_1.1.1      factoextra_1.0.7 ggplot2_3.4.1    FactoMineR_2.7  
-#&gt; [5] wrGraph_1.3.3    wrMisc_1.12.0   
+#&gt; [1] dplyr_1.1.2      factoextra_1.0.7 ggplot2_3.4.2    FactoMineR_2.8  
+#&gt; [5] wrGraph_1.3.4    wrMisc_1.13.0   
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] tidyr_1.3.0          splines_4.2.3        carData_3.0-5       
-#&gt;  [4] sm_2.2-5.7.1         highr_0.10           yaml_2.3.7          
-#&gt;  [7] ggrepel_0.9.3        pillar_1.9.0         backports_1.4.1     
-#&gt; [10] lattice_0.20-45      glue_1.6.2           limma_3.54.2        
-#&gt; [13] digest_0.6.31        RColorBrewer_1.1-3   ggsignif_0.6.4      
-#&gt; [16] qvalue_2.30.0        colorspace_2.1-0     sandwich_3.0-2      
-#&gt; [19] htmltools_0.5.5      Matrix_1.5-3         plyr_1.8.8          
-#&gt; [22] pkgconfig_2.0.3      broom_1.0.4          purrr_1.0.1         
-#&gt; [25] xtable_1.8-4         mvtnorm_1.1-3        scales_1.2.1        
-#&gt; [28] fdrtool_1.2.17       emmeans_1.8.5        tibble_3.2.1        
-#&gt; [31] generics_0.1.3       farver_2.1.1         car_3.1-1           
-#&gt; [34] ggpubr_0.6.0         DT_0.27              TH.data_1.1-1       
-#&gt; [37] withr_2.5.0          cli_3.6.0            survival_3.5-5      
-#&gt; [40] magrittr_2.0.3       estimability_1.4.1   evaluate_0.20       
-#&gt; [43] fansi_1.0.4          MASS_7.3-58.3        rstatix_0.7.2       
-#&gt; [46] tools_4.2.3          lifecycle_1.0.3      multcomp_1.4-23     
-#&gt; [49] stringr_1.5.0        munsell_0.5.0        cluster_2.1.4       
-#&gt; [52] flashClust_1.01-2    compiler_4.2.3       multcompView_0.1-8  
-#&gt; [55] rlang_1.1.0          grid_4.2.3           htmlwidgets_1.6.2   
-#&gt; [58] leaps_3.1            labeling_0.4.2       rmarkdown_2.20      
-#&gt; [61] gtable_0.3.3         codetools_0.2-19     abind_1.4-5         
-#&gt; [64] reshape2_1.4.4       R6_2.5.1             zoo_1.8-11          
-#&gt; [67] knitr_1.42           fastmap_1.1.1        utf8_1.2.3          
-#&gt; [70] stringi_1.7.12       Rcpp_1.0.10          vctrs_0.6.1         
-#&gt; [73] scatterplot3d_0.3-43 tidyselect_1.2.0     xfun_0.37           
-#&gt; [76] coda_0.19-4</code></pre>
+#&gt;  [1] gtable_0.3.3         xfun_0.39            bslib_0.4.2         
+#&gt;  [4] htmlwidgets_1.6.2    ggrepel_0.9.3        rstatix_0.7.2       
+#&gt;  [7] lattice_0.21-8       vctrs_0.6.2          tools_4.3.0         
+#&gt; [10] generics_0.1.3       sandwich_3.0-2       tibble_3.2.1        
+#&gt; [13] fansi_1.0.4          highr_0.10           cluster_2.1.4       
+#&gt; [16] pkgconfig_2.0.3      Matrix_1.5-4         RColorBrewer_1.1-3  
+#&gt; [19] scatterplot3d_0.3-43 lifecycle_1.0.3      stringr_1.5.0       
+#&gt; [22] farver_2.1.1         compiler_4.3.0       munsell_0.5.0       
+#&gt; [25] leaps_3.1            codetools_0.2-19     carData_3.0-5       
+#&gt; [28] htmltools_0.5.5      sass_0.4.6           fdrtool_1.2.17      
+#&gt; [31] yaml_2.3.7           pillar_1.9.0         car_3.1-2           
+#&gt; [34] ggpubr_0.6.0         jquerylib_0.1.4      tidyr_1.3.0         
+#&gt; [37] MASS_7.3-59          flashClust_1.01-2    DT_0.27             
+#&gt; [40] limma_3.56.0         cachem_1.0.8         abind_1.4-5         
+#&gt; [43] multcomp_1.4-23      tidyselect_1.2.0     digest_0.6.31       
+#&gt; [46] stringi_1.7.12       mvtnorm_1.1-3        reshape2_1.4.4      
+#&gt; [49] purrr_1.0.1          labeling_0.4.2       splines_4.3.0       
+#&gt; [52] fastmap_1.1.1        grid_4.3.0           colorspace_2.1-0    
+#&gt; [55] cli_3.6.1            magrittr_2.0.3       survival_3.5-5      
+#&gt; [58] utf8_1.2.3           sm_2.2-5.7.1         broom_1.0.4         
+#&gt; [61] TH.data_1.1-2        withr_2.5.0          scales_1.2.1        
+#&gt; [64] backports_1.4.1      estimability_1.4.1   rmarkdown_2.21      
+#&gt; [67] emmeans_1.8.5        qvalue_2.32.0        ggsignif_0.6.4      
+#&gt; [70] zoo_1.8-12           coda_0.19-4          evaluate_0.20       
+#&gt; [73] knitr_1.42           rlang_1.1.1          Rcpp_1.0.10         
+#&gt; [76] xtable_1.8-4         glue_1.6.2           jsonlite_1.8.4      
+#&gt; [79] plyr_1.8.8           R6_2.5.1             multcompView_0.1-9</code></pre>
 </div>
 
 <script type="text/javascript">

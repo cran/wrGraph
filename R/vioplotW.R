@@ -30,7 +30,7 @@
 #' @param xlab (character) custom x-axis label
 #' @param ylab (character) custom y-axis label
 #' @param cexLab (numeric) size of axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})
-#' @param cexAxis (numeric) size of numerix axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})
+#' @param cexAxis (numeric) size of numeric y-axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})
 #' @param lty (integer) line-type for linear regression line (see also \code{\link[graphics]{par}})
 #' @param pointCol (character or numeric) display of median: color (defauly white)
 #' @param cexPt (numeric) display of median : size of point as cex-expansion factor (see also \code{\link[graphics]{par}})

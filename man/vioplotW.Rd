@@ -73,7 +73,7 @@ vioplotW(
 
 \item{cexLab}{(numeric) size of axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
 
-\item{cexAxis}{(numeric) size of numerix axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
+\item{cexAxis}{(numeric) size of numeric y-axis labels as cex-expansion factor (see also \code{\link[graphics]{par}})}
 
 \item{lty}{(integer) line-type for linear regression line (see also \code{\link[graphics]{par}})}
 

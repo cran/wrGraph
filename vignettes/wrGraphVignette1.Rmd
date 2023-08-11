@@ -474,7 +474,7 @@ VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
 
 ## Standalone html Page with Plot and Mouse-Over Interactive Features 
 
-The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.rstudio.com/). 
+The idea of this function dates before somehow similar applications were made possible using [Shiny](https://shiny.posit.co/).
 In this case the original idea was simply to provide help to identify points in a plot and display via mouse-over labels to display and by providing clickable links. 
 To do so, very simple html documents are created which display a separately saved image and have a section indicating at which location of the figure which information should be displayed as mouse-over and providing the clickable links. 
 In high-throughput biology many times researchers want quickly know which protein or gene a given point in a graphic corresponds and being able to get further information on this protein or gene via links to [UniProt](https://www.uniprot.org) or [GenBank](https://www.ncbi.nlm.nih.gov/genbank).

@@ -16,6 +16,8 @@ profileAsClu(
   meCol = "grey",
   meLty = 1,
   meLwd = 1,
+  cex = NULL,
+  cexTit = NULL,
   legLoc = "bottomleft",
   silent = TRUE,
   debug = FALSE,
@@ -44,6 +46,10 @@ profileAsClu(
 \item{meLty}{(integer) line-type line of mean/representative values (see also \code{lty} in \code{\link[graphics]{par}})}
 
 \item{meLwd}{(numeric) line-width line of mean/representative values (see also \code{lwd} in \code{\link[graphics]{par}})}
+
+\item{cex}{(numeric) cex-like expansion factor  (see also \code{\link[graphics]{par}})}
+
+\item{cexTit}{(numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})}
 
 \item{legLoc}{(character) legend location}
 
