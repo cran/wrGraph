@@ -385,7 +385,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
 
   ## main graphics
   if(length(Mvalue) >0) {
-    pl1 <- try(graphics::par(mar=c(6.5,4,4,2), cex.main=cexMa, las=1), silent=TRUE)
+    pl1 <- try(graphics::par(mar=if(length(useMar)==4) useMar else c(6.5,4,4,2), cex.main=cexMa, las=1), silent=TRUE)
     if(inherits(pl1, "try-error")) {Mvalue <- NULL; message("UNABLE TO SET PLOT MARGINS !!  check plotting device ...")}
     if(debug) {message(fxNa,"VPW14")}  }
 

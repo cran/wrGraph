@@ -76,7 +76,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
   argL <- match.call(expand.dots = FALSE)$...            # extr arg names, based on https://stackoverflow.com/questions/55019441/deparse-substitute-with-three-dots-arguments
   if(debug) {message(callFrom," -> vioplotW  vv0"); vv0 <- list(datas=datas,x=x,argN=argN,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argL=argL,fixArg=fixArg)}
 
-  ## separate spectific arguments from all-input (lazy fitting) & clean datas
+  ## separate specific arguments from all-input (lazy fitting) & clean datas
   if(length(datas) >0) {
     pMa <- pmatch(names(argL), fixArg)                     # will only find if unique (partial) match
     if(length(argL) >0 && length(pMa) >0) { pMa[which(nchar(names(argL)) <3)] <- NA                # limit to min 3 chars length for lazy matching
@@ -161,15 +161,15 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       datas <- datas[n:1]                                          # return order that plot will read top -> bottom
       col <- col[length(col):1] }
     if(length(at) != n) at <- 1:n
+    if(length(datas)==1) at <- 1
     if(debug) {message(fxNa,"vv5, prepare 'at' ",wrMisc::pasteC(utils::head(at))); vv5 <- list(datas=datas,x=x,argN=argN,rangeVa=rangeVa,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,col=col,at=at,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argN=argN,argL=argL,halfViolin=halfViolin,horizontal=horizontal,n=n)}
     sumry <- function(x) {     # take summary and then points for boxplot  lwr,firQ,med,thiQ,upr
       outNA <- c(lwr=NA,firQ=NA,med=NA,thiQ=NA,upr=NA)
-      if(length(x) >0) {y <- summary(x);  if(is.numeric(x)) c(lwr=min(y[1], y[2] -(y[5] -y[2])*rangeVa, na.rm=TRUE),
-      firQ=as.numeric(y[2]), med=as.numeric(y[3]), thiQ=as.numeric(y[5]), upr=max(y[6], y[5] +(y[5] -y[2])*rangeVa, na.rm=TRUE)) else outNA} else outNA
+      if(length(x) >0) { if(is.numeric(x)) {y <- summary(as.numeric(x)); c(lwr=min(y[1], y[2] -(y[5] -y[2])*rangeVa, na.rm=TRUE),
+      firQ=as.numeric(y[2]), med=as.numeric(y[3]), thiQ=as.numeric(y[5]), upr=max(y[6], y[5] +(y[5] -y[2])*rangeVa, na.rm=TRUE))} else outNA} else outNA
     }
     ra2 <- as.matrix(sapply(datas, sumry))
     colnames(ra2) <- names(datas)
-
 
     if(debug) {message(fxNa,"vv5b, prepare 'at' ",wrMisc::pasteC(utils::head(at))); vv5b <- list()}
     smDensity <- sm::sm.density
@@ -218,7 +218,8 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     chNull <- colSums(is.na(ra2)) ==5
     if(any(chNull)) for(i in which(chNull)) vioDat[[i]] <- list(estimate=NULL)
 
-    xLim <- if(length(xlim) ==2) xlim else c(1 -max(0.2, vioDat[[1]]$estimate, na.rm=TRUE), n +max(0.2, vioDat[[n]]$estimate, na.rm=TRUE))  # supposed vertical display
+    xLim <- if(length(xlim) ==2) xlim else {               # 
+      c(1 -max(0.2, vioDat[[1]]$estimate, na.rm=TRUE), n +max(0.2, vioDat[[n]]$estimate, na.rm=TRUE))}  # supposed vertical display, note final xLim is changed by wex
     yLim <- if(length(ylim) ==2) ylim else range(ra2[c(1,5),], na.rm=TRUE)
     if(debug) {message(fxNa,"vv7, Init xlim=",wrMisc::pasteC(signif(xLim),4),"  ylim=",wrMisc::pasteC(signif(yLim,4)) )
       vv7 <- list(datas=datas,x=x,vioDat=vioDat,xLim=xLim,yLim=yLim,argN=argN,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,smDensity=smDensity,smArgs=smArgs,raYGlob=raYGlob,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argN=argN,argL=argL,halfViolin=halfViolin,horizontal=horizontal)}
@@ -227,7 +228,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     label <- if(is.null(nameSer)) names(datas) else nameSer
     if(is.null(label) || all(is.na(label))) label <- 1:n
     if(identical(halfViolin,"pairwise")) {
-      xLim <- xLim -c(0,ceiling(n/2))
+      xLim <- xLim -c(0, ceiling(n/2))
       labA <- label[2*(1:(ceiling(n/2))) -1]
       labB <- c(label[2*(1:(floor(n/2)))], if(n %%2 >0) "  ")
       ## check if half-series names just differ by extension
@@ -272,9 +273,11 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       if(debug) {message(fxNa,"vv7d  use wex=",signif(wex,4))}
     }
     for(i in 1:length(vioDat)) vioDat[[i]]$estimate <- vioDat[[i]]$estimate *wex      # change proportionally with of violins
-    if(debug) {message(fxNa,"vv8"); vv8 <- list(datas=datas, vioDat=vioDat,ra2=ra2,pwBoC=pwBoC,boxCoor=boxCoor,xLim=xLim,ylim=yLim,halfViolin=halfViolin,cexPt=cexPt,boxCol=boxCol )}
+    if(debug) {message(fxNa,"vv8"); vv8 <- list(datas=datas, vioDat=vioDat,ra2=ra2,pwBoC=pwBoC,boxCoor=boxCoor,xLim=xLim,ylim=yLim,at=at,wex=wex,halfViolin=halfViolin,cexPt=cexPt,boxCol=boxCol )}
     ## main plotting
     if(!isTRUE(horizontal)) {                                # plot vertical
+      xLim <- c(1- max(vioDat[[i]]$estimate)*1.1, n+ max(vioDat[[n]]$estimate)*1.1)              # readjust xLim to final wex
+      cat("..new xLim ",round(xLim,3),"\n")
       if(!isTRUE(add)) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
         graphics::axis(2, las=las, cex.axis=cexAxis)
@@ -289,7 +292,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
         graphics::rect(pwBoC[1,], pwBoC[2,], pwBoC[3,], pwBoC[4,], col=boxCol, border=NA)
         graphics::points(pwBoC[5,],ra2[3,], pch=16, cex=cexPt, col=pointCol)
         graphics::segments(pair/2, ra2[2,impa], pair/2, ra2[4,impa], col="grey", lty=2)     # grey line to separate adjacent boxes
-      } else {for(i in 1:n) graphics::polygon(i+vioDat[[i]]$estimate, vioDat[[i]]$evalPo, col=col[i], border=border)
+      } else {for(i in 1:n) graphics::polygon(i +vioDat[[i]]$estimate, vioDat[[i]]$evalPo, col=col[i], border=border)
         graphics::rect(boxCoor[,1], boxCoor[,2], boxCoor[,3], boxCoor[,4], col=boxCol, border=NA)
         graphics::points(1:n, ra2[3,], pch=16, cex=cexPt, col=pointCol)
       }
@@ -297,6 +300,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       }
     } else {
       ## this is a horizontal plot ..
+      yLim <- c(1- max(vioDat[[i]]$estimate)*1.1, n+ max(vioDat[[n]]$estimate)*1.1)               # readjust xLim to final wex
       if(!isTRUE(add)) {
         graphics::plot.window(xlim=yLim, ylim=xLim)
         graphics::axis(1, cex.axis=cexNameSer)
@@ -328,4 +332,4 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
   if(length(msg) >0) graphics::mtext(msg, side=1, cex=0.7, las=1)    # add note about groups/columns of data not plotted
   }
 }
-  
+    
