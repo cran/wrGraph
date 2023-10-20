@@ -9,11 +9,11 @@ imageW(
   latticeVersion = FALSE,
   transp = TRUE,
   NAcol = "grey95",
+  tit = NULL,
   rowNa = NULL,
   colNa = NULL,
-  tit = NULL,
-  xLab = NA,
-  yLab = NA,
+  xLab = NULL,
+  yLab = NULL,
   las = 2,
   col = NULL,
   nColor = 9,
@@ -23,9 +23,9 @@ imageW(
   centColShift = 0,
   cexDispl = NULL,
   panel.background.col = "white",
+  supLat = list(),
   rotXlab = 0,
   rotYlab = 0,
-  ...,
   cexXlab = 0.7,
   cexAxs = NULL,
   cexYlab = 0.9,
@@ -47,15 +47,15 @@ set to \code{FALSE} to get behaviour prior to version 1.3.0.}
 
 \item{NAcol}{(character or integer) custom color for NA-values, default is light grey}
 
+\item{tit}{(character) custom figure title}
+
 \item{rowNa}{(character) optional custom rownames}
 
 \item{colNa}{(character) optional custom colnames}
 
-\item{tit}{(character) custom figure title}
+\item{xLab}{(character) optional custom text for x-axis 'values'}
 
-\item{xLab}{(character) optional custom names for x-axis}
-
-\item{yLab}{(character) optional custom names for y-axis}
+\item{yLab}{(character) optional custom text for y-axis 'values'}
 
 \item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}}); in case of \code{latticeVersion=TRUE} this argument will override default \code{rotXlab=0} and/or  \code{rotYlab=0}}
 
@@ -76,11 +76,11 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 
 \item{panel.background.col}{(character, only used in lattice version)}
 
+\item{supLat}{(list, only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
+
 \item{rotXlab}{(numeric, 0 - 360, lattice version only) control rotation of x-axis labels}
 
 \item{rotYlab}{(numeric, 0 - 360, lattice version only) control rotation of y-axis labels}
-
-\item{...}{(only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
 
 \item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
 
@@ -104,16 +104,15 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 This function plots in image (to the current graphical device) as \code{image} does
 }
 \description{
-To get a quick overview of the distribution of data and, in particular, of local phenomena it is useful to express numeric values as colored boxes.
-Such an output can also be referred to as heatmap (note that the term 'hatmap' is also frequently associated with graphical display of hierarchcal clustering results).
+To get a quick overview of the spatial distribution of smaller data-sets it may be useful to display numeric values as colored boxes.
+Such an output may also be referred to as heatmap (note that the term 'heatmap' is frequently associated with graphical display of hierarchcal clustering results).
 The function \code{\link[graphics]{image}} provides the basic support to do so (ie heatmap without rearranging rows and columns by clustering).  
 To do this more conveniently, the function \code{imageW} offers additional options for displaying row- and column-names or displaying NA-values as custom-color.
 }
 \details{
-If the main input \code{data} is numeric vector (an not matrix or data.frame) the values will be displayed as multiple columns and single row.
-This function allows two modes of operation : 1) plotting using standard R -graphics or 2) using the framework of grid- and lattice-graphics. (since version 1.2.6). 
-The latter version has comes integrate with a legend for the color-scale, allows adding grid-lines rotation of axis-labels and removing tick-marks.
-Please note that sometimes the center-color segment may not end up directly with the center-color, in thi case you may adjust using the argument \code{centColShift=-1}
+This function allows two modes of operation : 1) plotting using standard R -graphics or 2) using the framework of grid- and lattice-graphics (since version 1.2.6). 
+The latter version allows integrating a legend for the color-scale and adding grid-lines, rotation of axis-labels or removing tick-marks.
+Please note that sometimes the center-color segment may not end up directly with the center-color, in this case you may adjust using the argument \code{centColShift=-1}
 }
 \examples{
 imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris (head)")

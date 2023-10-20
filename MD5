@@ -1,4 +1,4 @@
-034e8b91deed7c8db02aeda160fda4e7 *DESCRIPTION
+d3d0d2dd94f11db0f496dc1a14146c92 *DESCRIPTION
 2dce2a9b2a5d3730b77779a2b14e273a *NAMESPACE
 1c2fb4e66ad648ec74d8032a28159abd *R/MAplotW.R
 3b368d15a56b68e3a7790a1ee4d9f49a *R/VolcanoPlotW.R
@@ -8,7 +8,7 @@ dd05c76a11546eb6fb2c5c151b511c59 *R/convertPlotCoordPix.R
 3611435d9b065650932fe46c25cd57c5 *R/cumFrqPlot.R
 9278fae4b558d292cdc0289c1bbe2786 *R/foldChangeArrow.R
 3d0fe4f1f1d47d97013fee8b15261bc6 *R/histW.R
-46617d0d36f0b0e0c1aa2e2311c2cc98 *R/imageW.R
+dafd9b5bb18c6f406e759c7d7568dfee *R/imageW.R
 a7b78e6f28bb0b47128cdc3fa39394da *R/legendHist.R
 9bef2b910f2f755f24f4aa8dfb115e1b *R/mouseOverHtmlFile.R
 f4d35e18385ab5affc99752d9ed294ed *R/partitionPlot.R
@@ -18,11 +18,11 @@ c1ddf7f3fb13412d6a0df17bd329a9e8 *R/plotPCAw.R
 42fb5eba00ec209e54907802f8ea8359 *R/plotW2Leg.R
 8c1983aa4a23bec5a6d32a49a59ed096 *R/profileAsClu.R
 6497fd9ea9e5cb0c6dd7c145845fcc0a *R/staggerdCountsPlot.R
-d5e5edd21211ec905c5985b14eca298d *R/vioplotW.R
+8491ec8f006f2c68d21c1627f28f97b6 *R/vioplotW.R
 c89b7f2795a93336350b856abc7384e0 *build/vignette.rds
 0f48608df1968cf80798875252608391 *inst/doc/wrGraphVignette1.R
-23cb7d5fb7bc4ae0be0a75610ffa665f *inst/doc/wrGraphVignette1.Rmd
-e9e2105ec5fd83d97cbbfd277870dea0 *inst/doc/wrGraphVignette1.html
+e0143ce55bccc44af98fe562d72707bd *inst/doc/wrGraphVignette1.Rmd
+de3f67712d1761129b7b3040d7c8897a *inst/doc/wrGraphVignette1.html
 be6288e6981c69fbbb312c17abfeb42f *man/MAplotW.Rd
 ffa9f638aee8442760b85fb0d3b5a1b4 *man/VolcanoPlotW.Rd
 5a9aa4c419ab6cf8879714ec1969ff8d *man/addBagPlot.Rd
@@ -39,7 +39,7 @@ d123cf41cecbf2545a8d796b05aac3ae *man/dot-determFigMargPix.Rd
 d08ae74ae58553c81a3a3b0c9832ad5f *man/dot-serachColName.Rd
 41efe94b71366005c01f1af52aebbfd8 *man/foldChangeArrow.Rd
 d9e916daf4eb3e11a875578ad058dcb6 *man/histW.Rd
-46f9250ef5b0d923fad434cd97e959e1 *man/imageW.Rd
+cf83e3a382d7639e200467b82a644639 *man/imageW.Rd
 bad9e40302426c071833a75e71406b0d *man/legendHist.Rd
 c15fee114ac71489d282cf18edc468a6 *man/mouseOverHtmlFile.Rd
 36c1bd2b2d3281f1dcf8b5c857aed8ab *man/partitionPlot.Rd
@@ -50,4 +50,4 @@ c15fee114ac71489d282cf18edc468a6 *man/mouseOverHtmlFile.Rd
 84d9338a3de55fb1d95177bcb426754d *man/profileAsClu.Rd
 0d0fbdd82a0d630ed98299df32435f9d *man/staggerdCountsPlot.Rd
 e55ccceabac2c273a434a826daa5c98a *man/vioplotW.Rd
-23cb7d5fb7bc4ae0be0a75610ffa665f *vignettes/wrGraphVignette1.Rmd
+e0143ce55bccc44af98fe562d72707bd *vignettes/wrGraphVignette1.Rmd

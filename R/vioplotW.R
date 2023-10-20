@@ -277,8 +277,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     ## main plotting
     if(!isTRUE(horizontal)) {                                # plot vertical
       xLim <- c(1- max(vioDat[[i]]$estimate)*1.1, n+ max(vioDat[[n]]$estimate)*1.1)              # readjust xLim to final wex
-      cat("..new xLim ",round(xLim,3),"\n")
-      if(!isTRUE(add)) {
+        if(!isTRUE(add)) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
         graphics::axis(2, las=las, cex.axis=cexAxis)
         graphics::axis(1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data

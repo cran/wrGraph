@@ -16,7 +16,7 @@ vignette: >
 ---
 
 ## Introduction
-This package contains a collection of various plotting tools, mostly as an extension of packages 
+This package contains a collection of various plotting functions, mostly as an extension of packages 
 [wrMisc](https://CRAN.R-project.org/package=wrMisc) and [wrProteo](https://CRAN.R-project.org/package=wrProteo). 
 
 ```{r, include = FALSE}
@@ -159,15 +159,17 @@ Please note, that although smoothed distributions please the human eye, some dat
 
 Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
 the function provided here offers more flexibility for data-formats accepted (including data.frames and lists), coloring and display of n.
-In the case of the Iris-data, there are no NAs and thus n is constant, thus the number of values (n) will be displayed only once. 
-However, when working with data-sets containing NAs, or simply when working with lists the number of values per data-set/violin n may vary.
+All NA-values are ignored and n is adkusted accordingly.
+In the case of the Iris-data, there are no NAs and thus n is constant, in consequence the number of values (n) is displayed only once. 
+However, frequently the number of values per data-set/violin n may vary (presence of NAs of list with vectors of different sizes).
 
 
 ```{r vioplot1, fig.height=6, fig.width=8, echo=TRUE}
 vioplotW(iris[,-5], tit="Iris-Data Violin Plot")
 ```
 
-The smoothing of the curves uses default parameters from the function _sm.density_ from the package [sm](https://CRAN.R-project.org/package=sm). In some cases the Kernel smoothing may appear to strong, this behaviour can be modified using the argument _hh_ (which is passed on as argument _h_ to the function _sm.density_).
+The smoothing of the curves uses default parameters from the function _sm.density_ from the package [sm](https://CRAN.R-project.org/package=sm). 
+In some cases the Kernel smoothing may appear to strong, this behaviour can be modified using the argument _hh_ (which is passed on as argument _h_ to the function _sm.density_).
 
 ```{r vioplot2, fig.height=6, fig.width=8, echo=TRUE}
 ## less smoothing
@@ -528,13 +530,15 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 ## Acknowledgements
 
 The author wants to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](https://www.cnrs.fr/en), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr) and of course all collegues from the [IGBMC proteomics platform](https://proteomics.igbmc.fr).
-The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
+The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.
 This package is constantly evolving, new functions may get added to the next version.
 
 
 ## Appendix: Session-Info
+
+For completeness, here detailed documentation of versions used to produce this document.
 
 \small
 ```{r sessionInfo, echo=FALSE}
