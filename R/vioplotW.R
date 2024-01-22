@@ -275,9 +275,9 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     for(i in 1:length(vioDat)) vioDat[[i]]$estimate <- vioDat[[i]]$estimate *wex      # change proportionally with of violins
     if(debug) {message(fxNa,"vv8"); vv8 <- list(datas=datas, vioDat=vioDat,ra2=ra2,pwBoC=pwBoC,boxCoor=boxCoor,xLim=xLim,ylim=yLim,at=at,wex=wex,halfViolin=halfViolin,cexPt=cexPt,boxCol=boxCol )}
     ## main plotting
-    if(!isTRUE(horizontal)) {                                # plot vertical
-      xLim <- c(1- max(vioDat[[i]]$estimate)*1.1, n+ max(vioDat[[n]]$estimate)*1.1)              # readjust xLim to final wex
-        if(!isTRUE(add)) {
+    if(!isTRUE(horizontal)) {                                                            # plot vertical
+      xLim <- c(1- max(vioDat[[1]]$estimate)*1.1, n/(1 +identical(halfViolin,"pairwise")) + max(vioDat[[n]]$estimate)*1.1)              # readjust xLim to final wex
+      if(!isTRUE(add)) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
         graphics::axis(2, las=las, cex.axis=cexAxis)
         graphics::axis(1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data
@@ -299,7 +299,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       }
     } else {
       ## this is a horizontal plot ..
-      yLim <- c(1- max(vioDat[[i]]$estimate)*1.1, n+ max(vioDat[[n]]$estimate)*1.1)               # readjust xLim to final wex
+      yLim <- c(1- max(vioDat[[1]]$estimate)*1.1, n/(1 +identical(halfViolin,"pairwise")) + max(vioDat[[n]]$estimate)*1.1)              # readjust yLim to final wex
       if(!isTRUE(add)) {
         graphics::plot.window(xlim=yLim, ylim=xLim)
         graphics::axis(1, cex.axis=cexNameSer)
@@ -331,4 +331,4 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
   if(length(msg) >0) graphics::mtext(msg, side=1, cex=0.7, las=1)    # add note about groups/columns of data not plotted
   }
 }
-    
+      
