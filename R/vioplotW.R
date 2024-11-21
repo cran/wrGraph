@@ -1,4 +1,4 @@
-#' Violin-plots version W
+#' Violin-Plots Version W
 #'
 #' This function allows generating \href{https://en.wikipedia.org/wiki/Violin_plot}{Violin plots}) using a variety of input formats and offers additional options for colors.
 #' Main input may be multiple vectors, a matrix or list of multiple data-elements (entries may be of variable length),
@@ -7,8 +7,7 @@
 #' It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
 #' Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (here, the package \code{vioplot} is not required/used).
 #'
-#' @details The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applieds to all profiles drawn.
-#'  Please note that different n (eg for different columns) will not be shown, so far.
+#' @details The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applies to all profiles drawn.
 #'
 #' Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).
 #' Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas
@@ -68,12 +67,13 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
   if(!isTRUE(silent)) silent <- FALSE
   if(isTRUE(debug)) silent <- FALSE else debug <- FALSE
 
+  displLim <- 2        # limit for still displaying n on top of figure; still included
   fixArg <- c("x","finiteOnly","halfViolin","boxCol","hh","xlim","ylim","nameSer","horizontal","col","border","las",          # fixed argument names to check (and adjust)
     "lty","tit","lwd","rectCol","at","add","wex","drawRect",  "colMed","pchMed","silent","debug","callFrom")
   datas <- list(...)
-       out <- useColNo <- NULL
+  out <- useColNo <- NULL
   argN <- c(x=deparse(substitute(x)), sup=deparse(substitute(...)))
-  argL <- match.call(expand.dots = FALSE)$...            # extr arg names, based on https://stackoverflow.com/questions/55019441/deparse-substitute-with-three-dots-arguments
+  argL <- match.call(expand.dots = FALSE)$...             # extr arg names, based on https://stackoverflow.com/questions/55019441/deparse-substitute-with-three-dots-arguments
   if(debug) {message(callFrom," -> vioplotW  vv0"); vv0 <- list(datas=datas,x=x,argN=argN,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argL=argL,fixArg=fixArg)}
 
   ## separate specific arguments from all-input (lazy fitting) & clean datas
@@ -85,11 +85,21 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     if(any(chRepl)) {datas <- datas[-which(chRepl)]; argL <- argL[-which(chRepl)]}
   }
 
+  ## check for empty
+  if(length(x) >0)  { if(length(unlist(x)) <1) { x <- NULL
+     if(!silent) message(fxNa,"Main data '",argN[1],"' appears empty")
+  } }
+  if(length(datas) >0)  { if(length(unlist(datas)) <1) { datas <- NULL
+     if(debug) message(fxNa,"Suppl data '",argN[2],"' appears empty")
+  } }
+
   ## combine datas and x & set x to beginning , convert matrices to list of vectors
   if(length(x) >0)  {
     ## check x
+    #datas <- try(wrMisc::asSepList(x, asNumeric=TRUE, silent=silent, debug=debug, callFrom=fxNa), silent=TRUE)
+    #if(inherits(x, "try-error")) {datas <- NULL; if(!silent) message(fxNa,"Problem with separating data from main entry '",argN[1],"'")}}
     x <- try(wrMisc::asSepList(x, asNumeric=TRUE, silent=silent, debug=debug, callFrom=fxNa), silent=TRUE)
-    if(inherits(x, "try-error")) {datas <- NULL; if(!silent) message(fxNa,"Problem with separating data from main entry '",argN[1],"'")}}
+    if(inherits(x, "try-error")) {x <- NULL; if(!silent) message(fxNa,"Problem with separating data from main entry '",argN[1],"'")}}
 
   if(length(datas) >0)  {
     datas <- try(wrMisc::asSepList(datas, asNumeric=TRUE, silent=silent, debug=debug, callFrom=fxNa), silent=TRUE)
@@ -208,9 +218,6 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
 
     smFx2 <- function(yy, halfViolin, debug=FALSE, callFrom=NULL) {
       out <- try(smFx(yy, halfViolin, debug=FALSE), silent=TRUE)
-      #chEr <- sapply(out, inherits, "try-error")
-      #if(any(chEr)) { warning(callFrom,"Problem with calculating density ! Need to omit this series")
-      #  out <- out[which(!chEr)] }
       out }
 
     vioDat <- lapply(datas, smFx2, halfViolin, debug=debug, callFrom=fxNa)
@@ -222,7 +229,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       c(1 -max(0.2, vioDat[[1]]$estimate, na.rm=TRUE), n +max(0.2, vioDat[[n]]$estimate, na.rm=TRUE))}  # supposed vertical display, note final xLim is changed by wex
     yLim <- if(length(ylim) ==2) ylim else range(ra2[c(1,5),], na.rm=TRUE)
     if(debug) {message(fxNa,"vv7, Init xlim=",wrMisc::pasteC(signif(xLim),4),"  ylim=",wrMisc::pasteC(signif(yLim,4)) )
-      vv7 <- list(datas=datas,x=x,vioDat=vioDat,xLim=xLim,yLim=yLim,argN=argN,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,smDensity=smDensity,smArgs=smArgs,raYGlob=raYGlob,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argN=argN,argL=argL,halfViolin=halfViolin,horizontal=horizontal)}
+      vv7 <- list(datas=datas,x=x,vioDat=vioDat,xLim=xLim,yLim=yLim,argN=argN,finiteOnly=finiteOnly,halfViolin=halfViolin,boxCol=boxCol,hh=hh,smDensity=smDensity,smArgs=smArgs,raYGlob=raYGlob,xlim=xlim,ylim=ylim,nameSer=nameSer,tit=tit,argN=argN,argL=argL,halfViolin=halfViolin,horizontal=horizontal,add=add)}
 
     ## configure data/sample-names
     label <- if(is.null(nameSer)) names(datas) else nameSer
@@ -247,9 +254,15 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       at <- at[1:ceiling(n/2)] }
 
     ## configure n per samples
-    nDisp <- sapply(datas, function(x) sum(!is.na(x)))
-    nDisp <- if(length(unique(nDisp)) >1) paste0(rep(c("n=",""), if(n >6) c(1,n-1) else c(n,0)),nDisp) else paste(if(n >1) " each","n=",nDisp[1])
-    if(!isTRUE(add)) graphics::plot.new()
+    nDis0 <- sapply(datas, function(x) sum(!is.na(x)))
+    nDisp <- if(length(unique(nDis0)) >1) paste0(rep(c("n=",""), if(n >6) c(1,n-1) else c(n,0)), nDis0) else paste(if(n >1) " each","n=",nDis0[1])
+    chnDisp <- nDis0 < displLim
+    if(any(chnDisp)) {
+      nDisUni <- unique(nDis0[which(!chnDisp)])
+      if(length(nDisUni) >1) {nDisp[which(chnDisp)] <- ""} else nDisp <- paste0("n=",nDisUni[1]) 
+    }
+    if(n >3 && length(nDisp)==1) nDisp <- paste0(" ",nDisp)
+    if(debug) message(fxNa, "++ ", if(!isTRUE(add)) "Staring w plot" else "Adding plot to prevaious")
     ## for boxplot like insert
     boxFa <- 0.06                                  # box half-width
     boxCoor <- cbind(xL=(1:n) -boxFa, yB=ra2[2,], xR=(1:n) +boxFa, yT=ra2[4,])  # basic representation
@@ -262,7 +275,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       pwBoC[,impa] <- rbind(1:length(impa) -boxFa, ra2[2,impa], 1:length(impa), ra2[4,impa], 1:length(impa) -boxFa/2)
       pwBoC[,pair] <- rbind(1:length(pair), ra2[2,pair], 1:length(pair) +boxFa, ra2[4,pair], 1:length(impa) +boxFa/2)
     }
-     if(debug) {message(fxNa,"vv7c"); vv7c <- list( )}
+    if(debug) {message(fxNa,"vv7c"); vv7c <- list( )}
 
     ## automatic adjustement of wex
     ##  make automatic size of wex : smaller if many violins ...
@@ -273,19 +286,27 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
       if(debug) {message(fxNa,"vv7d  use wex=",signif(wex,4))}
     }
     for(i in 1:length(vioDat)) vioDat[[i]]$estimate <- vioDat[[i]]$estimate *wex      # change proportionally with of violins
-    if(debug) {message(fxNa,"vv8"); vv8 <- list(datas=datas, vioDat=vioDat,ra2=ra2,pwBoC=pwBoC,boxCoor=boxCoor,xLim=xLim,ylim=yLim,at=at,wex=wex,halfViolin=halfViolin,cexPt=cexPt,boxCol=boxCol )}
+    if(debug) {message(fxNa,"vv8"); vv8 <- list(datas=datas, vioDat=vioDat,ra2=ra2,pwBoC=pwBoC,boxCoor=boxCoor,xLim=xLim,ylim=yLim,at=at,wex=wex,halfViolin=halfViolin,cexPt=cexPt,boxCol=boxCol,nDisp=nDisp )}
+
     ## main plotting
+    if(!isTRUE(add)) graphics::plot.new() 
     if(!isTRUE(horizontal)) {                                                            # plot vertical
       xLim <- c(1- max(vioDat[[1]]$estimate)*1.1, n/(1 +identical(halfViolin,"pairwise")) + max(vioDat[[n]]$estimate)*1.1)              # readjust xLim to final wex
+      if(debug) message(fxNa," Ready for vertical plot;   cexNameSer ",cexNameSer,"   cexAxis ",cexAxis)
       if(!isTRUE(add)) {
         graphics::plot.window(xlim=xLim, ylim=yLim)
-        graphics::axis(2, las=las, cex.axis=cexAxis)
-        graphics::axis(1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data
-        if(length(xlab) >0) graphics::mtext(xlab, cex=cexLab, side=1, line=2.5)
+        tryP <- try(graphics::axis(side=2, las=las, cex.axis=cexAxis), silent=TRUE)                      # left on vertical plot (ie values)
+        if(inherits(tryP, "try-error")) {graphics::plot.new(); graphics::plot.window(xlim=xLim, ylim=yLim); graphics::axis(side=2, las=las, cex.axis=cexAxis);
+          if(!silent) message(fxNa,"vv8b  Starting as new plot ..") }
+        
+        graphics::axis(side=1, at=at, label=label, las=las, cex.axis=cexNameSer, adj=0.5)     # name/labels for indiv series of data
+        if(length(xlab) >0) graphics::mtext(xlab, cex=cexLab, side=1, line=2.5)               # axis legend
         if(length(ylab) >0) graphics::mtext(ylab, cex=cexLab, side=2, line=2.5)
         if(!is.null(tit)) graphics::title(main=tit)
       }
-      graphics::box()
+      tryB <- try(graphics::box(), silent=TRUE)
+      if(inherits(tryB, "try-error")) warning(fxNa,"Failed to create box()")
+      
       if(identical(halfViolin,"pairwise"))  {
         for(i in 1:n) graphics::polygon(ceiling(i/2) +vioDat[[i]]$estimate*(1 -2*(i %% 2)), vioDat[[i]]$evalPo, col=col[i], border=border)
         graphics::rect(pwBoC[1,], pwBoC[2,], pwBoC[3,], pwBoC[4,], col=boxCol, border=NA)
@@ -300,10 +321,11 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     } else {
       ## this is a horizontal plot ..
       yLim <- c(1- max(vioDat[[1]]$estimate)*1.1, n/(1 +identical(halfViolin,"pairwise")) + max(vioDat[[n]]$estimate)*1.1)              # readjust yLim to final wex
+      if(!silent) message(fxNa," Ready for horizontal plot;   cexNameSer ",cexNameSer,"   cexAxis ",cexAxis)
       if(!isTRUE(add)) {
         graphics::plot.window(xlim=yLim, ylim=xLim)
-        graphics::axis(1, cex.axis=cexNameSer)
-        graphics::axis(2, cex.axis=cexAxis, at=at, label=label,  cex=cexNameSer, las=las)
+        graphics::axis(side=1, cex.axis=cexNameSer)              # below
+        graphics::axis(side=2, cex.axis=cexAxis, at=at, label=label,  cex=cexNameSer, las=las)   # left
         if(length(xlab) >0) graphics::mtext(xlab, cex=cexLab, side=1, line=2.5)
         if(length(ylab) >0) graphics::mtext(ylab, cex=cexLab, side=2, line=2.5)
         if(!is.null(tit)) graphics::title(main=tit)
@@ -316,7 +338,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
         graphics::segments(ra2[2,impa], pair/2, ra2[4,impa], pair/2, col="grey",lty=2)     # grey line to separate adjacent boxes
       } else {for(i in 1:n) graphics::polygon(vioDat[[i]]$evalPo,i +vioDat[[i]]$estimate, col=col[i], border=border)
         graphics::rect(boxCoor[,2], boxCoor[,1], boxCoor[,4], boxCoor[,3], col=boxCol, border=NA)
-        graphics::points( ra2[3,], 1:n, pch=16, cex=cexPt, col=pointCol)
+        graphics::points(ra2[3,], 1:n, pch=16, cex=cexPt, col=pointCol)
         }
 
     }
@@ -324,11 +346,11 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     if(length(nDisp) <2) graphics::mtext(nDisp, adj=0, side=3, cex=0.7, line=-1, las=1) else {
       if(identical(halfViolin,"pairwise")) {
         nDisp <- cbind(nDisp[2*(1:(ceiling(n/2))) -1], c(nDisp[2*(1:(floor(n/2)))], if(n %%2 >0) " "))
-        if(horizontal) graphics::mtext(paste(nDisp[,2],nDisp[,1],sep="\n\n"), at=(1:nrow(nDisp))+0.01, side=3-horizontal, cex=0.7, line=-1.5, las=1) else {
-          graphics::mtext(paste(nDisp[,1],nDisp[,2],sep=" , "), at=1:nrow(nDisp), side=3, cex=0.7, line=-0.8)}
+        if(horizontal) graphics::mtext(paste(nDisp[,2],nDisp[,1], sep="\n\n"), at=(1:nrow(nDisp))+0.01, side=3-horizontal, cex=0.7, line=-1.5, las=1) else {
+          graphics::mtext(paste(nDisp[,1],nDisp[,2], sep=" , "), at=1:nrow(nDisp), side=3, cex=0.7, line=-0.8)}
       } else graphics::mtext(nDisp, at=(1:n) +horizontal/9, side=3-horizontal, las=1, cex=0.7, line=-0.8-horizontal)
     }
   if(length(msg) >0) graphics::mtext(msg, side=1, cex=0.7, las=1)    # add note about groups/columns of data not plotted
   }
 }
-      
+        

@@ -22,6 +22,23 @@ This package contains a collection of various plotting functions, mostly as an e
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse=TRUE, comment = "#>")
 ```
+This package is available from [CRAN](https://cran.r-project.org/), you might also have to install [wrMisc](https://CRAN.R-project.org/package=wrMisc), too.
+If not yet installed, the lastest versions of this package can be installed like this : 
+
+```{r setup2, echo=TRUE, eval=FALSE}
+if(!requireNamespace("wrMisc", quietly=TRUE)) install.packages("wrMisc")   # required underneath
+install.packages("wrGraph")
+```
+
+During this vignette we'll also use the packages [FactoMineR](https://CRAN.R-project.org/package=FactoMineR) and [factoextra](https://CRAN.R-project.org/package=factoextra), let's test if they are installed and install if not yet present.  
+
+```{r setup3, echo=TRUE, eval=FALSE}
+if(!requireNamespace("ggplot2", quietly=TRUE)) install.packages("ggplot2")   # also required
+if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
+if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
+```
+
+
 
 ```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
 suppressPackageStartupMessages({
@@ -32,19 +49,6 @@ suppressPackageStartupMessages({
 })
 ```
 
-This package is available from [CRAN](https://cran.r-project.org/), you might also have to install [wrMisc](https://CRAN.R-project.org/package=wrMisc), too.
-If not yet installed, the lastest versions of this package can be installed like this : 
-
-```{r setup2, echo=TRUE, eval=FALSE}
-install.packages("wrGraph")
-```
-
-During this vignette we'll also use the packages [FactoMineR](https://CRAN.R-project.org/package=FactoMineR) and [factoextra](https://CRAN.R-project.org/package=factoextra), let's test if they are installed and install if not yet present.  
-
-```{r setup3, echo=TRUE, eval=FALSE}
-if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
-if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
-```
 
 
 You cat start the vignette for this package by typing :
@@ -108,7 +112,7 @@ legend(legLoc$loc, legend=grp, text.col=2:3, pch=rep(2:3), cex=0.8)
 
 
 
-## One More Histogram Function ...
+## One More Histogram Function ...      {#HistW}
 
 Histograms are a very versatile tool for rapidly gaining insights in the distribution of data.
 This package presents a histogram function allowing to conveniently **work with log2-data** and (if desired) 
@@ -151,15 +155,15 @@ legendHist(iris[,2], loc="tl", legTit=colnames(iris)[2], cex=0.5)
 &nbsp; 
 
 
-## Violin Plots
+## Violin Plots             {#Violon-Plot}
 
 [Violin plots](https://en.wikipedia.org/wiki/Violin_plot) or vioplots are basically an adaptation of plotting the
 [Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) allowing to compare multiple data-sets.
 Please note, that although smoothed distributions please the human eye, some data-sets do not have such a continuous character.
 
-Compared to the 'original' vioplots in R from package [vioplot](https://CRAN.R-project.org/package=vioplot),
+Compared to the _vioplots_ R from the popular package [vioplot](https://CRAN.R-project.org/package=vioplot),
 the function provided here offers more flexibility for data-formats accepted (including data.frames and lists), coloring and display of n.
-All NA-values are ignored and n is adkusted accordingly.
+All NA-values are ignored/eliminated and n gets adjusted accordingly.
 In the case of the Iris-data, there are no NAs and thus n is constant, in consequence the number of values (n) is displayed only once. 
 However, frequently the number of values per data-set/violin n may vary (presence of NAs of list with vectors of different sizes).
 
@@ -174,6 +178,17 @@ In some cases the Kernel smoothing may appear to strong, this behaviour can be m
 ```{r vioplot2, fig.height=6, fig.width=8, echo=TRUE}
 ## less smoothing
 vioplotW(iris[,-5], tit="Iris-Data Violin Plot ('nervous')", hh=0.15)
+```
+
+
+### Paired Violin Plots
+
+In order to compare a paired setup easier only half-violins can be drawn for each distribution and shown back-to-back using the argument _halfViolin_.
+With larger data-sets this may be more helpful than in the example shown below.
+
+```{r vioplot3, fig.height=6, fig.width=6, echo=TRUE}
+## less smoothing
+vioplotW(iris[,-5], tit="Paired Iris-Data Violin Plot ", halfViolin="pairwise")
 ```
 
 
@@ -193,7 +208,7 @@ cumFrqPlot(iris[,1:4])
 ```
 
 For example, the Iris-data are rounded. As a result in the plot above the line is not progressing smooth but with more marked character of steps of stairs. 
-To get the same conclusion one would need to increase the number of bars in a histogram very much which would makes it in our experience more difficult to evaluate the same time the global distribution character.
+To get the same conclusion one would need to increase the number of bars in a histogram very much, which would makes it in our experience more difficult to evaluate the same time the global distribution character.
 
 At this plot you may note that the curves patal.width and petal.length look differently. 
 On the previous vioplots you may have noticed the bimodal character of the values, again this plot may be helpful to identify distributions which are very difficult to see well using boxplots.
@@ -210,9 +225,11 @@ To get a quick overview of the distribution of data and, in particular, of local
 
 Generally this type of display is called _heatmap_, however, most functions in R combine this directly with organizing by hierarchical clustering (_heatmap()_ (package stats) or _heatmap.2()_ from package [gplots](https://CRAN.R-project.org/package=wrMisc)).
 
-Simple plotting without reorganizing rows and columns can be done using the function _imageW()_ from this package, offering convenient options for displaying row- and column-names. 
-Using the argument _transp_ you can decide if the data should be shown _as is_ or rotated by 90 degrees (as in example below). 
-Furthermore, the output can be produced using stadard graphics or using the trellis/lattice framework. The latter includes also an automatic legend for the color-codes.
+Simple plotting without reorganizing rows and columns can be done using the function `imageW()` (from this package), offering convenient options for displaying row- and column-names. 
+First of all, the 1st line of your data will show up on the top of the plot and not on the bottom, as it is the case with _image()_ (since it starts counting from 0 at the bottom).
+
+Using the argument _transp_ you can decide if the data should be shown _as is_ or rotated by 90 degrees (as in example below, equivalent to a `t()` on your data). 
+Furthermore, the output can be produced using standard graphics or using the trellis/lattice framework. The latter includes also a convenient automatic legend for the color-codes used.
 Below, the first 40 lines of the Iris-dataset are used :
 
 ```{r imageW, echo=TRUE}
@@ -305,11 +322,11 @@ plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-Data")
 &nbsp; 
 
 
-## Principal Components Analysis (PCA)
+## Principal Components Analysis (PCA)     {#PCA}
 
 Principal components analysis, [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis), is a very powerful method
 to investigate similarity and correlation in larger sets of data.  
-Please note that several implementations exist in R (eg *prcomp()* in the base package stats or the package 
+Please note that several implementations exist in R (eg the function *prcomp()* in the base package stats or the package 
 [FactoMineR](https://CRAN.R-project.org/package=FactoMineR)).
 We'll start by looking at the plot produced with the basic function and FactoMineR, too.
 
@@ -321,23 +338,35 @@ iris.prc <- prcomp(iris[,1:4], scale.=TRUE)
 biplot(iris.prc)              # traditional plot
 ```
 
-
-```{r PCA3, echo=TRUE}
+Now we'll try plotting the PCA using the package 'FactoMineR':
+```{r PCA3a, echo=TRUE}
 ## via FactoMineR
 chPa <- c(requireNamespace("FactoMineR", quietly=TRUE), requireNamespace("dplyr", quietly=TRUE), 
-  requireNamespace("factoextra", quietly=TRUE))
+  requireNamespace("factoextra", quietly=TRUE), requireNamespace("ggpubr", quietly=TRUE) )
+```
+
+```{r PCA3b, echo=TRUE}
 if(all(chPa)) {
   library(FactoMineR); library(dplyr); library(factoextra)
   iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
-  fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
-    addEllipses=TRUE, legend.title="Groups" )
-} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure")  
+  iris.Fac2 <- try(fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
+    addEllipses=TRUE, legend.title="Groups"))
+  if(inherits(iris.Fac2, "try-error")) message("Problem running factoextra ..") else {
+    iris.Fac2 <- try(plot(iris.Fac2))  
+    if(inherits(iris.Fac2, "try-error")) message("A problem occured when trying to print from factoextra !!") }    
+} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure ! ",
+  "Check the messages of library() if there are other packages that may be missing (and need to get installed first)")  
 
 ```
 
 However, some sets of points do not always follow elliptic shapes. 
 Note, that FactoMineR represented the 2nd principal component upside-down compared to the very first PCA figure.
-To facilitate comparisons, the function *plotPCAw* has an argument allowing to rotate/flip any principal component axis. 
+To facilitate comparisons, the function *plotPCAw* has an argument allowing to rotate/flip any principal component axis (see below). 
+
+
+### PCA out of wrGraph
+
+Next we'll explore how to plot PCA using the function `plotPCAw()` out of this package.
 
 With more crowded data-sets it may be useful to rather highlight the more dense regions. 
 For this reason this package proposes to use [bagplots](https://en.wikipedia.org/wiki/Bagplot) 
@@ -367,13 +396,15 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
 
 ### Label all points in PCA
 
-In some cases it may be useful to identify all individual points on a plot.
-```{r PCA6, fig.height=7, fig.width=9, fig.align="center", echo=TRUE}
+In some cases it may be useful to identify all individual points on a plot using the argument _pointLabelPar_.
+
+```{r PCA6, fig.height=7.5, fig.width=9, fig.align="center", echo=TRUE}
 ## creat copy of data and add rownames
 irisD <- as.matrix(iris[,-5])
 rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
+## plot
 plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris Data PCA", 
-  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.45))
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.48))
 ```
 
 
@@ -383,7 +414,7 @@ plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Ir
 
 
 
-## MA-Plot
+## MA-Plot        {#MA-Plot}
 
 The aim of [MA-plots](https://en.wikipedia.org/wiki/MA_plot) consists in displaying a relative change on one axis (ordinate) while 
 showing the absolute (mean) value on the x-axis (abscissa). 
@@ -427,9 +458,11 @@ In the plot above one can see easily most of the points from the second group wh
 many of them exceed a (based on linear data) fold-change of 2 (which on log2 scale appears at 1.0).
 
 
-## Volcano-Plot
+## Volcano-Plot             {#Volcano-Plot}
 
-The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate) and outcome of statistical test on the other axis (abscissa). Typically the statistical values are represented as negative log10.
+The aim of [Volcano-plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) is to display a log-ratios on the x-axis (ordinate)
+ and outcome of statistical test on the y-axis (abscissa). 
+Typically the statistical values are represented as negative log10.
 
 This plot is very useful when inspecting larger data-sets for random or systematic effects.  
 Points with high log-ratios (ie high fold-change) may not always have enthusiastic p-values, too. 
@@ -491,11 +524,13 @@ locations to save files rather than R-temp which will be deleted when closing yo
 It is also possible to work with relative paths (eg by giving the png-filename without path). 
 Then the resultant html will simply require the png-file to be in the same directory as the html itself, and similarly for the clickable links.
 This results in files that are very easy to distribute to other people, in particular if the clickable links are pointing to the internet,
-however, the pnh-file always needs to be in the same directory as the html ...
+however, the png-file always needs to be in the same directory as the html ...
 If you have the possibility to make the png-file accessible through a url, you could also provide this url.
 
 The example below shows usage when specifying absolute paths. 
 Please note that the resulting html will not display the image if your browser cannot access the image any more.
+
+Unfortunately the resulting html couldn't get integrated in this package vignette. You need to open in (separetely) using a browser or launch a browser out of R (see end of code).
 
 
 
@@ -530,8 +565,10 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 
 ## Acknowledgements
 
-The author wants to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS), [CNRS](https://www.cnrs.fr/en), [Universit&eacute; de Strasbourg](https://www.unistra.fr) and [Inserm](https://www.inserm.fr) and of course all collegues from the [IGBMC proteomics platform](https://proteomics.igbmc.fr).
-The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their efforts in maintaining this repository of R-packages.
+The author would like to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS),
+[CNRS](http://www.cnrs.fr/en), [Universit&eacute; de Strasbourg (UdS)](https://www.unistra.fr) and [Inserm](https://www.inserm.fr).
+and of course all collegues from the [IGBMC proteomics platform](https://www.igbmc.fr/en/plateformes-technologiques/translate-to-english-proteomique).
+The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.
 This package is constantly evolving, new functions may get added to the next version.

@@ -205,8 +205,8 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256),
         alpha=if(max(table(sampleGrp)) > 2) signif(0.04 +0.25/nGrp, digits=3) else 0.1)
       dispOut <- length(unlist(pointLabelPar)) <1
-      outli <- if(displBagPl) addBagPlot(pca$x[which(as.numeric(wrMisc::naOmit(sampleGrp)) %in% i), 1:2], bagCol=useCol2, outCoef=outCoef,
-        ctrPch=useSymb2, returnOutL=TRUE, outlCol=useCol2, addSubTi=length(pointLabelPar >0) , callFrom=fxNa, silent=silent, debug=debug) else NULL
+      outli <- if(displBagPl) try(addBagPlot(pca$x[which(as.numeric(wrMisc::naOmit(sampleGrp)) %in% i), 1:2], bagCol=useCol2, outCoef=outCoef,
+        ctrPch=useSymb2, returnOutL=TRUE, outlCol=useCol2, addSubTi=length(pointLabelPar >0), callFrom=fxNa, silent=debug, debug=debug), silent=TRUE) else NULL
       if(length(outli) >0) outL[[i]] <- outli }
        if(debug) {message(fxNa,"plotPCAw_7.",i," .. displBagPl=",displBagPl) }
     if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {              # display of group-center (number & )
@@ -231,7 +231,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       graphics::plot(pca$x[,c(2,3)], pch=useSymb, main="PCA : 2nd and 3rd Component", col=useCol, cex=0.6, cex.axis=0.6*cexTxt, cex.lab=cexTxt*0.7, xlab=lab123[2], ylab=lab123[3], las=1 )
       for(i in 1:length(unique(sampleGrp))) {
         useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256), alpha=if(max(table(sampleGrp)) > 2) signif(0.04 +0.25/nGrp,digits=3) else 0.1)
-        if(displBagPl) addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(2,3)], outCoef=outCoef, bagCol=useCol2, ctrPch=useSymb2, returnOutL=FALSE, silent=silent, debug=debug) }
+        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(2,3)], outCoef=outCoef, bagCol=useCol2, ctrPch=useSymb2, returnOutL=FALSE, silent=debug, debug=debug), silent=TRUE) }
       if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {
         graphics::points(pca.grpMed[,c(2,3)], col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2, cex=1.1)
         cexCtr2 <- if(cexTxt <=1) useCex -0.1 else useCex
@@ -239,7 +239,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       graphics::plot(pca$x[,c(1,3)], pch=useSymb, main="PCA : 1st and 3rd Component", col=useCol, cex=0.6, cex.axis=0.6*cexTxt, cex.lab=cexTxt*0.7, xlab=lab123[1], ylab=lab123[3],las=1 )
       for(i in 1:length(unique(sampleGrp))) {
         useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256), alpha=if(max(table(sampleGrp)) > 2) signif(0.04+0.25/nGrp,digits=3) else 0.1)
-        if(displBagPl) addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(1,3)], outCoef=outCoef, bagCol=useCol2,ctrPch=useSymb2,returnOutL=FALSE,silent=TRUE) }
+        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(1,3)], outCoef=outCoef, bagCol=useCol2,ctrPch=useSymb2,returnOutL=FALSE,silent=debug), silent=TRUE) }
       if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {
         graphics::points(pca.grpMed[,c(1,3)],col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2, cex=1.1)
         graphics::text(pca.grpMed[,c(1,3)] +1.7*figNumOffs(pca, cols=c(1,3)), as.character(1:nGrp)[order(as.numeric(unique(averNa3)))], cex=useCex-0.1, col=1) }

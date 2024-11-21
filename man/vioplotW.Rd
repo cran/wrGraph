@@ -2,7 +2,7 @@
 % Please edit documentation in R/vioplotW.R
 \name{vioplotW}
 \alias{vioplotW}
-\title{Violin-plots version W}
+\title{Violin-Plots Version W}
 \usage{
 vioplotW(
   x,
@@ -113,8 +113,7 @@ It is also possible to plot pairwise half-violins for easier pairwise-comparison
 Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (here, the package \code{vioplot} is not required/used).
 }
 \details{
-The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applieds to all profiles drawn.
- Please note that different n (eg for different columns) will not be shown, so far.
+The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applies to all profiles drawn.
 
 Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).
 Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas

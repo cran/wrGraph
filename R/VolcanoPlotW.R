@@ -75,7 +75,7 @@
 VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, FCthrs=NULL, FdrList=NULL, FdrThrs=NULL, FdrType=NULL,
   subTxt=NULL, grayIncrem=TRUE, col=NULL, pch=16, compNa=NULL, batchFig=FALSE, cexMa=1.8, cexLa=1.1, limM=NULL, limp=NULL,
   annotColumn=c("SpecType","GeneName","EntryName","Accession","Species","Contam"), annColor=NULL, expFCarrow=FALSE,cexPt=NULL, cexSub=NULL,
-  cexTxLab=0.7, namesNBest=NULL, NbestCol=1, sortLeg="descend", NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE,debug=FALSE) {
+  cexTxLab=0.7, namesNBest=NULL, NbestCol=1, sortLeg="descend", NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE, debug=FALSE) {
   ## MA plot
   ## optional arguments for explicit title in batch-mode
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="VolcanoPlotW")
@@ -121,12 +121,12 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       }  ## .. otherwise spearate pValue was provided
       if(debug) {message(fxNa,"VPW3")}
       ## look for M-values (need to create if not available - using useComp checked when extracting pValue)
-      Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","m"), tolower(names(Mvalue))))      # which list-element
+      Melem <- wrMisc::naOmit(match(c("mvalues","mvalue","mval","m"), tolower(names(Mvalue))))      # which list-element
       Fcol <- wrMisc::naOmit(match(if(length(FdrType) <1) c("fdr","bh","lfdr","by","p.value") else tolower(FdrType), tolower(names(Mvalue))))    # needed for matching means to pair-wise names and for extracting FDR values
-      if(debug) {message(fxNa,"Fcol : ",wrMisc::pasteC(Fcol),"    VPW4")}
+      if(debug) {message(fxNa,"Fcol : ",wrMisc::pasteC(Fcol),"    VPW4"); VPW4 <- list(FdrList=FdrList,Mvalue=Mvalue,Fcol=Fcol,Melem=Melem,FdrType=FdrType,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans)}       #pairwCol=pairwCol,
 
       if(length(Fcol) <1) stop("Can't find elment suitable for statistical values", if(length(FdrType)==1) c(" to '",FdrType,"'")) else Fcol <- Fcol[1]
-      if(!silent & length(FdrType) <1) message(fxNa,"Using element '",names(Mvalue)[Fcol],"' as FDR-values for plot")
+      if(!silent && length(FdrType) <1) message(fxNa,"Using element '",names(Mvalue)[Fcol],"' as FDR-values for plot")
       if("lfdr" %in% names(Mvalue)[Fcol]) {   # switch from directly plotting FDR-values to uncorrected p-values
         plotByFdr <- FALSE }
 
@@ -136,7 +136,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol, callFrom=fxNa, silent=silent)
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])
         ## are all group-means needed (for exporting) ??
-      } else {grpMeans <- NULL; warning(fxNa,"Could not find suitable field '$means' in '",namesIn[1],"'")    }
+      } else {grpMeans <- NULL; message(fxNa,"NOTE: Could not find suitable field '$means' in '",namesIn[1],"'")    }
 
       if(length(Melem) >0) {            ## M-values are available
         Mvalue$Mval <- Mvalue[[Melem]]
@@ -150,9 +150,9 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           Melem <- which(names(Mvalue) =="Mval")                # update
         } else stop("Can't construct M-values since suitable field '$means' missing in '",namesIn[1],"' !")
       }
-      if(debug) {message(fxNa,"VPW4b")}
+      if(debug) {message(fxNa,"VPW4b"); VPW4b <- list()} 
       ## now one can check if 'pValue' & Mvalue match
-      chPM <- length(pValue) >0 && length(as.numeric(pValue)) == length(as.numeric(Mvalue[[Melem]]))
+      chPM <- length(pValue) >0 && length(pValue) == if(length(dim(Mvalue[[Melem]]))==2) nrow(Mvalue[[Melem]]) else length(Mvalue[[Melem]])
       if(!chPM) {
         if(length(pcol) >0) {            # pVal avilable in Mvalue
           if(length(as.numeric(Mvalue[[pcol[1]]][,useComp])) ==length(as.numeric(Mvalue[[Melem]]))) {  # pVal from Mvalue seems to fit => use
@@ -160,7 +160,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           } else stop("'pValue' & 'Mvalue' don't match")
         } else stop("'pValue' & 'Mvalue' don't match (no field in MArrayLM-object available)")
       }
-      if(debug) {message(fxNa,"Fcol : ",wrMisc::pasteC(Fcol),"    VPW5"); VPW5 <- list(FdrList=FdrList,Mvalue=Mvalue,Fcol=Fcol,Melem=Melem,FdrType=FdrType,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,pairwCol=pairwCol,grpMeans=grpMeans)}
+      if(debug) {message(fxNa,"Fcol : ",wrMisc::pasteC(Fcol),"    VPW5"); VPW5 <- list(FdrList=FdrList,Mvalue=Mvalue,Fcol=Fcol,Melem=Melem,FdrType=FdrType,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans)}   # pairwCol=pairwCol,
       ## extract FDR from MArrayLM-object
       if(length(FdrList) <1) {
         ## no explicit pValue, try to extract from MArrayLM-object (Mvalue)
@@ -182,7 +182,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
           FDRvalue <- as.numeric(FDRvalue[,useComp])
           if(length(pNa) >0) names(FDRvalue) <- pNa }}
       }
-      if(debug) {message(fxNa,"VPW6")}
+      if(debug) {message(fxNa,"VPW6"); VPW6 <- list(FdrList=FdrList,Mvalue=Mvalue,Fcol=Fcol,Melem=Melem,FdrType=FdrType,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans)}
       ## recuperate filtering - if present, but only when no custom filtering provided
       if(length(filtFin) <1 || isFALSE(filtFin)) {
         Fcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"), tolower(names(Mvalue))))
@@ -233,7 +233,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         names(pValue) <- pNa}
       FDRvalue <- if(length(FdrList) <1) NULL else FdrList
     }
-    if(debug) {message(fxNa,"VPW8")}
+    if(debug) {message(fxNa,"VPW8"); VPW8 <-  list(FdrList=FdrList,Mvalue=Mvalue,FdrType=FdrType,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans)}
 
     ## need to introduce -log10 to pValue
     chNA <- is.na(pValue)
@@ -256,7 +256,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       if(length(Mvalue) != length(pValue)) stop("p- and M- values have different length, but no names to match !!  (M=",length(Mvalue)," vs p=",length(pValue),")")
     }
     if(length(grpMeans) <1) grpMeans <- matrix(rep(NA,2*length(Mvalue)), ncol=2, dimnames=list(names(Mvalue),c("mean1","mean2")))
-    if(debug) {message(fxNa,"VPW9"); VPW9 <- list(FdrList=FdrList,Mvalue=Mvalue,FdrType=FdrType,FDRvalue=FDRvalue,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,pairwCol=pairwCol,grpMeans=grpMeans, filtFin=filtFin,annotColumn=annotColumn,annot=annot, pch=pch,sortLeg=sortLeg,batchFig=batchFig)}
+    if(debug) {message(fxNa,"VPW9"); VPW9 <- list(FdrList=FdrList,Mvalue=Mvalue,FdrType=FdrType,FDRvalue=FDRvalue,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans, filtFin=filtFin,annotColumn=annotColumn,annot=annot, pch=pch,sortLeg=sortLeg,batchFig=batchFig)}       # pairwCol=pairwCol,
 
     ## prepare/integrate FILTERING
     if(length(filtFin) >0) {
@@ -266,7 +266,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         matchNa <- wrMisc::naOmit(match(rownames(pValue), names(filtFin)))
         if(length(matchNa)==length(pValue)) filtFin <- as.logical(filtFin[matchNa])
       }
-    } else filtFin <- rep(TRUE, nrow(merg))
+    } else filtFin <- rep(TRUE, nrow(grpMeans))
 
 
     ## start creating merged data for plot (& export)
@@ -282,7 +282,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       if(any(chNa)) merg[which(chNa),annotColumn[1]] <- "NA"
     } else { merg <- cbind(merg, rep(1,nrow(merg)))            # add colum for 'SpecType'
       colnames(merg)[ncol(merg)] <- annotColumn[1] }
-    if(debug) {message(fxNa,"VPW10")}
+    if(debug) {message(fxNa,"VPW10"); VPW10 <- list(merg=merg,FdrList=FdrList,Mvalue=Mvalue,FdrType=FdrType,FDRvalue=FDRvalue,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans, filtFin=filtFin,annotColumn=annotColumn,annot=annot, pch=pch,sortLeg=sortLeg,batchFig=batchFig)}
 
     ## adjust col & pch
     if(!any(c(1,length(Mvalue)) %in% length(pch))) {
@@ -310,7 +310,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
         if(!silent) message(fxNa," filtered (based on 'filtFin') from ",length(filtFin)," to  ",nrow(merg)," lines")
       }
     } else filtFin <- rep(TRUE, nrow(merg))
-    if(debug) {message(fxNa,"VPW11")}
+    if(debug) {message(fxNa,"VPW11"); VPW11 <- list(merg=merg,FdrList=FdrList,Mvalue=Mvalue,FdrType=FdrType,FDRvalue=FDRvalue,plotByFdr=plotByFdr,pValue=pValue,useComp=useComp,grpMeans=grpMeans, filtFin=filtFin,annotColumn=annotColumn,annot=annot, pch=pch,sortLeg=sortLeg,batchFig=batchFig)}
 
     ## sort merg, so that legend always gets constructed the same order, ascending ('ascend') or descending ('descend')
     sortLeg <- if(identical(sortLeg,"ascend")) FALSE else {if(identical(sortLeg,"descend")) TRUE else NULL}
@@ -345,7 +345,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     chNA <- is.na(passAll)                              # passFdr may contain NAs
     if(any(chNA)) passAll[which(chNA)] <- FALSE
     if(debug) message(fxNa,"  ",sum(passFC,na.rm=TRUE)," passing FCthrs ; ",sum(passFdr,na.rm=TRUE)," passing FdrThrs ; combined ",sum(passAll,na.rm=TRUE))
-    if(debug) {message(fxNa,"VPW13")}
+    if(debug) {message(fxNa,"VPW13"); VPW13 <- list(merg=merg,Mvalue=Mvalue,filtFin=filtFin,col=col,passAll=passAll,cexPt=cexPt,annotColumn=annotColumn,annColor=annColor)}
 
     ## color for points passing filter
     if(length(col) >0) if(length(col) != nrow(merg)) { col <- NULL
@@ -375,19 +375,21 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
       ## assign color for those passing
       useCol[which(passAll)] <- if(any(passAll, na.rm=TRUE)) colPass[if(length(unique(merg[which(passAll),annotColumn[1]])) >1) wrMisc::levIndex(merg[which(passAll),annotColumn[1]]) else rep(1,sum(passAll))]  # assign colors for those passing
     } else useCol <- col
+    if(debug) {message(fxNa,"VPW13b"); VPW13b <- list(merg=merg,Mvalue=Mvalue,filtFin=filtFin,col=col,passAll=passAll,cexPt=cexPt,annotColumn=annotColumn,annColor=annColor,pch=pch,useCol=useCol)}
+
     ## adjust fill color for open symbols
     chPch <- pch %in% c(21:25)
-    if(any(chPch)) { ptBg <- useCol
+    if(any(chPch, na.rm=TRUE)) { ptBg <- useCol
       ptBg[which(chPch)] <- useCol[which(chPch)]    # background color for filled symbols
       useCol[which(chPch)] <- 1                     # contour as black
-    }
+    } 
 
 
   ## main graphics
   if(length(Mvalue) >0) {
     pl1 <- try(graphics::par(mar=if(length(useMar)==4) useMar else c(6.5,4,4,2), cex.main=cexMa, las=1), silent=TRUE)
     if(inherits(pl1, "try-error")) {Mvalue <- NULL; message("UNABLE TO SET PLOT MARGINS !!  check plotting device ...")}
-    if(debug) {message(fxNa,"VPW14")}  }
+    if(debug) {message(fxNa,"VPW14"); VPW14 <- list(pl1=pl1,merg=merg,Mvalue=Mvalue,filtFin=filtFin,useMar=useMar)}  }
 
   if(length(Mvalue) >0) {
     ## rather directly plot FDR

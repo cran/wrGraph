@@ -1,6 +1,15 @@
 ## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(collapse=TRUE, comment = "#>")
 
+## ----setup2, echo=TRUE, eval=FALSE--------------------------------------------
+# if(!requireNamespace("wrMisc", quietly=TRUE)) install.packages("wrMisc")   # required underneath
+# install.packages("wrGraph")
+
+## ----setup3, echo=TRUE, eval=FALSE--------------------------------------------
+# if(!requireNamespace("ggplot2", quietly=TRUE)) install.packages("ggplot2")   # also required
+# if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
+# if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
+
 ## ----setup, echo=FALSE, messages=FALSE, warnings=FALSE------------------------
 suppressPackageStartupMessages({
     library(wrMisc)
@@ -9,16 +18,9 @@ suppressPackageStartupMessages({
     library(factoextra)
 })
 
-## ----setup2, echo=TRUE, eval=FALSE--------------------------------------------
-#  install.packages("wrGraph")
-
-## ----setup3, echo=TRUE, eval=FALSE--------------------------------------------
-#  if(!requireNamespace("FactoMineR", quietly=TRUE)) install.packages("FactoMineR")
-#  if(!requireNamespace("factoextra", quietly=TRUE)) install.packages("factoextra")
-
 ## ----vignBrowse, echo=TRUE, eval=FALSE----------------------------------------
-#  # access vignette :
-#  browseVignettes("wrGraph")    #  ... and the select the html output
+# # access vignette :
+# browseVignettes("wrGraph")    #  ... and the select the html output
 
 ## ----setup4, echo=TRUE--------------------------------------------------------
 library("wrMisc")
@@ -69,6 +71,10 @@ vioplotW(iris[,-5], tit="Iris-Data Violin Plot")
 ## less smoothing
 vioplotW(iris[,-5], tit="Iris-Data Violin Plot ('nervous')", hh=0.15)
 
+## ----vioplot3, fig.height=6, fig.width=6, echo=TRUE---------------------------
+## less smoothing
+vioplotW(iris[,-5], tit="Paired Iris-Data Violin Plot ", halfViolin="pairwise")
+
 ## ----cumFrqPlot1, echo=TRUE---------------------------------------------------
 cumFrqPlot(iris[,1:4])
 
@@ -115,16 +121,22 @@ plotLinReg(iris$Sepal.Length, iris$Petal.Width, tit="Iris-Data")
 iris.prc <- prcomp(iris[,1:4], scale.=TRUE)
 biplot(iris.prc)              # traditional plot
 
-## ----PCA3, echo=TRUE----------------------------------------------------------
+## ----PCA3a, echo=TRUE---------------------------------------------------------
 ## via FactoMineR
 chPa <- c(requireNamespace("FactoMineR", quietly=TRUE), requireNamespace("dplyr", quietly=TRUE), 
-  requireNamespace("factoextra", quietly=TRUE))
+  requireNamespace("factoextra", quietly=TRUE), requireNamespace("ggpubr", quietly=TRUE) )
+
+## ----PCA3b, echo=TRUE---------------------------------------------------------
 if(all(chPa)) {
   library(FactoMineR); library(dplyr); library(factoextra)
   iris.Fac <- PCA(iris[,1:4],scale.unit=TRUE, graph=FALSE)
-  fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
-    addEllipses=TRUE, legend.title="Groups" )
-} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure")  
+  iris.Fac2 <- try(fviz_pca_ind(iris.Fac, geom.ind="point", col.ind=iris$Species, palette=c(2,4,3), 
+    addEllipses=TRUE, legend.title="Groups"))
+  if(inherits(iris.Fac2, "try-error")) message("Problem running factoextra ..") else {
+    iris.Fac2 <- try(plot(iris.Fac2))  
+    if(inherits(iris.Fac2, "try-error")) message("A problem occured when trying to print from factoextra !!") }    
+} else message("You need to install packages 'dplyr', 'FactoMineR' and 'factoextra' for this figure ! ",
+  "Check the messages of library() if there are other packages that may be missing (and need to get installed first)")  
 
 
 ## ----PCA4, echo=TRUE----------------------------------------------------------
@@ -138,12 +150,13 @@ plotPCAw(t(as.matrix(iris[,-5])), gl(3,50,labels=c("setosa","versicolor","virgin
   tit="Iris Data PCA", rowTyName="types of leaves", cexTxt=2)
 
 
-## ----PCA6, fig.height=7, fig.width=9, fig.align="center", echo=TRUE-----------
+## ----PCA6, fig.height=7.5, fig.width=9, fig.align="center", echo=TRUE---------
 ## creat copy of data and add rownames
 irisD <- as.matrix(iris[,-5])
 rownames(irisD) <- paste(iris$Species, rep(1:50,3), sep="_")
+## plot
 plotPCAw(t(irisD), gl(3,50,labels=c("setosa","versicolor","virginica")), tit="Iris Data PCA", 
-  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.45))
+  rowTyName="types of leaves", suplFig=FALSE, cexTxt=1.6, rotatePC=2, pointLabelPar=list(textCex=0.48))
 
 ## ----MA0, fig.height=6, fig.width=8, fig.align="center", echo=TRUE------------
 ## toy data

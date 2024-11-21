@@ -2,7 +2,7 @@
 % Please edit documentation in R/imageW.R
 \name{imageW}
 \alias{imageW}
-\title{Display numeric content of matrix as image}
+\title{Display Numeric Content Of Matrix As Image}
 \usage{
 imageW(
   data,
@@ -14,6 +14,8 @@ imageW(
   colNa = NULL,
   xLab = NULL,
   yLab = NULL,
+  xLabVal = NULL,
+  yLabVal = NULL,
   las = 2,
   col = NULL,
   nColor = 9,
@@ -26,12 +28,13 @@ imageW(
   supLat = list(),
   rotXlab = 0,
   rotYlab = 0,
-  cexXlab = 0.7,
+  cexTit = 1.6,
   cexAxs = NULL,
+  cexXlab = 0.7,
   cexYlab = 0.9,
+  showValues = FALSE,
   Xtck = 0,
   Ytck = 0,
-  cexTit = 1.6,
   silent = FALSE,
   debug = FALSE,
   callFrom = NULL
@@ -53,9 +56,13 @@ set to \code{FALSE} to get behaviour prior to version 1.3.0.}
 
 \item{colNa}{(character) optional custom colnames}
 
-\item{xLab}{(character) optional custom text for x-axis 'values'}
+\item{xLab}{(character, length=1) optional custom text for x-axis label (so far fixed color & fontsiez)}
 
-\item{yLab}{(character) optional custom text for y-axis 'values'}
+\item{yLab}{(character, length=1) optional custom text for y-axis label}
+
+\item{xLabVal}{(character) optional custom text for x-axis 'values' (multiple values/names instead of counters, replaces argument \code{xLab} in older versions)}
+
+\item{yLabVal}{(character) optional custom text for y-axis 'values' (multiple values/names instead of counters, replaces argument \code{yLab} in older versions)}
 
 \item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}}); in case of \code{latticeVersion=TRUE} this argument will override default \code{rotXlab=0} and/or  \code{rotYlab=0}}
 
@@ -76,23 +83,26 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 
 \item{panel.background.col}{(character, only used in lattice version)}
 
-\item{supLat}{(list, only used in lattice version) additional arguments/parameters passed to \code{levelplot}}
+\item{supLat}{(list, only used in lattice version) additional arguments/parameters passed to \code{levelplot} - currently not activated}
 
-\item{rotXlab}{(numeric, 0 - 360, lattice version only) control rotation of x-axis labels}
+\item{rotXlab}{(numeric, 0 - 360, lattice version only) control rotation of x-axis values}
 
-\item{rotYlab}{(numeric, 0 - 360, lattice version only) control rotation of y-axis labels}
+\item{rotYlab}{(numeric, 0 - 360, lattice version only) control rotation of y-axis values}
 
-\item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
+\item{cexTit}{(numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})}
 
 \item{cexAxs}{(numeric) cex-like expansion factor for x- and y-axis text/labels (see also \code{\link[graphics]{par}})}
 
+\item{cexXlab}{(numeric) cex-like expansion factor for x-axis labels  (see also \code{\link[graphics]{par}})}
+
 \item{cexYlab}{(numeric) cex-like expansion factor for y-axis labels  (see also \code{\link[graphics]{par}})}
+
+\item{showValues}{(logical or numeric) optional display of values from data, if contains eg \code{cex=0.5} this value will be used as expansion factor 
+(otherwise default to 0.6); if contains eg \code{digits=3} this value displayed will be rounded to this number of significant digits  (otherwise default to 4)}
 
 \item{Xtck}{(numeric or logical) expansion factor for length of tick-marks on x-axis (default=0 for no tick-marks)}
 
 \item{Ytck}{(numeric or logical) expansion factor for length of tick-marks on y-axis}
-
-\item{cexTit}{(numeric) cex-like expansion factor for title  (see also \code{\link[graphics]{par}})}
 
 \item{silent}{(logical) suppress messages}
 
@@ -112,11 +122,11 @@ To do this more conveniently, the function \code{imageW} offers additional optio
 \details{
 This function allows two modes of operation : 1) plotting using standard R -graphics or 2) using the framework of grid- and lattice-graphics (since version 1.2.6). 
 The latter version allows integrating a legend for the color-scale and adding grid-lines, rotation of axis-labels or removing tick-marks.
-Please note that sometimes the center-color segment may not end up directly with the center-color, in this case you may adjust using the argument \code{centColShift=-1}
+Please note that sometimes the center-color segment may not end up directly with the center of the scale, in this case you may adjust using the argument \code{centColShift=-1}
 }
 \examples{
-imageW(as.matrix(iris[1:40,1:4]), transp=FALSE, tit="Iris (head)")
-imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, col=c("blue","red"), 
+imageW(iris[1:40,1:4], transp=FALSE, tit="Iris (head)")
+imageW(iris[1:20,1:4], latticeVersion=TRUE, col=c("blue","red"), 
   rotXlab=45, yLab="Observation no", tit="Iris (head)")
 }
 \seealso{
