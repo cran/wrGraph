@@ -1,5 +1,5 @@
 Package: wrGraph
-Version: 1.3.8
+Version: 1.3.9
 Title: Graphics in the Context of Analyzing High-Throughput Data
 Authors@R: person("Wolfgang", "Raffelsberger", email = "w.raffelsberger@gmail.com", role = c("aut", "cre"))
 Author: Wolfgang Raffelsberger [aut, cre]
@@ -22,6 +22,6 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-11-21 13:12:39 UTC; wraff
+Packaged: 2025-04-01 14:19:26 UTC; wraff
 Repository: CRAN
-Date/Publication: 2024-11-21 14:30:03 UTC
+Date/Publication: 2025-04-01 23:10:02 UTC

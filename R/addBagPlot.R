@@ -27,7 +27,7 @@
 #' @param ctrPch (integer) symbol for showing group center (see also \code{\link[graphics]{par}})
 #' @param ctrCex (numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})
 #' @param ctrCol (character or integer) color for group center symbol
-#' @param addSubTi (logical) decide if subtitle (stating that potential outlyers were displayed separatetly) should be added in plot
+#' @param addSubTi (logical) decide if subtitle, ie names of points should be added in plot for points considered as potential outlyers
 #' @param returnOutL (logical) decide if rownames of (potential) outlyer values should be returned when running the function
 #' @param silent (logical) suppress messages
 #' @param callFrom (character) allow easier tracking of messages produced
@@ -119,14 +119,14 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
       if(is.null(ctrCex)) ctrCex <- 1.5
       graphics::points(ctr[1], ctr[2], pch=ctrPch, col=ctrCol, cex=ctrCex) }
     ## highlight outliers
-    if(length(outlCol) >0 & nrow(outL) >0) {
+    if(length(outlCol) >0 && nrow(outL) >0) {
       if(debug) {message(fxNa,"aBP4"); aBP4 <- list(ctr=ctr,x=x,lev1=lev1,outCoef=outCoef,outL=outL,outlPch=outlPch,outlCol=outlCol,addSubTi=addSubTi,outlCex=outlCex,
         offS=offS,bagCol=bagCol,bagCont=bagCont,bagLwd=bagLwd,silent=silent,debug=debug ) }
       if(length(outlPch) >0) graphics::points(outL, pch=outlPch, col=outlCol)
       if(length(addSubTi) <1 || !is.logical(addSubTi)) addSubTi <- FALSE else if(length(addSubTi) >1) addSubTi <- any(as.logical(addSubTi), na.rm=TRUE)
-      if(addSubTi && length(outlCex) <1) graphics::mtext(paste("names of ",sum(!sapply(outL, is.null),na.rm=TRUE),
+      if(addSubTi && length(outlCex) >0) { graphics::mtext(paste("names of ",sum(!sapply(outL, is.null),na.rm=TRUE),
         " elements looking like potential outlyers were displayed"), cex=0.55, line=-0.8, col=grDevices::grey(0.4))
-      if(length(outlCex) >0) graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21))
+        graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21)) }  # labels of points
       }
   }
   if(returnOutL) return( if(length(x) >0) {if(is.null(rownames(outL))) which(!keepX) else rownames(outL)} else NULL )

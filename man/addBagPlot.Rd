@@ -61,7 +61,7 @@ addBagPlot(
 
 \item{ctrCex}{(numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})}
 
-\item{addSubTi}{(logical) decide if subtitle (stating that potential outlyers were displayed separatetly) should be added in plot}
+\item{addSubTi}{(logical) decide if subtitle, ie names of points should be added in plot for points considered as potential outlyers}
 
 \item{returnOutL}{(logical) decide if rownames of (potential) outlyer values should be returned when running the function}
 
