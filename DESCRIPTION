@@ -1,5 +1,5 @@
 Package: wrGraph
-Version: 1.3.9
+Version: 1.3.10
 Title: Graphics in the Context of Analyzing High-Throughput Data
 Authors@R: person("Wolfgang", "Raffelsberger", email = "w.raffelsberger@gmail.com", role = c("aut", "cre"))
 Author: Wolfgang Raffelsberger [aut, cre]
@@ -12,7 +12,7 @@ Description: Additional options for making graphics in the context of analyzing 
   principal components analysis (PCA) <doi:10.1080/14786440109462720> with bag-plots <doi:10.1080/00031305.1999.10474494> to highlight and compare the center areas for groups of samples, 
   generic MA-plots (differential- versus average-value plots) <doi:10.1093/nar/30.4.e15>, 
   staggered count plots and generation of mouse-over interactive html pages.
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.5.0)
 Imports: graphics, grDevices, grid, lattice, RColorBrewer, stats,
         wrMisc
 Suggests: dplyr, factoextra, FactoMineR, ggpubr, knitr, limma,
@@ -22,6 +22,6 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2025-04-01 14:19:26 UTC; wraff
+Packaged: 2025-06-17 11:15:18 UTC; wraff
 Repository: CRAN
-Date/Publication: 2025-04-01 23:10:02 UTC
+Date/Publication: 2025-06-17 22:30:02 UTC

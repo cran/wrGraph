@@ -13,7 +13,8 @@
 #' @param pValue (numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the p-values to be used
 #' @param useComp (integer, length=1) choice of which of multiple comparisons to present in \code{Mvalue} (if generated using \code{moderTestXgrp()})
 #' @param filtFin (matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied
-#' @param ProjNa (character) custom title
+#' @param tit (character) custom title (has priority over \code{ProjNa})
+#' @param ProjNa (character) will be added to automatic title (if custom title \code{tit} was not specified)
 #' @param FCthrs (numeric) Fold-Change threshold (display as line) give as Fold-change and NOT log2(FC), default at 1.5, set to \code{NA} for omitting
 #' @param FdrList (numeric) FDR data or name of list-element
 #' @param FdrThrs (numeric) FDR threshold (display as line), default at 0.05, set to \code{NA} for omitting
@@ -72,7 +73,7 @@
 #' VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
 #'
 #' @export
-VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, FCthrs=NULL, FdrList=NULL, FdrThrs=NULL, FdrType=NULL,
+VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, tit=NULL, ProjNa=NULL, FCthrs=NULL, FdrList=NULL, FdrThrs=NULL, FdrType=NULL,
   subTxt=NULL, grayIncrem=TRUE, col=NULL, pch=16, compNa=NULL, batchFig=FALSE, cexMa=1.8, cexLa=1.1, limM=NULL, limp=NULL,
   annotColumn=c("SpecType","GeneName","EntryName","Accession","Species","Contam"), annColor=NULL, expFCarrow=FALSE,cexPt=NULL, cexSub=NULL,
   cexTxLab=0.7, namesNBest=NULL, NbestCol=1, sortLeg="descend", NaSpecTypeAsContam=TRUE, useMar=c(6.2,4,4,2), returnData=FALSE, callFrom=NULL, silent=FALSE, debug=FALSE) {
@@ -330,7 +331,7 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, ProjNa=NU
     ## prepare for  plotting
     if(is.null(cexSub)) cexSub <- cexLa +0.05
     xLab <- "M-value (log2 fold-change)"
-    tit1 <- paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","Volcano-Plot"),
+    tit1 <- if(length(tit)==1 && nchar(tit) >0) tit else paste(c(if(!batchFig) c(ProjNa, if(!is.null(ProjNa)) ": ","Volcano-Plot"),
       if(!is.null(compNa)) c(compNa[1]," vs ",compNa[2])), collapse=" ")    # but what title if batchFig=NULL & compNa=NULL -> only "Volcano-plot"
     if(length(FCthrs) <1) FCthrs <- 1.5
     if(length(FdrThrs) <1) FdrThrs <- 0.05

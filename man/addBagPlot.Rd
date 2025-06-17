@@ -12,7 +12,7 @@ addBagPlot(
   bagCont = bagCol,
   bagLwd = 1.5,
   nCore = 4,
-  outlCol = 2,
+  outlCol = NULL,
   outlPch = NULL,
   outlCex = 0.6,
   reCol = NULL,
@@ -57,7 +57,7 @@ addBagPlot(
 
 \item{ctrPch}{(integer) symbol for showing group center (see also \code{\link[graphics]{par}})}
 
-\item{ctrCol}{(character or integer) color for group center symbol}
+\item{ctrCol}{(character or integer) color for group center symbol and potential outlyers (names of outlyers will shown if \code{returnOutL=TRUE})}
 
 \item{ctrCex}{(numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})}
 
@@ -96,8 +96,8 @@ grp1 <- rep(1:4, nrow(dat1)/4)
 plot(dat1, col=grey(0.8), xlab="x", ylab="y", las=1, pch=grp1)
 for(i in 1:4) addBagPlot(dat1[which(grp1==i),], bagCol=col1[i])
 ## slightly improved
-library(wrMisc)
-col2 <- convColorToTransp(col1, 255)
+if(requireNamespace("wrMisc", quietly=TRUE)) {library(wrMisc); 
+  col2 <- convColorToTransp(col1, 255)} else col2 <- col1
 plot(dat1, col=grey(0.8), xlab="x", ylab="y", las=1, pch=grp1)
 for(i in 1:4) addBagPlot(dat1[which(grp1==i),], bagCol=col1[i], outlPch=i,
   outlCol=col2[i], bagLwd=3)

@@ -12,7 +12,7 @@
   col = NULL,
   adj = "auto",
   callFrom = NULL,
-  silent = FALSE,
+  silent = TRUE,
   debug = FALSE
 )
 }

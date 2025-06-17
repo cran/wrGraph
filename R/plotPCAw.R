@@ -64,7 +64,7 @@
 #' @export
 plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center=TRUE, scale.=TRUE, colBase=NULL, useSymb2=NULL,
   cexTxt=1, cexSub=0.6, displBagPl=TRUE, outCoef=2, getOutL=FALSE, showLegend=TRUE, nGrpForMedian=6, pointLabelPar=NULL, rowTyName="genes",
-  rotatePC=NULL, suplFig=TRUE, callFrom=NULL, silent=FALSE, debug=FALSE) {
+  rotatePC=NULL, suplFig=TRUE, callFrom=NULL, silent=TRUE, debug=FALSE) {
   ## note : so far not well adopted for plotting all points in transparent grey with same symb for interactive mouse-over
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="plotPCAw")
   msg <- " 'dat' must be matrix, data.frame (with at least 1 line and 2 columns) or list/MArrayLM-object (with element 'datImp','dat' or 'data' as matrix or data.frame)"
@@ -135,7 +135,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
     chGr <- duplicated(sampleGrp)
     if(!any(chGr, na.rm=TRUE)) { displBagPl <- FALSE; if(debug) message(fxNa,"All samples belong to different groups, bagplots won't make any sense ...")}
     if(!identical(unique(table(averNa3)), as.integer(1))) useCol <- useCol[as.numeric(wrMisc::naOmit(sampleGrp))]
-    if(debug) {message(fxNa,"plotPCAw_3") }
+    if(debug) {message(fxNa,"plotPCAw_3");  plotPCAw_3 <- list(dat=dat,sampleGrp=sampleGrp,tit=tit,useSymb=useSymb,useCol=useCol,chGr=chGr,nGrp=nGrp,averNa3=averNa3,center=center, scale.=scale. )}
   }
 
 
@@ -152,7 +152,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
         pca.grpAv[,i] <- unlist(tapply(pca$x[,i], averNa3, mean, na.rm=TRUE)) }
       rownames(pca.grpMed) <- rownames(pca.grpAv) <- unique(averNa3)
       pca.grpMed[names(tabAverNa3)[which(tabAverNa3 <nGrpForMedian)],] <- pca.grpAv[names(tabAverNa3)[which(tabAverNa3 < nGrpForMedian)],]}
-    if(debug) {message(fxNa,"plotPCAw_4 .. displLeg: ",displLeg); 
+    if(debug) {message(fxNa,"plotPCAw_4 .. : "); 
       plotPCAw_4 <- list(dat=dat,sampleGrp=sampleGrp,averNa3=averNa3,pca=pca,pca.grpMed=pca.grpMed,center=center,scale.=scale.,tit=tit,cexTxt=cexTxt,useSymb=useSymb ) }  
   
     useCex <- round( (1/nGrp +0.65)*cexTxt, 2)
@@ -171,7 +171,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       if(any(!rotatePC, na.rm=TRUE)) rotatePC <- rotatePC[which(rotatePC)]
       if(length(rotatePC) >0) pca$x[,rotatePC] <- -1*pca$x[,rotatePC] }
     if(debug) {message(fxNa,"plotPCAw_5 .. lab123: ",wrMisc::pasteC(lab123)); plotPCAw_5 <- list(dat=dat,sampleGrp=sampleGrp,averNa3=averNa3,pca=pca,useTit=useTit,cexTxt=cexTxt,showLegend=showLegend ) }
-    ## start plot
+    ## start plot (1st & 2nd PC)
     ch1 <- try(graphics::plot(pca$x[,c(1,2)], main=useTit, cex.axis=0.7*cexTxt, cex.lab=cexTxt*0.75, cex.main=if(ncol(dat) > 3) 1.4 else 0.85, xlab=lab123[1], ylab=lab123[2], las=1, type="n"))   # empty plot
     if(inherits(ch1, "try-error")) {dat <- NULL; message(fxNa,"UNABLE TO DRAW PLOT !!  check current plotting device...")} }
 
@@ -189,30 +189,40 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       paste(1:length(levels(sampleGrp)),"..",substr(unique(averNa3),1,25)), text.col=colBase,
       cex=cexTxt*max(0.4, round(0.75 -((length(unique(sampleGrp)) %/% 5)/31),3)), xjust=0.5, yjust=0.5)
     graphics::points(pca$x[,c(1,2)], pch=useSymb,col=useCol,cex=0.8)  # main plotting of points
-
-    if(debug) { message(fxNa,"plotPCAw_6 .. displLeg: ",unlist(displLeg[1:2])) }
+    if(debug) { message(fxNa,"plotPCAw_6 .. displLeg: ",unlist(displLeg[1:2])); plotPCAw_6 <- list(silent=silent, debug=debug, pca=pca,dat=dat, displLeg=displLeg) }
+    
+    
     ## prepare for labels on points
     if(length(pointLabelPar) >0) {
       chLe <- sapply(pointLabelPar, length) %in% c(1,ncol(dat))
       if(any(!chLe, na.rm=TRUE) && !silent) message(fxNa,"Some elements of argument 'pointLabelPar' may have odd lengths, they might be discarded")
-      if(isTRUE(pointLabelPar)) .addTextToPoints(x=pca$x, cex=0.6*cexTxt, adj="auto") else {
-        if(!isFALSE(pointLabelPar) && length(pointLabelPar) >0) .addTextToPoints(x=pca$x, paramLst=pointLabelPar, cex=0.6*cexTxt, adj="auto") }}
-    if(debug) {message(fxNa,"plotPCAw_7 .. displBagPl=",displBagPl); plotPCAw_7 <- list(dat=dat,sampleGrp=sampleGrp,pca=pca,useTit=useTit,cexTxt=cexTxt,lab123=lab123,showLegend=showLegend,displLeg=displLeg,
+
+      if(isTRUE(pointLabelPar)) .addTextToPoints(x=pca$x, cex=0.6*cexTxt, adj="auto", callFrom=fxNa, silent=silent,debug=debug) else {
+        if(!isFALSE(pointLabelPar) && length(pointLabelPar) >0) .addTextToPoints(x=pca$x[,1:2], paramLst=pointLabelPar, cex=0.6*cexTxt, adj="auto", callFrom=fxNa, silent=silent,debug=debug) }}
+    if(debug) {message(fxNa,"plotPCAw_7 .. displBagPl=",displBagPl); plotPCAw_7 <- list(dat=dat,sampleGrp=sampleGrp,pca=pca,colBase=colBase, useTit=useTit,cexTxt=cexTxt,lab123=lab123,showLegend=showLegend,displLeg=displLeg,
        nGrp=nGrp,averNa3=averNa3,pointLabelPar=pointLabelPar,colBase=colBase,
       outCoef=outCoef,useSymb2=useSymb2,nGrpForMedian=nGrpForMedian,nGrpLim=nGrpLim,displBagPl=displBagPl,pca.grpMed=pca.grpMed,figNumOffs=figNumOffs, callFrom=callFrom,fxNa=fxNa, silent=silent, debug=debug)}
 
     ## prepare for bagplot
     for(i in 1:length(levels(sampleGrp))) {
-      ## need to check if all labels are printed (set to NULL ?)
-
+      ## need to check if all labels are printed (or set to NULL)
+      if(debug) message(fxNa,"Setting alpha of useCol2 to ",if(max(table(sampleGrp)) > 2) signif(0.25 +0.95/nGrp, digits=3) else 0.1,"  ( since max(table(sampleGrp)) = ",max(table(sampleGrp)),")")
       useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256),
-        alpha=if(max(table(sampleGrp)) > 2) signif(0.1 +0.25/nGrp, digits=3) else 0.1)    # so far too light with signif(0.04 +0.25/nGrp, digits=3)
-      dispOut <- length(unlist(pointLabelPar)) <1
+        alpha=if(max(table(sampleGrp)) > 2) signif(0.15 +0.25/nGrp, digits=3) else 0.18)    # so far too light with signif(0.04 +0.25/nGrp, digits=3)
+      useCol3 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256),
+        alpha=if(max(table(sampleGrp)) > 2) signif(0.25 +0.95/nGrp, digits=3) else 0.4)    # for outlyer-labels
+      dispOut <- !(length(unlist(pointLabelPar)) >0 && any(c("col","color","cex","ce") %in% names(pointLabelPar)) )  # if TRUE : it is OK to add (outlyer-) names via addBagPlot()
+      if(debug) {message(fxNa,"plotPCAw_7b .. displBagPl=",displBagPl); plotPCAw_7b <- list(dat=dat,sampleGrp=sampleGrp,pca=pca,colBase=colBase,useCol2=useCol2, useTit=useTit,cexTxt=cexTxt,lab123=lab123,showLegend=showLegend,displLeg=displLeg,
+        nGrp=nGrp,averNa3=averNa3,pointLabelPar=pointLabelPar,colBase=colBase,
+        outCoef=outCoef,useSymb2=useSymb2,nGrpForMedian=nGrpForMedian,nGrpLim=nGrpLim,displBagPl=displBagPl,pca.grpMed=pca.grpMed,figNumOffs=figNumOffs, callFrom=callFrom,fxNa=fxNa, silent=silent, debug=debug)}
       ## addSubTi
-      outli <- if(displBagPl && length(pointLabelPar) >0) try(addBagPlot(pca$x[which(as.numeric(wrMisc::naOmit(sampleGrp)) %in% i), 1:2], bagCol=useCol2, outCoef=outCoef,
-        ctrPch=useSymb2, returnOutL=TRUE, outlCol=useCol2, addSubTi=dispOut || !isFALSE(pointLabelPar), callFrom=fxNa, silent=debug, debug=debug), silent=TRUE) else NULL
+      if(dispOut) { outlCex <- 0.6 } else { outlCex <- NULL}     # set 'default' values in case addBagPlot gets to add names of outlyer-points 
+
+      outli <- if(displBagPl) try(addBagPlot(pca$x[which(as.numeric(wrMisc::naOmit(sampleGrp)) %in% i), 1:2], bagCol=useCol2, outlCol=useCol3, outCoef=outCoef,
+        ctrPch=useSymb2, returnOutL=TRUE, addSubTi=dispOut , callFrom=fxNa, silent=!debug, debug=debug), silent=TRUE) else NULL
       if(length(outli) >0) outL[[i]] <- outli }
-       if(debug) {message(fxNa,"plotPCAw_7.",i," .. displBagPl=",displBagPl) }
+
+    if(debug) {message(fxNa,"plotPCAw_7.",i," .. displBagPl=",displBagPl) }
     if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {              # display of group-center (number & )
       cexCtr <- if(cexTxt <=1) useCex  +0.2 else useCex
       if(!displBagPl && any(duplicated(sampleGrp), na.rm=TRUE)) {  # add group-centers for those where multiple replicates/points were drawn (if not drawn by addBagPot)
@@ -230,14 +240,15 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
     graphics::mtext(paste0("n=",nrow(dat)," ",rowTyName, " ;  Samples shown as open symbols",
       if(isTRUE(pointLabelPar)) ", color stars and black numbers for group-centers",
       if(displBagPl) ", groups highlighted as bagplot"), cex=cexSub, line=0.25)
+    
     ##  add more plots to include 3rd PC
     if(suplFig && ncol(dat) > 3) {
       graphics::plot(pca$x[,c(2,3)], pch=useSymb, main="PCA : 2nd and 3rd Component", col=useCol, cex=0.6, cex.axis=0.6*cexTxt, cex.lab=cexTxt*0.7, xlab=lab123[2], ylab=lab123[3], las=1 )
       for(i in 1:length(unique(sampleGrp))) {
         useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256), alpha=if(max(table(sampleGrp)) > 2) signif(0.04 +0.25/nGrp,digits=3) else 0.1)
-        ## addSubTi=dispOut || !isFALSE(pointLabelPar)
-        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(2,3)], outCoef=outCoef, bagCol=useCol2, ctrPch=useSymb2, 
-          addSubTi=dispOut || !isFALSE(pointLabelPar), returnOutL=FALSE, silent=debug, debug=debug), silent=TRUE) }
+
+        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(2,3)], outCoef=outCoef, bagCol=useCol2, outlCol=useCol3, ctrPch=useSymb2, outlCex=outlCex, 
+          addSubTi=dispOut || !isFALSE(pointLabelPar), returnOutL=FALSE, callFrom=fxNa, silent=!debug, debug=debug), silent=TRUE) }
       if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {
         graphics::points(pca.grpMed[,c(2,3)], col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2, cex=1.1)
         cexCtr2 <- if(cexTxt <=1) useCex -0.1 else useCex
@@ -245,8 +256,9 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
       graphics::plot(pca$x[,c(1,3)], pch=useSymb, main="PCA : 1st and 3rd Component", col=useCol, cex=0.6, cex.axis=0.6*cexTxt, cex.lab=cexTxt*0.7, xlab=lab123[1], ylab=lab123[3],las=1 )
       for(i in 1:length(unique(sampleGrp))) {
         useCol2 <- grDevices::rgb(t(grDevices::col2rgb(colBase[order(as.numeric(unique(averNa3)))][i])/256), alpha=if(max(table(sampleGrp)) > 2) signif(0.04+0.25/nGrp,digits=3) else 0.1)
-        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(1,3)], outCoef=outCoef, bagCol=useCol2, ctrPch=useSymb2, 
-          addSubTi=dispOut || !isFALSE(pointLabelPar), returnOutL=FALSE,silent=debug, debug=debug), silent=TRUE) }
+        
+        if(displBagPl) try(addBagPlot(pca$x[as.numeric(averNa3) %in% i,c(1,3)], outCoef=outCoef, bagCol=useCol2, outlCol=useCol3, ctrPch=useSymb2, outlCex=outlCex, 
+          addSubTi=dispOut || !isFALSE(pointLabelPar), returnOutL=FALSE, callFrom=fxNa, silent=!debug, debug=debug), silent=TRUE) }
       if(length(nGrpForMedian) >0 && length(levels(sampleGrp)) < nGrpLim & !is.null(useSymb2)) {
         graphics::points(pca.grpMed[,c(1,3)],col=colBase[order(as.numeric(unique(averNa3)))], pch=useSymb2, cex=1.1)
         graphics::text(pca.grpMed[,c(1,3)] +1.7*figNumOffs(pca, cols=c(1,3)), as.character(1:nGrp)[order(as.numeric(unique(averNa3)))], cex=useCex-0.1, col=1) }
@@ -280,7 +292,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
 #' plot(dat1)        # traditional plot
 #' .addTextToPoints(dat1, labels=letters[1:nrow(dat1)])
 #' @export
-.addTextToPoints <- function(x, paramLst=NULL, labels=NULL, cex=NULL, col=NULL, adj="auto", callFrom=NULL, silent=FALSE, debug=FALSE){
+.addTextToPoints <- function(x, paramLst=NULL, labels=NULL, cex=NULL, col=NULL, adj="auto", callFrom=NULL, silent=TRUE, debug=FALSE){
   ##  add text at given position(s) to (scatter) plot (left top display), eg names describing points
   ## 'x' should be matrix or data.frame with numeric coordinates for plotting labels,
   ## paramLst may be list with additional parameters (priority over separate cex or col), otherwise names displayed will be taken from 'labels' or rownames of coordinates 'x'
@@ -289,11 +301,12 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
   fxNa <- wrMisc::.composeCallName(callFrom, newNa=".addTextToPoints")
   textCex <- textLabel <- textAdj <- textCol <- textOffSet <- NULL
   if(length(dim(x)) !=2) message(fxNa," Trouble ahead, 'x' shound be matrix or data.frame of min 2 columns")
-  if(length(adj) >0) textAdj <- paramLst$textAdj <- adj
+  if(length(adj) >0) { if(is.list(paramLst) && "textAdj" %in% names(paramLst)) {textAdj <- paramLst$textAdj <- adj} else {textAdj <- list(textAdj=adj)} }
   if(length(cex) >0) textCex <- cex
   if(length(col) ==nrow(x) || length(col)==1) textCol <- col
   textLabel <- if(length(labels) != length(x) ) names(x) else labels
-  if(debug) message(fxNa,"aTTP1")
+  if(debug) message(fxNa,"aTTP0")
+  if(length(paramLst) >0 && !is.list(paramLst)) paramLst <- as.list(paramLst)
   if(is.list(paramLst) && length(paramLst) >0) {
     textLabel <- if("labels" %in% names(paramLst)) paramLst$labels else {if(is.null(rownames(x))) 1:nrow(x) else rownames(x)}
     if("textLabel" %in% names(paramLst)) textLabel <- paramLst$textLabel
@@ -312,6 +325,7 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
         paramLst$textAdj <- 0 + chLe }
       textAdj <- paramLst$textAdj }
   } else {if(is.character(paramLst) && length(paramLst)==nrow(x)) textLabel <- paramLst}
+   if(debug) { message(fxNa,"aTTP1"); aTTP1 <- list(x=x,paramLst=paramLst,labels=labels,adj=adj,textAdj=textAdj,textOffSet=textOffSet,textLabel=textLabel,textCol=textCol,textCex=textCex)}
   if(length(textLabel) != nrow(x)) textLabel <- rownames(x)
   if(is.null(textLabel)) textLabel <- 1:nrow(x)
   if(length(textCol) <1) textCol <- rep(grDevices::grey(0.8), nrow(x)) else if(length(textCol) ==1) textCol <- rep(textCol, nrow(x))
@@ -319,7 +333,11 @@ plotPCAw <- function(dat, sampleGrp, tit=NULL, useSymb=c(21:25,9:12,3:4), center
   if(length(textOffSet) <1) {ra <- graphics::par("usr"); textOffSet <- c(2,-4)*signif((ra[c(2,4)] - ra[c(1,3)])/300,3) }
   textOffSet <- matrix(rep(textOffSet, each=nrow(x)), ncol=2)
   if(0 %in% textAdj) textOffSet[,1] <- textOffSet[,1]*(2*textAdj -1)
-  if(length(unique(textAdj)) >1) { for(i in unique(textAdj)) { j <- which(textAdj==i)
-    graphics::text(x[j,c(1,2)] -textOffSet[j,], labels=textLabel[j], col=textCol[j], cex=textCex, adj=i)}
-  } else graphics::text(x[,c(1,2)] -textOffSet, labels=textLabel, col=textCol, cex=textCex, adj=textAdj) }
-  
+   if(debug) { message(fxNa,"aTTP2"); aTTP2 <- list(x=x,paramLst=paramLst,labels=labels,adj=adj,textAdj=textAdj,textOffSet=textOffSet,textLabel=textLabel,textCol=textCol,textCex=textCex)}
+  if(length(unique(textAdj)) >1) {
+    for(i in unique(unlist(textAdj))) { j <- which(textAdj==i) 
+      graphics::text(x[j, c(1,2)] -textOffSet[j,], labels=textLabel[j], col=textCol[j], cex=textCex, adj=i)  }
+  } else { if(!silent) message(fxNa,"absent/short textAdj")
+     graphics::text(x[,c(1,2)] -textOffSet, labels=textLabel, col=textCol, cex=textCex, adj=if(grepl("^[[:digit:]]+(\\.[[:digit:]]+)$", textAdj)) textAdj else 1) }   
+  }
+ 

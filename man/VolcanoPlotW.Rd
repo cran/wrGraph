@@ -9,6 +9,7 @@ VolcanoPlotW(
   pValue = NULL,
   useComp = 1,
   filtFin = NULL,
+  tit = NULL,
   ProjNa = NULL,
   FCthrs = NULL,
   FdrList = NULL,
@@ -52,7 +53,9 @@ One may also furnish MArrayLM-objects created bpackage wrProteo or limma.}
 
 \item{filtFin}{(matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied}
 
-\item{ProjNa}{(character) custom title}
+\item{tit}{(character) custom title (has priority over \code{ProjNa})}
+
+\item{ProjNa}{(character) will be added to automatic title (if custom title \code{tit} was not specified)}
 
 \item{FCthrs}{(numeric) Fold-Change threshold (display as line) give as Fold-change and NOT log2(FC), default at 1.5, set to \code{NA} for omitting}
 

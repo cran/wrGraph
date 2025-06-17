@@ -25,7 +25,7 @@ plotPCAw(
   rotatePC = NULL,
   suplFig = TRUE,
   callFrom = NULL,
-  silent = FALSE,
+  silent = TRUE,
   debug = FALSE
 )
 }
