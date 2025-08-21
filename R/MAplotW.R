@@ -97,18 +97,18 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       ## extract FDR-values (or p-values if no FDR available)
       if(length(FDRcol) >0) FDRvalue <- Mvalue[[FDRcol[1]]] else if(length(pcol) >0) FDRvalue <- Mvalue[[pcol[1]]] 
       if(FDR4color || useComp >1) {
-        if(debug) message(" FDR4color=",FDR4color,"  need to extract FDR or p-values")
+        if(debug) message(fxNa," FDR4color=",FDR4color,"  need to extract FDR or p-values")
         if(length(dim(FDRvalue)) >0) {    # FDRvalues are present as multi-column
           if(colnames(FDRvalue)[1]=="(Intercept)" && ncol(FDRvalue) >1) {
             ## extract 2nd col if result from wrMisc::moderTest2grp()
-            if(debug) message("Extract 2nd col if result from wrMisc::moderTest2grp()")
+            if(debug) message(fxNa,"Extract 2nd col if result from wrMisc::moderTest2grp()")
             pNa <- rownames(FDRvalue)
             FDRvalue <- as.numeric(FDRvalue[,2])
             names(FDRvalue) <- pNa
             multiComp <- FALSE 
           } else {
             ## select corresponding of multiple comparisons
-            if(debug) message("Select corresponding FDR of multiple comparisons")
+            if(debug) message(fxNa,"Select corresponding FDR of multiple comparisons")
             if(useComp > ncol(FDRvalue)) { useComp <- 1
               if(!silent) message(fxNa,"Argument 'useComp' for FDR-Values invalid or too high; reset to 1") }
             names(useComp) <- colnames(FDRvalue)[useComp]
@@ -130,11 +130,11 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       ## look for group-means & identify column association to current question/pairwise comparison
       if("means" %in% names(Mvalue)) {
         ## identify sample-groups to comparsison(s) - needed lateron
-        if(debug) message("Identify sample-groups to comparsison(s)")
+        if(debug) message(fxNa,"Identify sample-groups to comparsison(s)")
         pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=names(Mvalue)[FDRcol[1]], callFrom=fxNa,silent=silent) 
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])  
         ## are all group-means needed (for exporting) ??
-      } else warning("Could not find suitable field '$means' in '",namesIn[1],"'")    
+      } else warning(fxNa,"Could not find suitable field '$means' in '",namesIn[1],"'")    
       
       if(length(Melem) >0) {            ## M-values are available
         if(debug) message(" M-values are available")
@@ -148,7 +148,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
           if(debug) message("Construct Mvalue based on means")
           Mvalue$Mval <- grpMeans[,2] - grpMeans[,1]                           
           Melem <- which(names(Mvalue)=="Mval")                # update
-        } else stop("Can't construct M-values since suitable field '$means' missing in '",namesIn[1],"' !")    
+        } else stop(fxNa,"Can't construct M-values since suitable field '$means' missing in '",namesIn[1],"' !")    
       }
 
       ## now one can check if 'Avalue' & Mvalue match (only if pValues or FDR values used for coloring)
@@ -161,7 +161,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         Filcol <- wrMisc::naOmit(match(c("filtfin","filter","filt","finfilt"), tolower(names(Mvalue))))
         filtFin <- if(length(Filcol) >0) Mvalue[[Filcol[1]]] else rep(TRUE,length(Avalue))
         if(length(dim(filtFin)) >1) filtFin <- filtFin[,useComp]
-        if(debug) message(" recuperate filtering - if present (length ",length(filtFin),")")
+        if(debug) message(fxNa,"Recuperate filtering - if present (length ",length(filtFin),")")
       }
 
       ## recuperate $annot if present and use for symbol
@@ -264,8 +264,8 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
 
     ## apply filtering
     msg <- " data provided in 'Mvalue' and 'Avalue' "
-    if(!silent && nrow(merg) < round(length(Mvalue)/10)) message(" .. note : less than 10% of",msg," were matched") else {
-      if(!silent && nrow(merg) < length(Mvalue)/2) message(" .. NOTE : less than 50% of",msg," were matched !!")}
+    if(!silent && nrow(merg) < round(length(Mvalue)/10)) message(fxNa," .. Note : less than 10% of",msg," were matched") else {
+      if(!silent && nrow(merg) < length(Mvalue)/2) message(fxNa," .. NOTE : less than 50% of",msg," were matched !!")}
     if(debug) message(msg," were matched to ",nrow(merg)," common entries")    
 
     ## apply filtering (keep all lines where at least one condition passes)
@@ -275,7 +275,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
         if(length(pch) >1) pch <- pch[whFilt]
         if(length(col) >1) col <- col[whFilt]
         merg <- merg[whFilt,]
-        if(!silent) message(fxNa," filtered (based on 'filtFin') from ",length(filtFin)," to  ",nrow(merg)," lines")
+        if(!silent) message(fxNa,"Filtered (based on 'filtFin') from ",length(filtFin)," to  ",nrow(merg)," lines")
       }
     } else filtFin <- rep(TRUE, nrow(merg))
     
@@ -386,7 +386,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
           displTx <- names(tmP[useL2])
           chNa <- is.na(displTx)
           if(any(chNa)) {displTx[which(chNa)] <- "unknown"; cexTxLab <- c(cexTxLab,cexTxLab*0.7)[1+chNa]}   # smaller label for 'unknown'
-          if(all(chNa)) {if(!silent) message(fxNa," no names for display of best")
+          if(all(chNa)) {if(!silent) message(fxNa,"No names for display of best")
           } else graphics::text(Avalue[useLi[useL2]] +xOffs, Mvalue[useLi[useL2]] +yOffs, displTx, cex=cexTxLab, col=NbestCol, adj=0) }
       }              
   

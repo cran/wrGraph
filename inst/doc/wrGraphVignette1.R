@@ -87,7 +87,7 @@ imageW(as.matrix(iris[1:20,1:4]), latticeVersion=TRUE, transp=FALSE, col=c("blue
   rotXlab=45, yLab="Observation no", tit="Iris-Data (head)")
 
 ## ----imageW3, fig.height=6, fig.width=5, echo=TRUE----------------------------
-ma1 <- matrix(-7:16,nc=4,dimnames=list(letters[1:6],LETTERS[1:4]))
+ma1 <- matrix(-9:14, nc=4, dimnames=list(letters[1:6],LETTERS[1:4]))
 ma1[1,2:3] <- 0
 ma1[3,3] <- ma1[3:4,4] <- NA
    

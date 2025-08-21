@@ -54,7 +54,7 @@ plotBy2Groups(
 \item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
-list with \code{$annot}, \code{$abund} for initial/raw abundance values and \code{$quant} with final normalized quantitations, or returns data.frame with annot and quant if \code{separateAnnot=FALSE}
+This function returns a list with \code{$annot}, \code{$abund} for initial/raw abundance values and \code{$quant} with final normalized quantitations, or returns data.frame with annot and quant if \code{separateAnnot=FALSE}
 }
 \description{
 Plot series of data as membership of 2 different grouping vectors (eg by grp=patient and grp2=age-group).

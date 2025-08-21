@@ -14,8 +14,8 @@ imageW(
   colNa = NULL,
   xLab = NULL,
   yLab = NULL,
-  xLabVal = NULL,
-  yLabVal = NULL,
+  xLabVal = NA,
+  yLabVal = NA,
   las = 2,
   col = NULL,
   nColor = 9,
@@ -56,13 +56,13 @@ set to \code{FALSE} to get behaviour prior to version 1.3.0.}
 
 \item{colNa}{(character) optional custom colnames}
 
-\item{xLab}{(character, length=1) optional custom text for x-axis label (so far fixed color & fontsiez)}
+\item{xLab}{(character, length=1) optional custom text for x-axis label (so far fixed color & fontsize)}
 
 \item{yLab}{(character, length=1) optional custom text for y-axis label}
 
-\item{xLabVal}{(character) optional custom text for x-axis 'values' (multiple values/names instead of counters, replaces argument \code{xLab} in older versions)}
+\item{xLabVal}{(character) optional custom text for x-axis 'values' (replaces rownames of data)}
 
-\item{yLabVal}{(character) optional custom text for y-axis 'values' (multiple values/names instead of counters, replaces argument \code{yLab} in older versions)}
+\item{yLabVal}{(character) optional custom text for y-axis 'values' (replaces colnames of data)}
 
 \item{las}{(numeric) style of axis labels (see also \code{\link[graphics]{par}}); in case of \code{latticeVersion=TRUE} this argument will override default \code{rotXlab=0} and/or  \code{rotYlab=0}}
 
@@ -111,7 +111,7 @@ used for correcting automatic scaling rounding issues to ensure the central elem
 \item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
-This function plots in image (to the current graphical device) as \code{image} does
+This function plots in image (to the current graphical device) similar to as \code{image} does
 }
 \description{
 To get a quick overview of the spatial distribution of smaller data-sets it may be useful to display numeric values as colored boxes.
@@ -128,6 +128,13 @@ Please note that sometimes the center-color segment may not end up directly with
 imageW(iris[1:40,1:4], transp=FALSE, tit="Iris (head)")
 imageW(iris[1:20,1:4], latticeVersion=TRUE, col=c("blue","red"), 
   rotXlab=45, yLab="Observation no", tit="Iris (head)")
+
+ma=matrix(round(runif(20),3) ,nrow=4, dimnames=list(letters[1:4],LETTERS[1:5]))
+imageW(ma, cexYlab=2, transp=FALSE)
+imageW(ma, cexYlab=2, transp=TRUE)
+## lattice version
+pl1 <- imageW(ma, latticeVersion=TRUE, trans=TRUE, yLab="my y label (Caps)")
+plot(pl1)    
 }
 \seealso{
 \code{\link[graphics]{image}}, for the lattice version \code{\link[lattice]{levelplot}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from package \href{https://CRAN.R-project.org/package=gplots}{gplots}

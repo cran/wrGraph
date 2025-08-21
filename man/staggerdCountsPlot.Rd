@@ -56,7 +56,7 @@ In proteomics benchmark studies this would typically be the species-abbreciation
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-plot only
+This function produces only a plot
 }
 \description{
 The basic idea of this plot is to show how counts data change while shifting a threshold-criterium.

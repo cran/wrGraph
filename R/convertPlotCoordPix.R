@@ -14,7 +14,7 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
-#' @return matrix with x- and y-coordinates in pixels
+#' @return This function returns a matrix with x- and y-coordinates in pixels
 #' @seealso  \code{\link{mouseOverHtmlFile}}
 #' @examples
 #' df1 <- data.frame(id=letters[1:10], x=1:10, y=rep(5,10),mou=paste("point",letters[1:10]),

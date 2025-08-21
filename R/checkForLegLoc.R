@@ -12,7 +12,7 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
-#' @return list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts
+#' @return This function returns a list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts
 #' @seealso \code{\link[graphics]{legend}}
 #' @examples
 #' dat1 <- matrix(c(1:5,1,1:5,5), ncol=2)
@@ -56,7 +56,7 @@ checkForLegLoc <- function(matr, sampleGrp=NULL, showLegend=TRUE, suplSpace=4, t
       txLe <- if(length(sampleGrp) >0) .longTxt(sampleGrp) else "sample"
       txLe <- graphics::strwidth(txLe,units="figure") +suplSpace*graphics::strwidth("z", units="figure") 
       nLi <- if(length(sampleGrp) >0) length(unique(sampleGrp)) else 4      # presume 4 groups (if no names given)
-      txHi <- (nLi+2.2)*graphics::strheight("1",units="figure")             # need to adjust for extra space towards edge/box of legend
+      txHi <- (nLi +2.2)*graphics::strheight("1",units="figure")             # need to adjust for extra space towards edge/box of legend
       locCount <- .bestLegendLoc(matr[,1:2], txtLen=txLe, txtHi=txHi, silent=silent, debug=debug, callFrom=callFrom) 
       ## prefer legend on left, add small penalty to right locations to favour lactions at left side (in case of egality)
       if(length(displLeg) >3) locCount[2:3] <- locCount[2:3] +0.1

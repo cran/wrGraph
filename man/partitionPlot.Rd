@@ -33,7 +33,7 @@ partitionPlot(
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-matrix for use with \code{layout} or (if \code{returnMatr=FALSE} numeric vector with number of segements in x- an y-axis)
+This function returns a matrix for use with \code{layout} or (if \code{returnMatr=FALSE} numeric vector with number of segements in x- an y-axis)
 }
 \description{
 This function proposes a matrix for use with \code{\link[graphics]{layout}} to arrange given number of plots to be placed on a page/plotting area.

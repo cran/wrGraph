@@ -30,7 +30,7 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
-#' @return plot only
+#' @return This function produces only a plot
 #' @seealso \code{\link[stats]{ecdf}}, for preparing input to ROC: function \code{summarizeForROC} in package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo}
 #' @examples
 #' set.seed(2019); test1 <- cbind(a=sample.int(n=7,size=50,repl=TRUE),
@@ -86,7 +86,7 @@ staggerdCountsPlot <- function(roc, threColumn=1, countsCol=NULL, fixedCountPat=
   if(length(countsCol) >1) for(i in 2:length(countsCol)) graphics::polygon( al2, c(if(i >2) rowSums(roc[,countsCol[(i-1):1]]) else roc[,countsCol[1]],
     rowSums(roc[nrow(roc):1, countsCol[i:1]])), col=col[i])
   if(length(vertLine) >0) {graphics::abline(v=0.05,lty=2,col=grDevices::grey(0.4))           # display alpha
-    graphics::mtext(paste(names(threColumn),"=",vertLine),at=vertLine,side=3,line=if(logScale) -1 else 0.1, cex=0.7, las=las.alph)}
+    graphics::mtext(paste(names(threColumn),"=",vertLine), at=vertLine, side=3, line=if(logScale) -1 else 0.1, cex=0.7, las=las.alph)}
   if(displMaxSpec) { z <- roc[nrow(roc),countsCol]
     z <- rbind(z,cumsum(z))
     graphics::mtext(paste("max",varCountNa), side=4, at=z[2,]-z[1,]/2, cex=0.6, las=3, line=0.1)

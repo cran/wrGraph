@@ -1,4 +1,4 @@
-#' Volcano-Plot (Statistical Test Outcome versus Relative Change)
+      #' Volcano-Plot (Statistical Test Outcome versus Relative Change)
 #'
 #' This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/Volcano_plot_(statistics)}{Volcano-plot}.
 #' Basically, this plot allows comparing the outcome of a statistical test to the relative change (ie log fold-change, M-value).
@@ -97,9 +97,9 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, tit=NULL,
       ## try working based on MArrayLM-object (Mvalue)
       ## initial check of  useComp
       if(length(useComp) >1) { useComp <- wrMisc::naOmit(useComp)[1]
-        if(!silent) message(fxNa," argument 'useComp' should be integer of length=1; using only 1st entry") }
+        if(!silent) message(fxNa,"Argument 'useComp' should be integer of length=1; using only 1st entry") }
       if(length(useComp) <1) { useComp <- 1
-        if(!silent) message(fxNa," argument 'useComp' invalid, setting to 1") }
+        if(!silent) message(fxNa,"Argument 'useComp' invalid, setting to 1") }
       if(debug) {message(fxNa,"VPW2")}
       if(length(pValue) <1) {
         ## no spearate pValues provided : extract from MArrayLM-object (Mvalue)
@@ -134,7 +134,14 @@ VolcanoPlotW <- function(Mvalue, pValue=NULL, useComp=1, filtFin=NULL, tit=NULL,
       ## look for group-means & identify column association to current question/pairwise comparison
       if("means" %in% names(Mvalue)) {
         ## identify sammple-groups to comparsison(s) - needed lateron
+        if(is.numeric(Fcol)) Fcol <- names(Mvalue)[Fcol]
+        if(debug) {message(fxNa,"    VPW4a"); VPW4a <- list()}       #pairwCol=pairwCol,
         pairwCol <- wrMisc::sampNoDeMArrayLM(Mvalue, useComp, lstMeans="means", lstP=Fcol, callFrom=fxNa, silent=silent)
+        if(all(is.na(pairwCol))) {
+          if(grepl("[[:alnum:]]-[[:alnum:]]", gsub(" ","", names(useComp)))) {     ## another attempt to locate columns
+            pairwCol <- match(unlist(strsplit(gsub(" ","", names(useComp)),"-")), colnames(Mvalue[["means"]])) }}
+        if(all(is.na(pairwCol))) stop(fxNa,"Unable to locate '", useComp,"' (ie pair of columns with data for plot)  in $means" )
+        
         grpMeans <- cbind(mean1=Mvalue$means[,pairwCol[1]], mean2=Mvalue$means[,pairwCol[2]])
         ## are all group-means needed (for exporting) ??
       } else {grpMeans <- NULL; message(fxNa,"NOTE: Could not find suitable field '$means' in '",namesIn[1],"'")    }

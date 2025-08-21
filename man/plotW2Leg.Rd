@@ -63,7 +63,7 @@ plotW2Leg(
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-graphical output only
+This function returns graphical output only
 }
 \description{
 This is a modified version of \code{plot} for 2-dimensional data,

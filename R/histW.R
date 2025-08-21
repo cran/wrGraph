@@ -1,11 +1,14 @@
-#' Histogram (version by WR)
+#' Histogram (version W)
 #'
 #' This function proposes a few special tweaks to the general \code{\link[graphics]{hist}} function :
 #' In a number of settings data are treated and plotted as log-data. This function allows feeding directly log2-data and displaying the x-axis   
 #' (re-translated) in linear scale (see argument \code{isLog}). 
+#'
+#' @details 
 #' The default settings allow making (very) small histograms ('low resolution'), which may be used as a rough overview of bandwidth and distribution of values in \code{dat}. 
+#' 
 #' Similar to \code{\link[graphics]{hist}}, by changing the parameters \code{nBars} and/or \code{breaks} very 'high resolution' histograms can be produced.
-#' By default it displays n per set of data (on the top of the figure). 
+#' By default it displays n (the nuber of values used underneith) per set of data (on the top of the figure). 
 #' Note that the argument for (costom) title \code{main} is now called \code{tit}.
 #' 
 #' @param dat (matrix, list or data.frame) data to plot
@@ -17,6 +20,7 @@
 #' @param subTi (character) may be \code{FALSE} for NOT displaying, or any text, otherwise range
 #' @param xLab (character) custom x-axes label
 #' @param yLab (character) custom y-axes label 
+#' @param xLim (numeric, length=2) custom x-axes limits 
 #' @param las (integer) optional fixed text orientation of x-axis numbers : use 1 for horizontal and 2 for perpendicular, see also \code{\link[graphics]{par}} 
 #' @param xcex (numeric) cex-type expansion factor for x-axis numbers, see also \code{\link[graphics]{par}} 
 #' @param imgxSize (integer) width of image when saving to file, see also \code{\link[graphics]{par}} 
@@ -29,7 +33,7 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allow easier tracking of messages produced
-#' @return This function produces a histogram type graphic (to the ccurrent graphical device)
+#' @return This function produces a histogram type graphic (to the current graphical device), it may also plot to file if the arguments \code{fileName} designs a valid (path&) file for the output
 #' @seealso \code{\link[graphics]{hist}}
 #' @examples
 #' set.seed(2016); dat1 <- round(c(rnorm(200,6,0.5),rlnorm(300,2,0.5),rnorm(100,17)),2)
@@ -41,7 +45,7 @@
 #' layout(partitionPlot(4))
 #' for(i in 1:4) histW(iris[,i], isLog=FALSE, tit=colnames(iris)[i])
 #' @export
-histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, tit=NULL, subTi=NULL,xLab=NULL,yLab=NULL,las=NULL,xcex=0.7,
+histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, tit=NULL, subTi=NULL, xLab=NULL, yLab=NULL, xLim=NULL, las=NULL, xcex=0.7,
   imgxSize=900, useCol=NULL, useBord=NULL, isLog=TRUE, cexSubTi=NULL, cropHist=TRUE, parDefault=TRUE, silent=FALSE, debug=FALSE, callFrom=NULL) {
   ## make (small) histogram, eg as overview of bandwidth of values in 'dat'
   ## 'isLog'  .. for lin scale SI values where repesentation needs log
@@ -96,6 +100,7 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
   if(inherits(tmp, "try-error")) {
     warning(fxNa,"Cannot create file '",output,"' (or other selected format) !")
   } else  {
+    if(debug) {message(callFrom,"hiW1"); hiW1 <- list(dat=dat,mainHist=mainHist,fileName=fileName,output=output,nBars=nBars,breaks=breaks,tit=tit,subTi=subTi,xLab=xLab,yLab=yLab,xLim=xLim,xcex=xcex,imgxSize=imgxSize,useCol=useCol)}
     nBars <- length(mainHist$breaks)
     ## try to adopt number of x-axis labels displayed to space available
     ch1 <- if(pl2fi) imgSize[1]/150 else graphics::par("pin")[1]            # bring px-size & screen-width to similar measure ..
@@ -107,6 +112,7 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
     ch2 <- round(nBars/ch1)
     ch1 <- round(ch1) 
     if(debug) message("Final ch1 ",signif(ch1,3),"   nBars ",nBars,"   ch2 ",ch2)
+    if(length(xLim) !=2 || !is.numeric(xLim)) xLim <- NULL
     showBorder <- if(nBars >3 && nBars >ch1) ch2*(1:(nBars/ch2)) else 1:nBars 
     ## define las                                           # x-axis numbers text orientation
     txtLas <- if(length(las) !=1) 1 + (nCharLab >4) else las
@@ -114,7 +120,12 @@ histW <- function(dat, fileName="histW", output="screen", nBars=8, breaks=NULL, 
     if(parDefault) graphics::par(mar=c(0.8 +txtLas, 5, 2.6, 0.8), cex.axis=xcex)                    # mar(bot,le,top,ri)
     cexSubTi <- if(!is.numeric(cexSubTi) || length(cexSubTi) !=1) graphics::par("font.sub")*0.7
     txt2 <- c("Initial values range from  ","  to  ")
-    graphics::plot(mainHist, xlab=xLab, ylab=yLab, col=useCol, border=useBord, main=tit, xaxt="n", las=1)
+    if(debug) {message(callFrom,"hiW2"); hiW2 <- list(dat=dat,mainHist=mainHist,fileName=fileName,output=output,nBars=nBars,breaks=breaks,tit=tit,subTi=subTi,xLab=xLab,yLab=yLab,xLim=xLim,xcex=xcex,imgxSize=imgxSize,useCol=useCol)}
+    ## start main plot
+    if(length(xLim)==2) { graphics::plot(mainHist, xlab=xLab, ylab=yLab, col=useCol, border=useBord, xlim=xLim, main=tit, xaxt="n", las=1)
+       if(!silent && any(mainHist$breaks > min(xLim) | mainHist$breaks < min(xLim), na.rm=TRUE)) message(fxNa,"NOTE: current argumnet xLim (",wrMisc::pasteC(xLim),") seems to hide some of the data !")
+    } else {
+      graphics::plot(mainHist, xlab=xLab, ylab=yLab, col=useCol, border=useBord, main=tit, xaxt="n", las=1)}
     graphics::segments(hist.ini$breaks[showBorder], 0, hist.ini$breaks[showBorder], -1*signif(max(hist.ini$counts,na.rm=TRUE)/110,3) ) # x-axis ticks
     ## look for alternatve of making plot, rather as contour-lines for overlay ?
     if(isLog) {

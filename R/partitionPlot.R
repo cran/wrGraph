@@ -12,7 +12,7 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
-#' @return matrix for use with \code{layout} or (if \code{returnMatr=FALSE} numeric vector with number of segements in x- an y-axis) 
+#' @return This function returns a matrix for use with \code{layout} or (if \code{returnMatr=FALSE} numeric vector with number of segements in x- an y-axis) 
 #' @seealso \code{\link[graphics]{layout}}
 #' @examples
 #' partitionPlot(5); partitionPlot(14,horiz=TRUE)

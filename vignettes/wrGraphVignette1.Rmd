@@ -248,7 +248,7 @@ In some cases it may be desirable to pass the color-gradient through the value o
 One can also display the (rounded) values and choose a custom color for NA-values. 
 
 ```{r imageW3, fig.height=6, fig.width=5, echo=TRUE}
-ma1 <- matrix(-7:16,nc=4,dimnames=list(letters[1:6],LETTERS[1:4]))
+ma1 <- matrix(-9:14, nc=4, dimnames=list(letters[1:6],LETTERS[1:4]))
 ma1[1,2:3] <- 0
 ma1[3,3] <- ma1[3:4,4] <- NA
    
@@ -530,7 +530,7 @@ If you have the possibility to make the png-file accessible through a url, you c
 The example below shows usage when specifying absolute paths. 
 Please note that the resulting html will not display the image if your browser cannot access the image any more.
 
-Unfortunately the resulting html couldn't get integrated in this package vignette. You need to open in (separetely) using a browser or launch a browser out of R (see end of code).
+Unfortunately the resulting html couldn't get integrated in this package vignette. You need to open in (separetely) using a browser or launch a browser out of R (see commented last line of code).
 
 
 
@@ -568,7 +568,7 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 The author would like to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS),
 [CNRS](http://www.cnrs.fr/en), [Universit&eacute; de Strasbourg (UdS)](https://www.unistra.fr) and [Inserm](https://www.inserm.fr).
 and of course all collegues from the [IGBMC proteomics platform](https://www.igbmc.fr/en/plateformes-technologiques/translate-to-english-proteomique).
-The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help with new entries and their efforts in maintaining this repository of R-packages.
+The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help and their efforts in maintaining this repository of R-packages.
 
 Thank you for you interest in this package.
 This package is constantly evolving, new functions may get added to the next version.
@@ -576,7 +576,7 @@ This package is constantly evolving, new functions may get added to the next ver
 
 ## Appendix: Session-Info
 
-For completeness, here detailed documentation of versions used to produce this document.
+For completeness, here detailed documentation of versions used to produce this document, produced by the function sessionInfo().
 
 \small
 ```{r sessionInfo, echo=FALSE}

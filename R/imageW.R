@@ -19,10 +19,10 @@
 #' @param rowNa (character) optional custom rownames
 #' @param colNa (character) optional custom colnames
 #' @param tit (character) custom figure title
-#' @param xLabVal (character) optional custom text for x-axis 'values' (multiple values/names instead of counters, replaces argument \code{xLab} in older versions)
-#' @param yLabVal (character) optional custom text for y-axis 'values' (multiple values/names instead of counters, replaces argument \code{yLab} in older versions)
-#' @param xLab (character, length=1) optional custom text for x-axis label (so far fixed color & fontsiez)
+#' @param xLab (character, length=1) optional custom text for x-axis label (so far fixed color & fontsize)
 #' @param yLab (character, length=1) optional custom text for y-axis label
+#' @param xLabVal (character) optional custom text for x-axis 'values' (replaces rownames of data)
+#' @param yLabVal (character) optional custom text for y-axis 'values' (replaces colnames of data)
 #' @param las (numeric) style of axis labels (see also \code{\link[graphics]{par}}); in case of \code{latticeVersion=TRUE} this argument will override default \code{rotXlab=0} and/or  \code{rotYlab=0}
 #' @param nColor (integer, only used in lattice version) number of color-blocks in color gradient (made based on central- and end-points from \code{col} 
 #' @param balanceCol (logical, only used in lattice version) if \code{TRUE} the color-radient aims to color the value closest to 0 with the center color (from \code{col} (default gray)
@@ -49,15 +49,24 @@
 #' @param callFrom (character) allow easier tracking of messages produced
 #' 
 #' @seealso \code{\link[graphics]{image}}, for the lattice version \code{\link[lattice]{levelplot}}, heatmaps including hierarchical clustering \code{\link[stats]{heatmap}} or \code{heatmap.2} from package \href{https://CRAN.R-project.org/package=gplots}{gplots}   
-#' @return This function plots in image (to the current graphical device) as \code{image} does
+#' @return This function plots in image (to the current graphical device) similar to as \code{image} does
 #' @examples
 #' imageW(iris[1:40,1:4], transp=FALSE, tit="Iris (head)")
 #' imageW(iris[1:20,1:4], latticeVersion=TRUE, col=c("blue","red"), 
 #'   rotXlab=45, yLab="Observation no", tit="Iris (head)")
+#' 
+#' ma=matrix(round(runif(20),3) ,nrow=4, dimnames=list(letters[1:4],LETTERS[1:5]))
+#' imageW(ma, cexYlab=2, transp=FALSE)
+#' imageW(ma, cexYlab=2, transp=TRUE)
+#' ## lattice version
+#' pl1 <- imageW(ma, latticeVersion=TRUE, trans=TRUE, yLab="my y label (Caps)")
+#' plot(pl1)    
 #' @export
-imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=NULL, rowNa=NULL, colNa=NULL, xLab=NULL, yLab=NULL, xLabVal=NULL, yLabVal=NULL, las=2, 
-  col=NULL, nColor=9, balanceCol=TRUE, gridCol="grey75", gridLty=1, centColShift=0, cexDispl=NULL, panel.background.col="white", supLat=list(),
-  rotXlab=0, rotYlab=0, cexTit=1.6, cexAxs=NULL, cexXlab=0.7, cexYlab=0.9, showValues=FALSE, Xtck=0, Ytck=0, silent=FALSE, debug=FALSE, callFrom=NULL) { 
+imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=NULL, rowNa=NULL, colNa=NULL, xLab=NULL, yLab=NULL, 
+  xLabVal=NA, yLabVal=NA, las=2, col=NULL, nColor=9, balanceCol=TRUE, 
+  gridCol="grey75", gridLty=1, centColShift=0, cexDispl=NULL, panel.background.col="white", supLat=list(),
+  rotXlab=0, rotYlab=0, cexTit=1.6, cexAxs=NULL, cexXlab=0.7, cexYlab=0.9, showValues=FALSE, Xtck=0, Ytck=0, 
+  silent=FALSE, debug=FALSE, callFrom=NULL) { 
   ## improved version if image() or  levelplot()
   fxNa <- wrMisc::.composeCallName(callFrom, newNa="imageW")
   argNa <- deparse(substitute(data))
@@ -79,36 +88,36 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=
 #  if(length(dim(data)) <2) data <- try(matrix(as.numeric(data), ncol=1, dimnames=list(names(data), NULL)), silent=TRUE)
 #  if(inherits(data, "try-error")) doPlot <- FALSE else {
 #    if(is.data.frame(data) && doPlot) {doPlot <- is.numeric(as.matrix(data)); data <- as.matrix(data)}}
-  if(debug) {message(fxNa," xiW0   debug: ",debug); xiW0 <- list(data=data,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion,doPlot=doPlot, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
+  if(debug) {message(fxNa," xiW0   debug: ",debug); xiW0 <- list(data=data,xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion,doPlot=doPlot, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
   if(doPlot) {    
     ## checks & adjust
-    if(length(xLabVal) >1 && !all(is.na(xLabVal))) {
-      if(transp) { 
-        if(length(xLabVal) ==ncol(data) && length(colNa) <1 ) { colNa <- xLabVal; xLabVal <- NA
-          if(!silent) message(fxNa,"(88) It seems you meant 'colNa' when using argument 'xLabVal' (interpreting as such) ...") 
-        } else { if(length(xLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'xLabVal'"); xLabVal <- NA }
-      } else {   
-        if(length(xLabVal) ==nrow(data) && length(rowNa) <1 ) { rowNa <- xLabVal; xLabVal <- NA
-          if(!silent) message(fxNa,"(92) It seems you meant 'rowNa' when using argument 'xLabVal' (interpreting as such) ...") 
-        } else { if(length(xLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'xLabVal'"); xLabVal <- NA }
-      } 
-    } else { if(length(xLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'xLabVal'"); xLabVal <- NA }
-    
-    if(length(yLabVal) >1 && !all(is.na(yLabVal))) {
-      if(transp) { 
-        if(length(yLabVal) ==nrow(data) && length(rowNa) <1 ) { rowNa <- yLabVal; yLabVal <- NA
-          if(!silent) message(fxNa,"(100) It seems you meant 'rowNa' when using argument 'yLabVal' (interpreting as such) ...")
-        } else { if(length(yLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'yLabVal'"); yLabVal <- NA }
-      } else {  
-        if(length(yLabVal) ==ncol(data) && length(colNa) <1 ) { colNa <- yLabVal; yLabVal <- NA
-          if(!silent) message(fxNa,"(104) It seems you meant 'colNa' when using argument 'yLabVal' (interpreting as such) ...")
-        } else { if(length(yLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'xLabVal'"); yLabVal <- NA}           
-      }      
-    } else { if(length(yLabVal) >1) if(!silent) message(fxNa,"Invalid entry for 'xLabVal'"); yLabVal <- NA}
+    if(length(xLabVal) ==ncol(data)) {
+      if(any(duplicated(xLabVal)) || any(is.na(xLabVal))) {xLabVal <- NA; if(!silent) message(fxNa,"Argument 'xLabVal' invalid  - ignoring  (must be all unique values)")}
+      if(transp) {
+        ch1 <- try(colnames(data) <- xLabVal, silent=TRUE)
+        if(inherits(ch1, "try-error") && !silent) message(fxNa,"Argument 'xLabVal' invalid   (unable setting colnames)")
+      } else {
+        ch1 <- try(rownames(data) <- xLabVal, silent=TRUE)
+        if(inherits(ch1, "try-error") && !silent) message(fxNa,"Argument 'xLabVal' invalid   (unable setting rownames)")
+      }
+    } else { if(length(xLabVal) >0) {if(!silent && !all(is.na(xLabVal))) message(fxNa,"Invalid entry for 'xLabVal'"); xLabVal <- NA} }
+
+    if(length(yLabVal) ==ncol(data)) {
+      if(any(duplicated(yLabVal)) || any(is.na(yLabVal))) {yLabVal <- NA; if(!silent) message(fxNa,"Argument 'yLabVal' invalid  - ignoring  (must be all unique values)")}
+      if(transp) {
+        ch1 <- try(rownames(data) <- yLabVal, silent=TRUE)
+        if(inherits(ch1, "try-error") && !silent) message(fxNa,"Argument 'yLabVal' invalid   (unable setting rownames)")
+      } else {
+        ch1 <- try(colnames(data) <- yLabVal, silent=TRUE)
+        if(inherits(ch1, "try-error") && !silent) message(fxNa,"Argument 'yLabVal' invalid   (unable setting colnames)")
+      }  
+    } else { if(length(yLabVal) >0) {if(!silent && !all(is.na(yLabVal))) message(fxNa,"Invalid entry for 'yLabVal'"); yLabVal <- NA} }
                                                                                                                      
     if(length(rowNa) < nrow(data)) rowNa <- if(nrow(data) >1) {if(length(rownames(data)) >0) rownames(data) else 1:nrow(data)} else ""
     if(length(colNa) < ncol(data)) colNa <- if(ncol(data) >1) {if(length(colnames(data)) >0) colnames(data) else 1:ncol(data)} else ""
-    if(debug) {message(fxNa," xiW1"); xiW1 <- list(data=data,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
+    if(debug) {message(fxNa," xiW1"); xiW1 <- list(data=data,xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
+    
+    ## Main plotting
     if(isTRUE(latticeVersion)) {
       ## reformat input
       if(!transp) data <- t(data)                 #  was initially written for transp=T, re-transform if not chosen
@@ -117,15 +126,14 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=
       ma2 <- expand.grid(1:ncol(data), 1:nrow(data))
       ma2 <- cbind(ma2, as.numeric(t(data[nrow(data):1,])))
       colnames(ma2) <- c("x","y","z")
-      if(any(is.na(xLabVal))) xLabVal <- NULL
-      if(any(is.na(yLabVal))) yLabVal <- NULL
+
       ## colors
       if(length(col) <2) col <- c("blue","grey80","red")
       nCol2 <- try(round(nColor[1]), silent=TRUE)
       msg <- "Note: Argument 'nColor' should contain integer at least as high as numbers of colors defined to pass through; resetting to default=9"
-      if(inherits(nCol2, "try-error")) { message(fxNa,msg); nCol2 <- 9 }
+      if(inherits(nCol2, "try-error")) { message(fxNa, if(debug) "xiW1b", msg); nCol2 <- 9 }
       if(nCol2 < length(col)) { message(fxNa,msg); nCol2 <- 9 }
-      if(debug) {message(fxNa," xiW2"); xiW2 <- list(data=data,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, nCol2=nCol2,tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
+      if(debug) {message(fxNa," xiW2"); xiW2 <- list(data=data,xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, nCol2=nCol2,tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues)}
 
       miMa <- range(as.matrix(data), na.rm=TRUE)
       width <- (miMa[2] - miMa[1])/ nCol2
@@ -181,27 +189,29 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=
           lattice::panel.abline(h=0.5 +1:(nrow(data) -1), col=gridCol, lty=gridLty)     # vertical 
           lattice::panel.abline(v=0.5 +1:(ncol(data) -1), col=gridCol, lty=gridLty) }   # hor
         ## add axis label (new oct24)
-        if(length(xLab)==1 && !is.na(xLab)) lattice::panel.text(x=mean(argXYZ$x), y=0.02, xLab, gp=grid::gpar(fontsize=14), just="center", check.overlap=TRUE) 
-        if(length(yLab)==1 && !is.na(yLab)) lattice::panel.text(x=0.02, mean(argXYZ$y), yLab, gp=grid::gpar(fontsize=14), vjust=0.5, rot=90, check.overlap=TRUE)  # text may be too much to left
+        #if(length(xLab)==1 && !is.na(xLab)) lattice::panel.text(x=mean(argXYZ$x), y=0.02, xLab, gp=grid::gpar(fontsize=14), just="center", check.overlap=TRUE) 
+        #if(length(yLab)==1 && !is.na(yLab)) lattice::panel.text(x=0.02, mean(argXYZ$y), yLab, gp=grid::gpar(fontsize=14), vjust=0.5, rot=90, check.overlap=TRUE)  # text may be too much to left
       } 
           #panel.text(x=mytable$Xcoord, y=mytable$Ycoord, mytable$Labels)              
-      if(debug) {message(fxNa," xiW3"); xiW3 <- list(data=data,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues,ma2=ma2,cols=cols,cexXlab=cexXlab,rotXlab=rotXlab,Xtck=Xtck,Ytck=Ytck)}
+      if(debug) {message(fxNa," xiW3"); xiW3 <- list(data=data,xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, myPanel=myPanel,cexXlab=cexXlab,cexYlab=cexYlab,rotYlab=rotYlab, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues,ma2=ma2,cols=cols,cexXlab=cexXlab,rotXlab=rotXlab,Xtck=Xtck,Ytck=Ytck)}
 
       ## lattice levelplot
       plo <- try(lattice::levelplot(z ~ x *y, data=ma2, aspect=nrow(data)/ncol(data), col.regions=cols,
-        region=TRUE, cuts=length(cols) -1, xlab=yLabVal, ylab=xLabVal, main=tit,
-        scales=list(relation="free", x=list(at=1:ncol(data), labels=if(transp) colNa else rowNa, cex=cexXlab, rot=rotXlab, tck=as.numeric(Xtck)), 
-          y=list(at=nrow(data):1, labels=if(transp) rowNa else colNa, cex=cexYlab, rot=rotYlab, tck=as.numeric(Ytck))),  # axis labels 
-        par.settings=list(axis.line=list(col='black')), 
-        panel=myPanel ), silent=TRUE)
-      if(inherits(plo, "try-error")) message(fxNa, "Failed to plot !!\n", plo) else {                 # new oct24
+          region=TRUE, cuts=length(cols) -1, xlab=if(transp) yLab else xLab, ylab=if(transp) xLab else yLab,
+          scales=list(relation="free", x=list(at=1:ncol(data), labels=if(transp) colNa else rowNa, cex=if(transp) cexYlab else cexXlab, rot=rotXlab, tck=as.numeric(Xtck)), 
+            y=list(at=nrow(data):1, labels=if(transp) rowNa else colNa, cex=if(transp) cexYlab else cexXlab, rot=rotYlab, tck=as.numeric(Ytck))),  # axis labels 
+          par.settings=list(axis.line=list(col='black')), 
+          panel=myPanel ), silent=TRUE)
+        if(debug){ message("xiW3aa :  length plo ", length(plo)); }  
+        if(inherits(plo, "try-error")) message(fxNa, "Failed to plot !!\n", plo)  # else {                 # new oct24
         #if(length(xLab)==1 && !is.na(xLab)) plo <- plo + grid::grid.text(xLab, y=0.02, gp=grid::gpar(fontsize=14), just="center", check.overlap=TRUE) 
         #if(length(yLab)==1 && !is.na(yLab)) plo <- plo + grid::grid.text(yLab, x=0.02, gp=grid::gpar(fontsize=14), vjust=0.5, rot=90, check.overlap=TRUE)  # text may be too much to left
-      }  
-         
+        #}
+      return(plo)            # need to return object !
+      if(debug) {message(fxNa," xiW3b"); xiW3b <- list(data=data,plo=plo, xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,latticeVersion=latticeVersion, myPanel=myPanel,cexXlab=cexXlab,cexYlab=cexYlab,rotYlab=rotYlab, tit=tit,rowNa=rowNa,colNa=colNa,showValues=showValues,ma2=ma2,cols=cols,cexXlab=cexXlab,rotXlab=rotXlab,Xtck=Xtck,Ytck=Ytck)}
+
     } else {
       ## (until v1.2.5) standard graphics version  (ie non-lattice)
-      if(debug) message(fxNa," (175)  xVal=",xLabVal,"   yVal=",yLabVal)
       if(transp) data <- t(data)
       if(ncol(data) >1) data <- data[,ncol(data):1]                         # reverse for intuitive display left -> right
       if(identical(col,"heat.colors") || identical(col,"heatColors")) col <- rev(grDevices::heat.colors(sort(c(15, prod(dim(data)) +2))[2] ))
@@ -219,14 +229,16 @@ imageW <- function(data, latticeVersion=FALSE, transp=TRUE, NAcol="grey95", tit=
         ## mark NAs
         if(any(chNa)) data[which(chNa)] <- min(data, na.rm=TRUE) -diff(range(data, na.rm=TRUE))*1.1/(length(col))
         col <- c(NAcol, col) }
+      if(length(xLab) <1 || all(is.na(xLab))) xLab <- ""
+      if(length(yLab) <1 || all(is.na(yLab))) yLab <- ""
       ## main plot
       yAt <- (0:(length(rowNa)-1))/(length(rowNa)-1)
       if(is.data.frame(data)) data <- as.matrix(data)
-      if(debug) {message(fxNa," (197)  xVal=",xLabVal,"   yVal=",yLabVal, "  xiW4"); xiW4 <- list(data=data, col=col, xLabVal=xLabVal,yLabVal=yLabVal,transp=transp,tit=tit,rowNa=rowNa,colNa=colNa,yAt=yAt,showValues=showValues,cexTit=cexTit)}
-      plo <- try(graphics::image(data, col=col, xaxt="n", yaxt="n", main=tit, cex.main=cexTit, xlab=if(transp) yLabVal else xLabVal, ylab=if(transp) xLabVal else yLabVal), silent=TRUE)
+      if(debug) {message(fxNa, if(debug) "xiW4 (229) "); xiW4 <- list(data=data, col=col, xLab=xLab,yLab=yLab,xLabVal=xLabVal,yLabVal=yLabVal,cexXlab=cexXlab,cexYlab=cexYlab,transp=transp,tit=tit,rowNa=rowNa,colNa=colNa,yAt=yAt,showValues=showValues,cexTit=cexTit)}
+      plo <- try(graphics::image(data, col=col, xaxt="n", yaxt="n", main=tit, cex.main=cexTit, xlab=if(transp) yLab else xLab, ylab=if(transp) xLab else yLab), silent=TRUE)
       if(inherits(plo, "try-error")) message(fxNa,"Failed to plot !!\n", plo) else {
-        graphics::mtext(at=(0:(length(colNa)-1))/(length(colNa)-1), colNa, side=if(transp) 1 else 2, line=0.3, las=las, cex=cexYlab)   # 'colNames'
-        graphics::mtext(at=if(transp) rev(yAt) else yAt, rowNa, side=if(transp) 2 else 1, line=0.3, las=las, cex=cexXlab)           # 'rowNames'
+        graphics::mtext(at=(0:(length(colNa)-1))/(length(colNa)-1), colNa, side=if(transp) 1 else 2, line=0.3, las=las, cex=if(transp) cexXlab else cexYlab)   # 'colNames'
+        graphics::mtext(at=if(transp) rev(yAt) else yAt, rowNa, side=if(transp) 2 else 1, line=0.3, las=las, cex=if(transp) cexYlab else cexXlab)              # 'rowNames' of init dat
         graphics::box(col=grDevices::grey(0.8)) 
         showVal <- if(length(showValues) >0) !isFALSE(showValues[1]) else FALSE
         if(showVal) {

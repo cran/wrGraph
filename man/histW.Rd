@@ -2,7 +2,7 @@
 % Please edit documentation in R/histW.R
 \name{histW}
 \alias{histW}
-\title{Histogram (version by WR)}
+\title{Histogram (version W)}
 \usage{
 histW(
   dat,
@@ -14,6 +14,7 @@ histW(
   subTi = NULL,
   xLab = NULL,
   yLab = NULL,
+  xLim = NULL,
   las = NULL,
   xcex = 0.7,
   imgxSize = 900,
@@ -47,6 +48,8 @@ histW(
 
 \item{yLab}{(character) custom y-axes label}
 
+\item{xLim}{(numeric, length=2) custom x-axes limits}
+
 \item{las}{(integer) optional fixed text orientation of x-axis numbers : use 1 for horizontal and 2 for perpendicular, see also \code{\link[graphics]{par}}}
 
 \item{xcex}{(numeric) cex-type expansion factor for x-axis numbers, see also \code{\link[graphics]{par}}}
@@ -72,15 +75,18 @@ histW(
 \item{callFrom}{(character) allow easier tracking of messages produced}
 }
 \value{
-This function produces a histogram type graphic (to the ccurrent graphical device)
+This function produces a histogram type graphic (to the current graphical device), it may also plot to file if the arguments \code{fileName} designs a valid (path&) file for the output
 }
 \description{
 This function proposes a few special tweaks to the general \code{\link[graphics]{hist}} function :
 In a number of settings data are treated and plotted as log-data. This function allows feeding directly log2-data and displaying the x-axis   
-(re-translated) in linear scale (see argument \code{isLog}). 
+(re-translated) in linear scale (see argument \code{isLog}).
+}
+\details{
 The default settings allow making (very) small histograms ('low resolution'), which may be used as a rough overview of bandwidth and distribution of values in \code{dat}. 
+
 Similar to \code{\link[graphics]{hist}}, by changing the parameters \code{nBars} and/or \code{breaks} very 'high resolution' histograms can be produced.
-By default it displays n per set of data (on the top of the figure). 
+By default it displays n (the nuber of values used underneith) per set of data (on the top of the figure). 
 Note that the argument for (costom) title \code{main} is now called \code{tit}.
 }
 \examples{

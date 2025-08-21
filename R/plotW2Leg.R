@@ -24,7 +24,7 @@
 #' @param debug (logical) additonal messages for debugging
 #' @param callFrom (character) allows easier tracking of messages produced
 #' @seealso (standard plots) \code{plot} from the package \code{base}   
-#' @return graphical output only
+#' @return This function returns graphical output only
 #' @examples
 #' x1 <- cbind(x=c(2,1:7), y=8:1 +runif(8), grade=rep(1:4,2))
 #' plotW2Leg(x1,useCol=c("x","y","y","grade"))

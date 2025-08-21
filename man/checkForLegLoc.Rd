@@ -33,7 +33,7 @@ checkForLegLoc(
 \item{callFrom}{(character) allows easier tracking of messages produced}
 }
 \value{
-list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts
+This function returns a list with $showL indicating if legend is desired and $loc for the proposition of the best location, $nConflicts gives the counts of conflicts
 }
 \description{
 This function tries to find the best location for placing a legend of a bivariate plot, ie scatter-plot.

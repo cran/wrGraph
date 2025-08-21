@@ -36,7 +36,7 @@ convertPlotCoordPix(
 \item{debug}{(logical) additonal messages for debugging}
 }
 \value{
-matrix with x- and y-coordinates in pixels
+This function returns a matrix with x- and y-coordinates in pixels
 }
 \description{
 This function allows conversion the plotting positions ('x' and 'y' coordinates) of points in a given plot into coordinates in pixels (of the entire plotting region).

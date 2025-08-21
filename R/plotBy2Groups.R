@@ -17,14 +17,14 @@
 #' @param silent (logical) suppress messages
 #' @param debug (logical) additional messages for debugging
 #' @param callFrom (character) allow easier tracking of messages produced
-#' @return list with \code{$annot}, \code{$abund} for initial/raw abundance values and \code{$quant} with final normalized quantitations, or returns data.frame with annot and quant if \code{separateAnnot=FALSE}
+#' @return This function returns a list with \code{$annot}, \code{$abund} for initial/raw abundance values and \code{$quant} with final normalized quantitations, or returns data.frame with annot and quant if \code{separateAnnot=FALSE}
 #' @seealso \code{\link[utils]{read.table}}, \code{\link[wrMisc]{normalizeThis}}) 
 #' @examples
 #' set.seed(2020); rand1 <- round(runif(12),2) +rep(1:3,each=4)
 #' plotBy2Groups(rand1, gl(2,6,labels=LETTERS[5:6]), gl(4,3,labels=letters[1:4]))
 #'  
 #' @export
-plotBy2Groups <- function(dat, grp, grp2=NULL, col=NULL, pch=NULL, tit=NULL, cex=2, lwd=0.5, lty=2, yLab=NULL, cexLab=NULL, sepLines=FALSE,silent=FALSE,debug=FALSE, callFrom=NULL) {
+plotBy2Groups <- function(dat, grp, grp2=NULL, col=NULL, pch=NULL, tit=NULL, cex=2, lwd=0.5, lty=2, yLab=NULL, cexLab=NULL, sepLines=FALSE, silent=FALSE,debug=FALSE, callFrom=NULL) {
   ## plot indiv values as membership of 2 grouping vectors (eg by grp=patient and grp2=age-group)
   fxNa <- wrMisc::.composeCallName(callFrom,newNa="plotBy2Groups")  
   if(!isTRUE(silent)) silent <- FALSE
@@ -36,7 +36,7 @@ plotBy2Groups <- function(dat, grp, grp2=NULL, col=NULL, pch=NULL, tit=NULL, cex
   if(length(grp2) <1) grp2 <- grp
   dat0 <- dat <- as.numeric(dat)
   chNaGrp <- is.na(grp) | is.na(grp2)
-  if(any(chNaGrp)) { if(all(chNaGrp)) stop(" No individual defined by both groups")
+  if(any(chNaGrp)) { if(all(chNaGrp)) stop(fxNa," No individual defined by both groups")
     if(!silent) message(fxNa,"Remove ",sum(chNaGrp)," due to NAs in (one of the) groups")
     dat <- dat[which(!chNaGrp)]
     dat0 <- dat0[which(!chNaGrp)]

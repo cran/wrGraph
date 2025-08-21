@@ -7,7 +7,8 @@
 #' It is also possible to plot pairwise half-violins for easier pairwise-comparisons (using \code{halfViolin="pairwise"}).
 #' Many arguments are kept similar to \href{https://CRAN.R-project.org/package=vioplot}{vioplot} (here, the package \code{vioplot} is not required/used).
 #'
-#' @details The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applies to all profiles drawn.
+#' @details 
+#' The (relative) width of the density-profiles ('Violins') may be manually adjusted using the parameter \code{wex} which applies to all profiles drawn.
 #'
 #' Note : Arguments have to be given with full names, lazy evaluation of arguments will not work properly with this function (since '...' is used to capture additional data-sets).
 #' Note : \href{https://CRAN.R-project.org/package=vioplot}{vioplot} offers better options for plotting formulas
