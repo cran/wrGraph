@@ -169,11 +169,11 @@ matMeans <- round(cbind(A=rowMeans(mat[,1:3]), B=rowMeans(mat[,4:6])),4)
 
 ## ----MA1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE------------
 ## now we are ready to plot, M-values can be obtained by subtracting thr group-means
-MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
+MAplotW(M=matMeans[,1] -matMeans[,2], A=rowMeans(mat)) 
 
 ## ----MA4, echo=TRUE-----------------------------------------------------------
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
-tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
+tRes <- wrMisc::moderTest2grp(mat,  gl(2, 3, labels=LETTERS[1:2]), addResults=c("FDR","Mval","means"))
 
 ## ----MA5,fig.height=6, fig.width=8, fig.align="center",  echo=TRUE------------
 ## convenient way, change fold-change threshold to 2x and mark who is beyond :
@@ -189,7 +189,7 @@ mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 
 ## assume 2 groups with 3 samples each
 gr3 <- gl(3,3,labels=c("C","A","B"))
-tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
+tRes2 <- suppressWarnings(moderTest2grp(mat[,1:6], gl(2,3)))
 
 VolcanoPlotW(tRes2)
 
@@ -198,7 +198,7 @@ VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass", expFCarrow=c(0.75,
 
 ## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
 ## assume 3 groups with 3 samples each
-tRes <- moderTestXgrp(mat, gr3)
+tRes <- suppressWarnings(moderTestXgrp(mat, gr3))
 
 layout(matrix(1:2, nrow=1))
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)

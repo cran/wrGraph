@@ -60,7 +60,7 @@ profileAsClu <- function(dat, clu, meanD=NULL, tit=NULL, col=NULL, pch=NULL, xla
   cluLoc <- table(clu)[rank(unique(clu))]
   cluBord <- cumsum(cluLoc[-nClu]) +0.5
   cluLoc <- cumsum(cluLoc) - cluLoc/2 +0.5
-  meanLi <- matrix(NA, nrow=nrow(dat) +nClu, ncol=2)
+  meanLi <- matrix(NA_real_, nrow=nrow(dat) +nClu, ncol=2)
   inc <- 0
   if(debug) message(fxNa,"pAC2")
   for(i in unique(clu)) { li <- which(clu==i); meanLi[inc+li,] <- cbind(li, meanD[li]); inc <- inc +1}

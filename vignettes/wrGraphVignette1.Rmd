@@ -437,7 +437,7 @@ One way of using the function _MAplotW()_ is by providing (explicitely) the M- a
 By default a threshold-line is drawn for a fold-change of 1.5x (which on log2 scale apprears at +/- 0.58).
 ```{r MA1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE}
 ## now we are ready to plot, M-values can be obtained by subtracting thr group-means
-MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
+MAplotW(M=matMeans[,1] -matMeans[,2], A=rowMeans(mat)) 
 ```
 
 The function _MAplotW_ may also be used to conveniently inspect results from t-tests performed with the package [wrMisc](https://CRAN.R-project.org/package=wrMisc)
@@ -445,7 +445,7 @@ or from the very popular package [limma](https://www.bioconductor.org/packages/r
 
 ```{r MA4, echo=TRUE}
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
-tRes <- wrMisc::moderTest2grp(mat, gl(2,3), addResults=c("FDR","Mval","means"))
+tRes <- wrMisc::moderTest2grp(mat,  gl(2, 3, labels=LETTERS[1:2]), addResults=c("FDR","Mval","means"))
 ```
  
 This object conatains data for different types of plots (MA-plot, Volcano-Plot, etc ..), let's also mark the names of those passing the fold-change threshold.
@@ -471,6 +471,10 @@ Numerous implementations for specific applications exist (eg the package [Enhanc
 The version presented here is rather generic and uses transparent points to avoid getting plots too crowded.
 Furthermore, this version has the advantage to take all information needed directly in MArrayLM-objects, like the output of  moderTest2grp() or moderTestXgrp().
 
+Please note that the examples use faily small toy-data where the estimation of local fdr-values (lfdr) may not be optimal. 
+For this reason the functions for estimating the lfdr give warning messages which are suppressed in the exmaples below.
+In real world testing the user may either switch to the frequenly used Bejamini-Hochberg (global) FDR or should interprete results on lfdr-level with caution.
+
 
 ```{r Volc1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE}
 ## let's generate some toy data
@@ -482,7 +486,7 @@ mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 
 ## assume 2 groups with 3 samples each
 gr3 <- gl(3,3,labels=c("C","A","B"))
-tRes2 <- moderTest2grp(mat[,1:6], gl(2,3))
+tRes2 <- suppressWarnings(moderTest2grp(mat[,1:6], gl(2,3)))
 
 VolcanoPlotW(tRes2)
 
@@ -494,7 +498,7 @@ Note, that this exampe is very small and for this reason the function _fdrtool()
 
 ```{r Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE}
 ## assume 3 groups with 3 samples each
-tRes <- moderTestXgrp(mat, gr3)
+tRes <- suppressWarnings(moderTestXgrp(mat, gr3))
 
 layout(matrix(1:2, nrow=1))
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
@@ -566,7 +570,7 @@ for(i in 1:nrow(df1)) cat(paste("point no ",i," : ",df1[i,1]," x=",df1[i,2]," y=
 ## Acknowledgements
 
 The author would like to acknowledge the support by the [IGBMC](https://www.igbmc.fr) (CNRS UMR 7104, Inserm U 1258, UdS),
-[CNRS](http://www.cnrs.fr/en), [Universit&eacute; de Strasbourg (UdS)](https://www.unistra.fr) and [Inserm](https://www.inserm.fr).
+[CNRS](http://www.cnrs.fr/en), [Universit&eacute; de Strasbourg (UdS)](https://www.unistra.fr/fr) and [Inserm](https://www.inserm.fr).
 and of course all collegues from the [IGBMC proteomics platform](https://www.igbmc.fr/en/plateformes-technologiques/translate-to-english-proteomique).
 The author wishes to thank the [CRAN-staff](https://CRAN.R-project.org) for all their help and their efforts in maintaining this repository of R-packages.
 

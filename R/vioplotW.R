@@ -270,7 +270,7 @@ vioplotW <- function(x, ..., finiteOnly=TRUE, removeEmpty=FALSE, halfViolin=FALS
     ## prepare half-violins
     if(identical(halfViolin,"pairwise")) {
       boxFa <- boxFa +identical(halfViolin,"pairwise")/50              # adjust box width
-      pwBoC <- matrix(NA, nrow=5, ncol=n, dimnames=list(c("xLe","yBo","xRi","yTo","xPo"),NULL))  # coords for box
+      pwBoC <- matrix(NA_real_, nrow=5, ncol=n, dimnames=list(c("xLe","yBo","xRi","yTo","xPo"),NULL))  # coords for box
       impa <- which(1:n %% 2 >0)
       pair <- 2* which(impa +1 <= n)
       pwBoC[,impa] <- rbind(1:length(impa) -boxFa, ra2[2,impa], 1:length(impa), ra2[4,impa], 1:length(impa) -boxFa/2)

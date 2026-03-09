@@ -111,15 +111,17 @@ Please note, that plotting a very high number of points in transparency (eg >100
 \examples{
 library(wrMisc)
 set.seed(2005); mat <- matrix(round(runif(600),2), ncol=6)
-rownames(mat) <- c(rep(letters[1:25],each=3), letters[2:26])
-MAplotW(mat[,2] -mat[,1], A=rowMeans(mat))
+rownames(mat) <- paste(rep(letters[1:25],each=4), letters[2:26])
+MAplotW(mat[,2] -mat[,1], A=rowMeans(mat[,1:2]))
+
 ## assume 2 groups with 3 samples each
 matMeans <- rowGrpMeans(mat, gr=gl(2,3,labels=LETTERS[3:4]))
-MAplotW(M=matMeans[,2] -matMeans[,1], A=matMeans) 
+MAplotW(M=matMeans[,2] -matMeans[,1], A=rowMeans(mat)) 
+
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- moderTest2grp(mat, gl(2,3))
 MAplotW(tRes$Mval, tRes$Amean)                          
-MAplotW(M=tRes$Mval, A=tRes$means, FCth=1.3) 
+MAplotW(M=tRes$Mval, A=rowMeans(tRes$means), FCth=1.3) 
 MAplotW(tRes)
 MAplotW(tRes, limM=c(-2,2), FCth=1.3) 
 

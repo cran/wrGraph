@@ -26,9 +26,9 @@
 #' @param reCex (numeric) cex type expansion factor for lfor replotting (non-outlyer) points, default set to \code{NULL} for not replotting
 #' @param ctrPch (integer) symbol for showing group center (see also \code{\link[graphics]{par}})
 #' @param ctrCex (numeric) cex type expansion factor for size of group center (see also \code{\link[graphics]{par}})
+#' @param returnOutL (logical) decide if rownames of (potential) outlyer values should be returned when running the function
 #' @param ctrCol (character or integer) color for group center symbol and potential outlyers (names of outlyers will shown if \code{returnOutL=TRUE})
 #' @param addSubTi (logical) decide if subtitle, ie names of points should be added in plot for points considered as potential outlyers
-#' @param returnOutL (logical) decide if rownames of (potential) outlyer values should be returned when running the function
 #' @param silent (logical) suppress messages
 #' @param callFrom (character) allow easier tracking of messages produced
 #' @param debug (logical) display additional messages for debugging
@@ -76,7 +76,7 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
   if(length(bagCol) <1) bagCol <- grDevices::rgb(0.1,0.1,0.1,0.1)
   ## main
   if(length(x) >0) {
-    if(debug) {message(fxNa,"aBP1"); aBP1 <- list(chNA=chNA,x=x,lev1=lev1,bagCol=bagCol,nCore=nCore,outCoef=outCoef)}
+    if(debug) {message(fxNa,"aBP1"); aBP1 <- list(chNA=chNA,x=x,lev1=lev1,bagCol=bagCol,bagCont=bagCont,nCore=nCore,outCoef=outCoef)}
     if(is.null(rownames(x))) rownames(x) <- 1:nrow(x)
     ctr <- if(nrow(x) < nCore) colMeans(x,na.rm=TRUE) else apply(x, 2, stats::median,na.rm=TRUE)                      # overall center : medain if >5 elements
     di <- sqrt((x[,1] -ctr[1])^2 + (x[,2] -ctr[2])^2)                # Euclidean distance to center
@@ -85,23 +85,25 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
     if(any(chdNA)) keepX[which(chdNA)] <- FALSE
     if(sum(keepX) <1) { keepX <- rep(TRUE, nrow(x))
       if(!silent) message(fxNa,"Problem defining non-outlyer part of data, keep all")}
-    if(debug) {message(fxNa,"aBP2") }
+    if(debug) {message(fxNa,"aBP2"); aBP2 <- list(chNA=chNA,x=x,di=di,lev1=lev1,bagCol=bagCol,bagCont=bagCont,nCore=nCore,outCoef=outCoef,keepX=keepX,outlPch=outlPch,outlCex=outlCex,reCol=reCol,reCex=reCex,ctrPch=ctrPch,ctrCol=ctrCol) }
 
     ## define outlyers
     outL <- matrix(x[which(!keepX),], ncol=2)
     if(nrow(outL) >0) rownames(outL) <- rownames(x)[which(!keepX)]
     offS <- if(nrow(x) >1) apply(x, 2, function(z) max(abs(range(z, finite=TRUE)), na.rm=TRUE))/70 else x/70               #
-    if(!silent && nrow(x) > 2) message(fxNa,"Keep ",sum(keepX)," out of ",nrow(x)," points and consider ",
-      sum(!keepX)," as outliers")
-    if(sum(keepX) < nrow(x)) { x <- x[which(keepX), , drop=FALSE]
-      di <- di[which(keepX)] }
-    if(debug) {message(fxNa,"aBP3") ; aBP3 <- list(outL=outL,keepX=keepX,x=x,di=di,lev1=lev1)}
+    if(!silent && nrow(x) > 2) message(fxNa,"Keep ",sum(keepX)," out of ",nrow(x)," points and consider ", sum(!keepX)," as outliers")
+    if(sum(keepX) < nrow(x)) { 
+      x <- x[which(keepX), , drop=FALSE]
+      di <- di[which(keepX)]
+    }
     ## chull around core data
     xCore <- x
     liBag <- if(length(di) <4) rep(TRUE, length(di)) else di <= stats::quantile(di, lev1, na.rm=TRUE) +min(di,na.rm=TRUE)/100
     if(sum(liBag) <4 && length(di) >2) liBag[order(di, decreasing=FALSE)[1:3]] <- TRUE   # have at least 3 points for bag
     if(sum(liBag) < length(liBag)/2.7) liBag <- di <= stats::quantile(di, lev1, na.rm=TRUE) + mean(di,na.rm=TRUE)/10
     if(sum(liBag) >1 && sum(liBag) < nrow(x)) xCore <- x[which(liBag), , drop=FALSE]
+    if(debug) {message(fxNa,"aBP3  .+.+.") ; aBP3 <- list(chNA=chNA,x=x,di=di,lev1=lev1,bagCol=bagCol,bagCont=bagCont,outL=outL,keepX=keepX,offS=offS)}
+
     htps <- grDevices::chull(xCore)
     if(nrow(x) > 2) {
       ## shade core ...
@@ -112,8 +114,10 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
         graphics::segments(y[,1], y[,2], y[,3], y[,4], col=bagCont, lwd=bagLwd) }
       ## optional replotting of non-outlyer-points
       if(length(reCol) >0 && length(rePch) >0 && length(reCex) >0) graphics::points(x, pch=rePch, col=reCol, cex=reCex)
-    } else if(nrow(x)==2) graphics::lines(x[,1], x[,2], lwd=5, col=bagCol)      # can only connect 2 remaining points by fat line
-    if(debug) {message(fxNa,"aBP4") }
+      if(debug) {message(fxNa,"aBP3b"); aBP3b <- list(x=x,di=di,nCore=nCore,outCoef=outCoef,keepX=keepX,lev1=lev1,xCore=xCore,htps=htps,htps2=htps2,bagCol=bagCol,bagCont=bagCont,bagLwd=bagLwd) }
+
+    } else if(nrow(x)==2) graphics::lines(x[,1], x[,2], lwd=5, col=bagCol)      # can only connect 2 remaining points by fat line    
+    if(debug) {message(fxNa,"aBP4  .+.+.+") ; aBP4 <- list(chNA=chNA,x=x,di=di,lev1=lev1,bagCol=bagCol,bagCont=bagCont,outL=outL,keepX=keepX,offS=offS,xCore=xCore,liBag=liBag)}
 
     ## show group-center (only if ctrPch defined)
     if(is.null(ctrCol)) ctrCol <- bagCol
@@ -124,15 +128,16 @@ addBagPlot <- function(x, lev1=0.5, outCoef=2, bagCol=NULL, bagCont=bagCol, bagL
     if(length(outlCol) <1 && nrow(outL) >0) outlCol <- bagCol
     if(any(is.na(outlCol))) outL <- NULL   # don't give names of outlyers if any outlCol is NA
     if(nrow(outL) >0) {
-      if(debug) {message(fxNa,"aBP5"); aBP4 <- list(ctr=ctr,x=x,lev1=lev1,outCoef=outCoef,outL=outL,outlPch=outlPch,outlCol=outlCol,addSubTi=addSubTi,outlCex=outlCex,
-        offS=offS,bagCol=bagCol,bagCont=bagCont,bagLwd=bagLwd,silent=silent,debug=debug ) }
+      if(debug) {message(fxNa,"aBP5"); aBP5 <- list(ctr=ctr,x=x,lev1=lev1,outCoef=outCoef,outL=outL,addSubTi=addSubTi,outlPch=outlPch,outlCol=outlCol,outlCex=outlCex,
+        offS=offS,bagCol=bagCol,bagCont=bagCont,bagLwd=bagLwd,addSubTi=addSubTi, silent=silent,debug=debug ) }
       if(length(outlPch) >0) graphics::points(outL, pch=outlPch, col=outlCol)
       if(length(addSubTi) <1 || !is.logical(addSubTi)) addSubTi <- FALSE else if(length(addSubTi) >1) addSubTi <- any(as.logical(addSubTi), na.rm=TRUE)
       if(is.null(outlCol)) outlCol <- bagCol
-      if(addSubTi && length(outlCex) >0) { graphics::mtext(paste("names of ",sum(!sapply(outL, is.null),na.rm=TRUE),
-        " elements looking like potential outlyers were displayed"), cex=0.55, line=-0.8, col=grDevices::grey(0.4))
-        graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21)) }  # labels of points
-      }
+      if(addSubTi) { graphics::mtext(paste(sum(!sapply(outL, is.null),na.rm=TRUE),
+        " elements looking like potential outlyers were plotted separately", if(length(outlCex) >0) "and labeled"), cex=0.55, line=-0.8, col=grDevices::grey(0.4))
+        if(length(outlCex) >0 ) graphics::text(outL[,1] +offS[1], outL[,2] +offS[2], col=outlCol, adj=0,cex=outlCex, labels=substr(rownames(outL),1,21))  # labels of points
+      }          
+    }
   }
   if(returnOutL) return( if(length(x) >0) {if(is.null(rownames(outL))) which(!keepX) else rownames(outL)} else NULL )
 }
