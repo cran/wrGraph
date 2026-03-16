@@ -93,8 +93,7 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
       if(length(useComp) >1) { useComp <- wrMisc::naOmit(useComp)[1]
         if(!silent) message(fxNa,"Argument 'useComp' should be integer of length=1; using only 1st entry") }
       if(length(useComp) <1) { useComp <- 1
-        if(!silent) message(fxNa,"Argument 'useComp' invalid, setting to 1") }
-        
+        if(!silent) message(fxNa,"Argument 'useComp' invalid, setting to 1") }        
         
       ## address multiple questions (via useComp): need to check 'useComp', thus need to locate FDRvalues or pValues for group-names ..
       ## extract data: find suitable columns
@@ -117,20 +116,18 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
           ## single comparison case (colnames of Mvalue$design are fixed); determine optimal sep and create pairwise name(s)
           grp <- colnames(Mvalue$means)            # 
           if(utils::packageVersion("wrMisc") < "2.0.0") {
-            pwSep <- " "
+            pwSep <- "-"
           } else {
-            pwSep <- " "
-            #pwSep <- if(length(Mvalue$setup$sep)==1) Mvalue$setup$sep else wrMisc::getPWseparator(grp=grp)
+            pwSep <- if(length(Mvalue$setup$sep)==1) Mvalue$setup$sep else wrMisc::getPWseparator(grp=grp)
           }
           pwNames <- if(length(Mvalue$setup$pwNames)==1) Mvalue$setup$pwNames else utils::combn(grp, 2)
           allCompNa <- if(length(Mvalue$setup$allCompNa) >0) Mvalue$setup$allCompNa else paste(pwNames[1,], pwNames[2,], sep=pwSep)
         } else {
           grp <- colnames(Mvalue$design)
           if(utils::packageVersion("wrMisc") < "2.0.0") {
-            pwSep <- " "
+            pwSep <- "-"
           } else {  
-            pwSep <- " "
-            #pwSep <- if(length(Mvalue$setup$sep)==1) Mvalue$setup$sep else wrMisc::getPWseparator(grp=colnames(Mvalue$design), includeGrp=FALSE, silent=silent, debug=debug, callFrom=fxNa) 
+            pwSep <- if(length(Mvalue$setup$sep)==1) Mvalue$setup$sep else wrMisc::getPWseparator(grp=colnames(Mvalue$design), includeGrp=FALSE, silent=silent, debug=debug, callFrom=fxNa) 
           }
           allCompNa <- if(length(Mvalue$setup$allCompNa) >0) Mvalue$setup$allCompNa else colnames(Mvalue[[c(pcol,FDRcol)[1] ]])
         }
@@ -141,11 +138,13 @@ MAplotW <- function(Mvalue, Avalue=NULL, useComp=1, filtFin=NULL, ProjNa=NULL, F
 
         if(length(useCompNa) ==0) useCompNa <- allCompNa[useComp] 
         names(useComp) <- useCompNa
+        chCompNa <- grepl(wrMisc::protectSpecChar(pwSep), useCompNa)
+        if(any(!chCompNa)) stop(fxNa,"PROBLEM with 'compNa' : Suggested pairwise separator not matching !")
         
         useCompNaS <- if(length(useCompNa) ==0 && length(pwNames) >0 ) t(pwNames)[useComp,] else unlist(strsplit(useCompNa, pwSep))  
         avInd <- match(useCompNaS, colnames(grpMeans))
         Mvalue$Mval <- grpMeans[,avInd[1]] - grpMeans[,avInd[2]] 
-        if(debug) {message(fxNa,"maP1c"); maP1c <- list(Mvalue=Mvalue,Avalue=Avalue,useComp=useComp,filtFin=filtFin,ProjNa=ProjNa,FCthrs=FCthrs,pcol=pcol,FDRcol=FDRcol,grpMeans=grpMeans,pwSep=pwSep,useCompNaS=useCompNaS,avInd=avInd,annotColumn=annotColumn )}
+        if(debug) {message(fxNa,"maP1d"); maP1d <- list(Mvalue=Mvalue,Avalue=Avalue,useComp=useComp,filtFin=filtFin,ProjNa=ProjNa,FCthrs=FCthrs,pcol=pcol,FDRcol=FDRcol,grpMeans=grpMeans,pwSep=pwSep,useCompNaS=useCompNaS,avInd=avInd,annotColumn=annotColumn )}
 
         useCompNaS <- unlist(strsplit(useCompNa, pwSep))  
         avInd <- match(useCompNaS, colnames(grpMeans))

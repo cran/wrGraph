@@ -1,7 +1,7 @@
-0f926b2bedf5d6467408337c0614b491 *DESCRIPTION
+f77e20af037d9837a8b7f1c71274ff9b *DESCRIPTION
 4c45e8677695012273f534940c8689f1 *NAMESPACE
-9c4c944ac49fc58b8249a9796a78bfe6 *R/MAplotW.R
-98fdc67d5bc3223725d7f2e8cfb66b73 *R/VolcanoPlotW.R
+884c6a774b9369abdd634ae1a176deab *R/MAplotW.R
+1237845bc3aeeef06cc7a4a16b20b243 *R/VolcanoPlotW.R
 c1d5f6cb95c2526796ffffa45156e65a *R/addBagPlot.R
 794dfb93d5233b9501f578c33200bf28 *R/checkForLegLoc.R
 edc6cea0afed77393531ca201fbbba13 *R/convertPlotCoordPix.R
@@ -22,9 +22,9 @@ bd8c9383b2f86e958c14bcc9d24848fe *R/profileAsClu.R
 590246c9ba44a5f65dbe9816af220a9d *build/vignette.rds
 a77f1281fe4fe8c92fff810f46c75e7b *inst/doc/wrGraphVignette1.R
 ac2898295ac08c03aaf3e8f9e78c38b9 *inst/doc/wrGraphVignette1.Rmd
-907343bc81a663ca772b10524ab0d71b *inst/doc/wrGraphVignette1.html
+db3aa9fdc9e9c90b7aade4531dd56e51 *inst/doc/wrGraphVignette1.html
 efea42223b4168181d39fc89520669ca *man/MAplotW.Rd
-d46f1e9f4019153575b835d5b66044cf *man/VolcanoPlotW.Rd
+4ac23c8fbaf8c148ef4029b5abb6a27c *man/VolcanoPlotW.Rd
 c0b1b200af1e9b7084f6da1a7a340bc5 *man/addBagPlot.Rd
 4b9d507b06e03653cf711575e0845b64 *man/checkForLegLoc.Rd
 9b750b384bf2314ba340904c8423f9f5 *man/convertPlotCoordPix.Rd

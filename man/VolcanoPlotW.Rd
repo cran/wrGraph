@@ -15,6 +15,7 @@ VolcanoPlotW(
   FdrList = NULL,
   FdrThrs = NULL,
   FdrType = NULL,
+  plotAsFdr = FALSE,
   subTxt = NULL,
   grayIncrem = TRUE,
   col = NULL,
@@ -33,6 +34,7 @@ VolcanoPlotW(
   cexTxLab = 0.7,
   namesNBest = NULL,
   NbestCol = 1,
+  colBySpecType = FALSE,
   sortLeg = "descend",
   NaSpecTypeAsContam = TRUE,
   useMar = c(6.2, 4, 4, 2),
@@ -44,7 +46,7 @@ VolcanoPlotW(
 }
 \arguments{
 \item{Mvalue}{(MArrayLM-object, numeric or matrix) data to plot; M-values are typically calculated as difference of log2-abundance values and 'pValue' the mean of log2-abundance values;
- M-values and p-values may be given as 2 columsn of a matrix, in this case the argument \code{pValue} should remain NULL.
+M-values and p-values may be given as 2 columsn of a matrix, in this case the argument \code{pValue} should remain NULL.
 One may also furnish MArrayLM-objects created bpackage wrProteo or limma.}
 
 \item{pValue}{(numeric, list or data.frame) if \code{NULL} it is assumed that 2nd column of 'Mvalue' contains the p-values to be used}
@@ -65,6 +67,8 @@ One may also furnish MArrayLM-objects created bpackage wrProteo or limma.}
 
 \item{FdrType}{(character) FDR-type to extract if \code{Mvalue} is 'MArrayLM'-object (eg produced by from \code{moderTest2grp} etc);
 if \code{NULL} it will search for suitable fields/values in this order : 'FDR','BH','lfdr' and 'BY'}
+
+\item{plotAsFdr}{(logical) rather plot using FDR-values (if available) instead of p-Values}
 
 \item{subTxt}{(character) custom sub-title}
 
@@ -105,11 +109,13 @@ if the initial object \code{Mvalue} contains a list-element called 'annot' the s
 
 \item{NbestCol}{(character or integer) colors for text-labels of best points, also used for arrow}
 
+\item{colBySpecType}{(logical) incase arument \code{Mvalue} is MArrayLM-object it is possible to use different color-codes for points passing thresholds based on Mvalue$annot[,"SpecType"]; use this with multi-species benchmark tests}
+
 \item{sortLeg}{(character) sorting of 'SpecType' annotation either ascending ('ascend') or descending ('descend'), no sorting if \code{NULL}}
 
 \item{NaSpecTypeAsContam}{(logical) consider lines/proteins with \code{NA} in Mvalue$annot[,"SpecType"] as contaminants (if a 'SpecType' for contaminants already exits)}
 
-\item{useMar}{(numeric,length=4) custom margings (see also \code{\link[graphics]{par}})}
+\item{useMar}{(numeric, length=4) custom margings (see also \code{\link[graphics]{par}})}
 
 \item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt)}
 
@@ -130,6 +136,10 @@ Basically, this plot allows comparing the outcome of a statistical test to the r
 In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-values (obtained by subtrating two group means) represent a relative change.
 Output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} or \code{\link[wrMisc]{moderTestXgrp}} can be directly read to produce Volcano plots for diagnostic reasons.
 Please note, that plotting a very high number of points (eg >10000) in transparency may take several seconds.
+
+Using the argument \code{plotAsFdr} FDR value will be used for plaotting instead of p-values. Since selection of 'significant' hits is usually done based on FDR-values, it makes sense to plot them directly.
+However, FDR values are not fully linear to initial p-values and plateau-phenomena may occur frequently. 
+Thus, resulting plots may appear less spread, so finally drawing p-values (but cutting based on FDR-thersholds) many times results in nicer plots.
 }
 \examples{
 library(wrMisc)
