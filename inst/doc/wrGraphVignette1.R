@@ -175,9 +175,13 @@ MAplotW(M=matMeans[,1] -matMeans[,2], A=rowMeans(mat))
 ## assume 2 groups with 3 samples each and run moderated t-test (from package 'limma')
 tRes <- wrMisc::moderTest2grp(mat,  gl(2, 3, labels=LETTERS[1:2]), addResults=c("FDR","Mval","means"))
 
+## ----MA4b,fig.height=6, fig.width=8, fig.align="center",  echo=TRUE-----------
+## basic default MA-plot of object from testing :
+try(MAplotW(tRes))
+
 ## ----MA5,fig.height=6, fig.width=8, fig.align="center",  echo=TRUE------------
 ## convenient way, change fold-change threshold to 2x and mark who is beyond :
-MAplotW(tRes, FCth=2, namesNBest="passFC")    
+try(MAplotW(tRes, FCth=2, namesNBest="passFC"))
 
 ## ----Volc1, fig.height=6, fig.width=8, fig.align="center", echo=TRUE----------
 ## let's generate some toy data
@@ -191,18 +195,18 @@ mat[11:15,1:6] <- mat[11:15,1:6] - 0.7
 gr3 <- gl(3,3,labels=c("C","A","B"))
 tRes2 <- suppressWarnings(moderTest2grp(mat[,1:6], gl(2,3)))
 
-VolcanoPlotW(tRes2)
+try(VolcanoPlotW(tRes2))
 
 # now with thresholds, labels and arrow for expected ratio
-VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass", expFCarrow=c(0.75,2))
+try(VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="pass", expFCarrow=c(0.75,2)))
 
 ## ----Volc2,  fig.height=6, fig.width=9.5, fig.align="center", echo=TRUE-------
 ## assume 3 groups with 3 samples each
 tRes <- suppressWarnings(moderTestXgrp(mat, gr3))
 
 layout(matrix(1:2, nrow=1))
-VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2)
-VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3)
+try(VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=2))
+try(VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2, useComp=3))
 
 ## ----createHtmlWithPointsIdentif1, echo=TRUE----------------------------------
 ## Let's make some toy data 

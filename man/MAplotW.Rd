@@ -9,6 +9,7 @@ MAplotW(
   Avalue = NULL,
   useComp = 1,
   filtFin = NULL,
+  tit = NULL,
   ProjNa = NULL,
   FCthrs = NULL,
   subTxt = NULL,
@@ -20,14 +21,17 @@ MAplotW(
   cexMa = 1.8,
   cexLa = 1.1,
   limM = NULL,
-  limA = NULL,
+  limp = NULL,
   annotColumn = c("SpecType", "GeneName", "EntryName", "Accession", "Species", "Contam"),
   annColor = NULL,
+  expFCarrow = FALSE,
   cexPt = NULL,
   cexSub = NULL,
   cexTxLab = 0.7,
   namesNBest = NULL,
   NbestCol = 1,
+  colBySpecType = FALSE,
+  sortLeg = "descend",
   NaSpecTypeAsContam = TRUE,
   useMar = c(6.2, 4, 4, 2),
   returnData = FALSE,
@@ -40,25 +44,27 @@ MAplotW(
 \item{Mvalue}{(numeric, list or MArrayLM-object) main data to plot; if numeric, the content will be used as M-values (and A-values must be provided separateley);
 if list or MArrayLM-object, it must conatin list-elements named \code{Mvalue} and \code{means} to extract all information needed for plotting}
 
-\item{Avalue}{(numeric, list or data.frame) if \code{NULL} it is assumed that M-values can be extracted form argument \code{Avalue}}
+\item{Avalue}{(numeric, list or data.frame) if \code{NULL} it is assumed that A-values can be extracted form argument \code{Mvalue}}
 
 \item{useComp}{(integer) choice of one of multiple comparisons present in \code{Mvalue} (if generated using \code{moderTestXgrp()})}
 
 \item{filtFin}{(matrix or logical) The data may get filtered before plotting: If \code{FALSE} no filtering will get applied; if matrix of \code{TRUE}/\code{FALSE} it will be used as optional custom filter, otherwise (if \code{Mvalue} if an \code{MArrayLM}-object eg from limma) a default filtering based on the \code{filtFin} element will be applied}
 
-\item{ProjNa}{(character) custom title}
+\item{tit}{(character) custom title}
+
+\item{ProjNa}{(character) add project-name to (automatic) title}
 
 \item{FCthrs}{(numeric) Fold-Change threshold (display as line) give as Fold-change and NOT log2(FC)}
 
 \item{subTxt}{(character) custom sub-title}
 
-\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points (not exceeding threshold) as increased shades of gray}
+\item{grayIncrem}{(logical) if \code{TRUE}, display overlay of points  (not exceeding thresholds) as increased shades of gray}
 
 \item{col}{(character) custom color(s) for points of plot (see also \code{\link[graphics]{par}})}
 
 \item{pch}{(integer) type of symbol(s) to plot (default=16) (see also \code{\link[graphics]{par}})}
 
-\item{compNa}{depreciated, please use \code{useComp} instead}
+\item{compNa}{(character) names of groups compared}
 
 \item{batchFig}{(logical) if \code{TRUE} figure title and axes legends will be kept shorter for display on fewer splace}
 
@@ -68,12 +74,15 @@ if list or MArrayLM-object, it must conatin list-elements named \code{Mvalue} an
 
 \item{limM}{(numeric, length=2) range of axis M-values}
 
-\item{limA}{(numeric, length=2) range of axis A-values}
+\item{limp}{(numeric, length=2) range of axis FDR / p-values}
 
 \item{annotColumn}{(character) column names of annotation to be extracted (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot).
 The first entry (typically 'SpecType') is used for different symbols in figure, the second (typically 'GeneName') is used as prefered text for annotating the best points (if \code{namesNBest} allows to do so.)}
 
 \item{annColor}{(character or integer) colors for specific groups of annotation (only if \code{Mvalue} is \code{MArrayLM}-object containing matrix $annot)}
+
+\item{expFCarrow}{(logical, character or numeric) optional adding arrow for expected fold-change; if \code{TRUE} the expected ratio will be extracted from numeric concentration-indications from sample-names
+if \code{numeric} an arrow will be drawn (M-value as 1st position, color of 2nd position of vector).}
 
 \item{cexPt}{(numeric) size of points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
@@ -81,16 +90,20 @@ The first entry (typically 'SpecType') is used for different symbols in figure, 
 
 \item{cexTxLab}{(numeric) size of text-labels for points, as expansion factor (see also \code{cex} in \code{\link[graphics]{par}})}
 
-\item{namesNBest}{(integer or character, length=1) number of best points to add names in figure; if 'passThr' all points passing FC-filter will be selected; 
+\item{namesNBest}{(integer or character) for display of labels to points in figure: if 'pass','passThr' or 'signif' all points passing thresholds; if numeric (length=1) this number of best points will get labels
 if the initial object \code{Mvalue} contains a list-element called 'annot' the second of the column specified in argument \code{annotColumn} will be used as text}
 
-\item{NbestCol}{(character or integer) colors for text-labels of best points}
+\item{NbestCol}{(character or integer) colors for text-labels of best points, also used for arrow}
+
+\item{colBySpecType}{(logical) incase arument \code{Mvalue} is MArrayLM-object it is possible to use different color-codes for points passing thresholds based on Mvalue$annot[,"SpecType"]; use this with multi-species benchmark tests}
+
+\item{sortLeg}{(character) sorting of 'SpecType' annotation either ascending ('ascend') or descending ('descend'), no sorting if \code{NULL}}
 
 \item{NaSpecTypeAsContam}{(logical) consider lines/proteins with \code{NA} in Mvalue$annot[,"SpecType"] as contaminants (if a 'SpecType' for contaminants already exits)}
 
-\item{useMar}{(numeric,length=4) custom margings (see also \code{\link[graphics]{par}})}
+\item{useMar}{(numeric, length=4) custom margings (see also \code{\link[graphics]{par}})}
 
-\item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, Avalue, FDRvalue, passFilt)}
+\item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt)}
 
 \item{callFrom}{(character) allow easier tracking of messages produced}
 
@@ -99,7 +112,7 @@ if the initial object \code{Mvalue} contains a list-element called 'annot' the s
 \item{debug}{(logical) additional messages for debugging}
 }
 \value{
-This function plots an MA-plot (to the current graphical device); if \code{returnData=TRUE}, a data.frame with ($ID, $Mvalue, $Avalue, $FDRvalue, $passFilt) gets returned
+This function plots an MA-plot (to the current graphical device); if \code{returnData=TRUE}, a data.frame with ($ID, $Mvalue, $Avalue, $passFilt) gets returned
 }
 \description{
 This type of plot for display of relative changes versus (mean) absolute abundance is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/MA_plot}{MA-plot}.

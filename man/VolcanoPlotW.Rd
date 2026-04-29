@@ -2,7 +2,7 @@
 % Please edit documentation in R/VolcanoPlotW.R
 \name{VolcanoPlotW}
 \alias{VolcanoPlotW}
-\title{Volcano-Plot (Statistical Test Outcome versus Relative Change)}
+\title{Volcano-Plot (Statistical Test Outcome Versus Relative Change)}
 \usage{
 VolcanoPlotW(
   Mvalue,
@@ -119,7 +119,7 @@ if the initial object \code{Mvalue} contains a list-element called 'annot' the s
 
 \item{returnData}{(logical) optional returning data.frame with (ID, Mvalue, pValue, FDRvalue, passFilt)}
 
-\item{callFrom}{(character) allow easier tracking of messages produced}
+\item{callFrom}{(character) allows easier tracking of messages produced}
 
 \item{silent}{(logical) suppress messages}
 
@@ -130,16 +130,22 @@ This function simply plots an MA-plot (to the current graphical device), if \cod
 }
 \description{
 This type of plot is very common in high-throughput biology, see \href{https://en.wikipedia.org/wiki/Volcano_plot_(statistics)}{Volcano-plot}.
-Basically, this plot allows comparing the outcome of a statistical test to the relative change (ie log fold-change, M-value).
+Basically, Volcano-Plots allows comparing the outcome of a statistical test to the relative change (ie log fold-change, M-value).
 }
 \details{
-In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-values (obtained by subtrating two group means) represent a relative change.
-Output from statistical testing by \code{\link[wrMisc]{moderTest2grp}} or \code{\link[wrMisc]{moderTestXgrp}} can be directly read to produce Volcano plots for diagnostic reasons.
-Please note, that plotting a very high number of points (eg >10000) in transparency may take several seconds.
+In high-throughput biology data are typically already transformed to log2 and thus, the 'M'-values (obtained by subtrating two group means) represent a relative change (ie fold-change).
+Output from statistical testing by \code{\link[wrMisc]{moderTestXgrp}} or from package \href{https://CRAN.R-project.org/package=wrProteo}{wrProteo} can be directly read to produce Volcano plots.
+Please note, that plotting a very high number of points (eg >3000) in transparency may take several seconds.
 
-Using the argument \code{plotAsFdr} FDR value will be used for plaotting instead of p-values. Since selection of 'significant' hits is usually done based on FDR-values, it makes sense to plot them directly.
+Thresholds for the statistical testing can be set using \code{FdrThrs} which will be using FDR-values (or lfdr-values) from MArrayLM-objects or externaly provided \code{FdrList}
+Besides, typically thresholds are set on the M-values, too. Here the threshold from argulent \code{FCthrs} will be used. Please note that M-value threshold should be given as _linear scale_, 
+ie \code{FCthrs=1.5} will be shown on the log2-axes at 0.58.
+
+Using the argument \code{plotAsFdr} FDR value will be used for plotting instead of p-values. Since selection of 'significant' hits is usually done based on FDR-values, it makes sense to plot them directly instead of inityial p-values.
 However, FDR values are not fully linear to initial p-values and plateau-phenomena may occur frequently. 
-Thus, resulting plots may appear less spread, so finally drawing p-values (but cutting based on FDR-thersholds) many times results in nicer plots.
+Thus, resulting plots may appear less spread, so finally drawing p-values (but cutting based on FDR-thersholds) many sometimes result in nicer plots.
+
+The argument \code{returnData=TRUE} allows exporting directly all data shown on the plot, plus group-means (if available) filtering-status (if available) and symbol used on figure.
 }
 \examples{
 library(wrMisc)
@@ -157,7 +163,7 @@ VolcanoPlotW(tRes2)
 VolcanoPlotW(tRes2, FCth=1.3, FdrThrs=0.2, namesNBest="passThr")
 
 ## assume 3 groups with 3 samples each
-tRes <- moderTestXgrp(mat, gr3, addResults = c("FDR","means"))
+tRes <- moderTestXgrp(mat, gr3, useComparison="all", addResults = c("FDR","means"))
 # Note: due to the small number of lines only FDR chosen to calculate
 VolcanoPlotW(tRes)
 VolcanoPlotW(tRes, FCth=1.3, FdrThrs=0.2)
